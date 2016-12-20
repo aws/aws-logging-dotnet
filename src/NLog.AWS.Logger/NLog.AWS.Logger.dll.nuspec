@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>AWS.Logger.NLog</id>
+    <version>1.0.0</version>
+    <authors>Amazon Web Services</authors>
+    <owners>Amazon Web Services</owners>
+    <licenseUrl>http://aws.amazon.com/apache2.0/</licenseUrl>
+    <projectUrl>https://github.com/aws/aws-logging-dotnet</projectUrl>
+    <iconUrl>http://media.amazonwebservices.com/aws_singlebox_01.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>An AWS NLog target that records logging messages to Amazon CloudWatch Logs.</description>
+    <copyright>Copyright 2016</copyright>
+    <tags>AWS Cloudwatch Logger NLog</tags>
+    <dependencies>
+
+	  <group targetFramework=".NETFramework4.5" />
+
+    </dependencies>
+  </metadata>
+  <files>
+
+    <file src="bin\Release\NLog.AWS.Logger.dll" target="lib\net45" />
+    <file src="bin\Release\NLog.AWS.Logger.pdb" target="lib\net45" />
+
+  </files>
+</package>

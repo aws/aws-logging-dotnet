@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>AWS.Logger.SystemDiagnostics</id>
+    <version>0.9.0-beta</version>
+    <authors>Amazon Web Services</authors>
+    <owners>Amazon Web Services</owners>
+    <licenseUrl>http://aws.amazon.com/apache2.0/</licenseUrl>
+    <projectUrl>https://github.com/aws/aws-sdk-net/</projectUrl>
+    <iconUrl>http://media.amazonwebservices.com/aws_singlebox_01.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>System Diagnostics Adapter for AWS Cloudwatch</description>
+    <releaseNotes>System Diagnostics Adapter for AWS Cloudwatch</releaseNotes>
+    <copyright>Copyright 2016</copyright>
+    <tags>AWS Cloudwatch Logger</tags>
+    <dependencies>
+
+      <group targetFramework="portable-dnxcore50">
+        <dependency id="AWS.Logger.Core" version="0.9-beta" />
+        <dependency id="NETStandard.Library" version="[1.6.0]" />
+        <dependency id="System.Diagnostics.TraceSource" version="[4.0.0]" />
+      </group>
+
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\netstandard1.3\AWS.Logger.SystemDiagnostics.dll" target="lib\netstandard1.3" />
+    <file src="bin\Release\netstandard1.3\AWS.Logger.SystemDiagnostics.pdb" target="lib\netstandard1.3" />
+   <!--  <file src="bin\Release\netstandard1.5\*" target="lib\netstandard1.5" /> -->
+
+
+    <file src="bin\Release\AWS.Logger.SystemDiagnostics.dll" target="lib\net45" />
+    <file src="bin\Release\AWS.Logger.SystemDiagnostics.pdb" target="lib\net45" />
+   <!--  <file src="bin\Release\*" target="lib\net45" /> -->
+
+  </files>
+</package>

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>AWS.Logger.Core</id>
+    <version>1.0.0</version>
+    <authors>Amazon Web Services</authors>
+    <owners>Amazon Web Services</owners>
+    <licenseUrl>http://aws.amazon.com/apache2.0/</licenseUrl>
+    <projectUrl>https://github.com/aws/aws-logging-dotnet</projectUrl>
+    <iconUrl>http://media.amazonwebservices.com/aws_singlebox_01.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This is the core logging package used by the Adapter packages like AWS.Logger.Log4net to push logging messages into Amazon CloudWatch Logs.</description>
+    <copyright>Copyright 2016</copyright>
+    <tags>AWS Cloudwatch Logger</tags>
+      <dependencies>
+
+      <group targetFramework="netstandard1.3">
+        <dependency id="AWSSDK.CloudWatchLogs" version="[3.3.2, 3.4)" />
+        <dependency id="System.Collections.Concurrent" version="4.0.12" />
+        <dependency id="System.Globalization" version="4.0.11" />
+        <dependency id="System.Runtime.Loader" version="4.0.0" />
+        <dependency id="System.Threading.Tasks"  version="4.0.11"/>
+        <dependency id="System.Threading.ThreadPool" version= "4.0.10"/>
+        <dependency id="System.Threading.Timer" version= "4.0.1"/>
+      </group>
+
+        <group targetFramework="net452">
+          <dependency id="AWSSDK.CloudWatchLogs" version="[3.3.2, 3.4)" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+  <file src="bin\Release\netstandard1.3\AWS.Logger.Core.dll" target="lib\netstandard1.3" />
+  <file src="bin\Release\netstandard1.3\AWS.Logger.Core.pdb" target="lib\netstandard1.3" />
+
+  <file src="bin\Release\AWS.Logger.Core.dll" target="lib\net45" />
+  <file src="bin\Release\AWS.Logger.Core.pdb" target="lib\net45" />
+
+</files>
+</package>

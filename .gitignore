@@ -1,0 +1,24 @@
+######################################
+# Visual Studio per-user settings data
+######################################
+*.suo
+*.user
+*.xproj.user
+
+####################
+# Build/Test folders
+####################
+
+**/bin/
+**/obj/
+**/TestResults/
+**/Temp/
+**/buildlogs/
+**/packages/
+**/*project.lock.json
+
+**/.vs/
+
+**/Deployment/
+/src/AWS.Logger.Core/AWS.Logger.Core45.nuget.props
+*.props

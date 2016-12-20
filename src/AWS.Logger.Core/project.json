@@ -1,0 +1,30 @@
+{
+  "name": "AWS.Logger.Core",
+  "title": "AWS.Logger.Core",
+  "version": "1.0.0",
+  "authors": [
+    "Amazon Web Services"
+  ],
+  "description": "AWS Core logging library used to send logging messages to Amazon CloudWatch Logs",
+  "dependencies": {
+    "AWSSDK.CloudWatchLogs": "3.3.2",
+    "Microsoft.Extensions.Configuration.Abstractions": "1.0.0",
+    "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
+    "System.Collections.Concurrent": "4.0.12",
+    "System.Threading.Tasks": "4.0.11",
+    "System.Threading.ThreadPool": "4.0.10",
+    "System.Threading.Timer": "4.0.1"
+  },
+  "frameworks": {
+    "netstandard1.3": {
+      "imports": [ "dnxcore50" ],
+      "dependencies": {
+        "System.Runtime.Loader": "4.0.0",
+        "System.Globalization": "4.0.11"
+      }
+    }
+  },
+  "buildOptions": {
+    "define": [ "CORECLR" ]
+  }
+}

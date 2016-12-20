@@ -1,0 +1,15 @@
+{
+  "version": "0.9.0-beta",
+
+
+  "dependencies": {
+    "AWS.Logger.Core": "0.9.0-beta",
+    "NETStandard.Library": "1.6.0",
+    "System.Diagnostics.TraceSource": "4.0.0"
+  },
+  "frameworks": {
+    "netstandard1.3": {
+      "imports": [ "dnxcore50" ]
+    }
+  }
+}

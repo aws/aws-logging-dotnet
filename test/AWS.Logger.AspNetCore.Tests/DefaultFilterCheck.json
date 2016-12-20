@@ -1,0 +1,12 @@
+﻿{
+  "AWS.Logging": {
+    "LogGroup": "AWSILoggerGroup",
+    "Region": "us-west-2",
+    "LogLevel": {
+      "Default": "Debug",
+      "System": "Information",
+      "Microsoft": "Information",
+      "AWS": "Debug"
+    }
+  }
+}

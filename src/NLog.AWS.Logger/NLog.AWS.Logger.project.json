@@ -1,0 +1,12 @@
+﻿{
+  "frameworks": {
+    "net45": {}
+  },
+  "runtimes": {
+    "win": {}
+  },
+  "dependencies": {
+    "AWSSDK.Core": "3.3.7",
+    "NLog": "4.4.0"
+  }
+}

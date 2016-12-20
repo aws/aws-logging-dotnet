@@ -1,0 +1,13 @@
+﻿{
+  "AWS.Logging": {
+    "LogGroup": "AWSILoggerGroupMultiThreadBufferFullTest",
+    "Region": "us-west-2",
+    "MaxQueuedMessages": "100",
+    "LogLevel": {
+      "Default": "Debug",
+      "System": "Information",
+      "Microsoft": "Information",
+      "AWS": "Debug"
+    }
+  }
+}

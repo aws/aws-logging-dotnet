@@ -1,0 +1,19 @@
+{
+  "name": "NLog.AWS.Logger",
+  "title": "NLog.AWS.Logger",
+  "version": "1.0.0",
+  "authors": [
+    "Amazon Web Services"
+  ],
+  "description": "An AWS NLog target that records logging messages to Amazon CloudWatch Logs.",
+  "dependencies": {
+    "NETStandard.Library": "1.6.0",
+    "AWS.Logger.Core": "1.0.0",
+    "NLog": "4.4.0-beta5"
+  },
+  "frameworks": {
+    "netstandard1.3": {
+      "imports": [ "dnxcore50" ]
+    }
+  }
+}

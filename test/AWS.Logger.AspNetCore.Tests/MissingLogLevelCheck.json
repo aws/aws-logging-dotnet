@@ -1,0 +1,6 @@
+﻿{
+  "AWS.Logging": {
+    "LogGroup": "AWSILoggerGroup",
+    "Region": "us-west-2"
+  }
+}
