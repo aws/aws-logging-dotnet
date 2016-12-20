@@ -9,8 +9,8 @@ For a history of releases view the [release change log](RELEASE.CHANGELOG.md)
 ## Supported Logging Frameworks
 
 1. [NLog](#nlog)
-2. [Apache log4net](#log4net)
-3. [ASP.NET Core Logging](#asp.net-core-logging)
+2. [Apache log4net](#apache-log4net)
+3. [ASP.NET Core Logging](#aspnet-core-logging)
 
 ### NLog
 
