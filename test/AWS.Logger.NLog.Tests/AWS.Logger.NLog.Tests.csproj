@@ -77,6 +77,14 @@
       <Project>{7cff5520-83cf-4fc4-9669-7a017e2612d5}</Project>
       <Name>AWS.Logger.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\NLog.AWS.Logger\NLog.AWS.Logger.csproj">
+      <Project>{284abc3b-da69-4038-a025-0212a6df65a3}</Project>
+      <Name>NLog.AWS.Logger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AWS.Logger.TestUtils\AWS.Logger.TestUtils.csproj">
+      <Project>{ab1255e0-1956-401d-a0b2-3855cfbcbf7e}</Project>
+      <Name>AWS.Logger.TestUtils</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\..\packages\AWSSDK.CloudWatchLogs.3.3.2\analyzers\dotnet\cs\AWSSDK.CloudWatchLogs.CodeAnalysis.dll" />

@@ -9,13 +9,19 @@ using System.Collections.Generic;
 using Amazon.CloudWatchLogs;
 using Amazon.CloudWatchLogs.Model;
 using NLog.Config;
+using AWS.Logger.TestUtils;
 
 namespace AWS.Logger.NLog.Tests
 {
     // This project can output the Class library as a NuGet Package.
     // To enable this option, right-click on the project and select the Properties menu item. In the Build tab select "Produce outputs on build".
-    public class TestClass
+    public class NLogTestClass: IClassFixture<TestFixture>
     {
+        TestFixture testFixture;
+        public NLogTestClass(TestFixture testFixture)
+        {
+            this.testFixture = testFixture;
+        }
         #region Test Cases  
         [Fact]
         public void Nlog()
@@ -38,28 +44,28 @@ namespace AWS.Logger.NLog.Tests
             string logGroupName = "AWSNLogGroup";
 
             Thread.Sleep(10000);
-            AmazonCloudWatchLogsClient client = new AmazonCloudWatchLogsClient(
+            testFixture.client = new AmazonCloudWatchLogsClient(
                 Amazon.RegionEndpoint.GetBySystemName(region));
 
-            DescribeLogStreamsResponse describeLogstreamsResponse = client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
+            DescribeLogStreamsResponse describeLogstreamsResponse = testFixture.client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
             {
                 Descending = true,
                 LogGroupName = logGroupName,
                 OrderBy = "LastEventTime"
             }).Result;
 
-            GetLogEventsResponse getLogEventsResponse = client.GetLogEventsAsync(new GetLogEventsRequest
+            GetLogEventsResponse getLogEventsResponse = testFixture.client.GetLogEventsAsync(new GetLogEventsRequest
             {
                 LogGroupName = logGroupName,
                 LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
             }).Result;
 
             Assert.Equal(10, getLogEventsResponse.Events.Count());
-        }
-    }
 
-    public class NLogMultiThreadTest
-    {
+            testFixture.logGroupNameList.Add(logGroupName);
+            testFixture.regionList.Add(region);
+        }
+
         [Fact]
         public void MultiThreadTest()
         {
@@ -80,7 +86,7 @@ namespace AWS.Logger.NLog.Tests
             var totcount = 0;
             for (int i = 0; i < 2; i++)
             {
-                tasks.Add(Task.Factory.StartNew(() => NLogThread(count,logger)));
+                tasks.Add(Task.Factory.StartNew(() => NLogThread(count, logger)));
                 totcount = totcount + count;
             }
             Task.WaitAll(tasks.ToArray());
@@ -89,12 +95,12 @@ namespace AWS.Logger.NLog.Tests
             string region = "us-west-2";
             string logGroupName = "AWSNLogGroupMultiThreadTest";
 
-            
-            AmazonCloudWatchLogsClient client = new AmazonCloudWatchLogsClient(
+
+            testFixture.client = new AmazonCloudWatchLogsClient(
                 Amazon.RegionEndpoint.GetBySystemName(region));
 
 
-            DescribeLogStreamsResponse describeLogstreamsResponse = client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
+            DescribeLogStreamsResponse describeLogstreamsResponse = testFixture.client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
             {
                 Descending = true,
                 LogGroupName = logGroupName,
@@ -102,12 +108,29 @@ namespace AWS.Logger.NLog.Tests
             }).Result;
 
 
-            GetLogEventsResponse getLogEventsResponse = client.GetLogEventsAsync(new GetLogEventsRequest
+            int testCount = 0;
+            if (describeLogstreamsResponse.LogStreams.Count > 0)
             {
-                LogGroupName = logGroupName,
-                LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
-            }).Result;
-            Assert.Equal(totcount, getLogEventsResponse.Events.Count());
+                foreach (var logStream in describeLogstreamsResponse.LogStreams)
+                {
+                    GetLogEventsResponse getLogEventsResponse = testFixture.client.GetLogEventsAsync(new GetLogEventsRequest
+                    {
+                        LogGroupName = logGroupName,
+                        LogStreamName = logStream.LogStreamName
+                    }).Result;
+
+                    if (getLogEventsResponse != null)
+                    {
+                        testCount += getLogEventsResponse.Events.Count();
+                    }
+                }
+            }
+
+
+            Assert.Equal(totcount, testCount);
+
+            testFixture.logGroupNameList.Add(logGroupName);
+            testFixture.regionList.Add(region);
         }
 
         [Fact]
@@ -129,7 +152,7 @@ namespace AWS.Logger.NLog.Tests
             var totcount = 0;
             for (int i = 0; i < 2; i++)
             {
-                tasks.Add(Task.Factory.StartNew(() => NLogThread(count,logger)));
+                tasks.Add(Task.Factory.StartNew(() => NLogThread(count, logger)));
                 totcount = totcount + count;
             }
             Task.WaitAll(tasks.ToArray());
@@ -138,20 +161,20 @@ namespace AWS.Logger.NLog.Tests
             string logGroupName = "AWSNLogGroupMultiThreadBufferFullTest";
 
             Thread.Sleep(10000);
-            AmazonCloudWatchLogsClient client = new AmazonCloudWatchLogsClient(
+            testFixture.client = new AmazonCloudWatchLogsClient(
                 Amazon.RegionEndpoint.GetBySystemName(region));
 
-            DescribeLogStreamsResponse describeLogstreamsResponse = client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
+            DescribeLogStreamsResponse describeLogstreamsResponse = testFixture.client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
             {
                 Descending = true,
                 LogGroupName = logGroupName,
                 OrderBy = "LastEventTime"
             }).Result;
 
-            
+
             List<string> logStreamNames = new List<string>();
             logStreamNames.Add(describeLogstreamsResponse.LogStreams[0].LogStreamName);
-            FilterLogEventsResponse filterLogEventsResponse = client.FilterLogEventsAsync(new FilterLogEventsRequest
+            FilterLogEventsResponse filterLogEventsResponse = testFixture.client.FilterLogEventsAsync(new FilterLogEventsRequest
             {
                 FilterPattern = "maximum",
                 LogGroupName = logGroupName,
@@ -159,6 +182,9 @@ namespace AWS.Logger.NLog.Tests
             }).Result;
 
             Assert.NotEmpty(filterLogEventsResponse.Events);
+
+            testFixture.logGroupNameList.Add(logGroupName);
+            testFixture.regionList.Add(region);
         }
 
         private void NLogThread(int count, global::NLog.Logger logger)
@@ -168,6 +194,17 @@ namespace AWS.Logger.NLog.Tests
                 logger.Debug(string.Format("Test logging message {0} NLog, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
             }
         }
+
+        //public void Dispose()
+        //{
+        //    testFixture.client = new AmazonCloudWatchLogsClient(
+        //        Amazon.RegionEndpoint.GetBySystemName(region));
+
+        //    var response = testFixture.client.DeleteLogGroupAsync(new DeleteLogGroupRequest
+        //    {
+        //        LogGroupName = logGroupName
+        //    });
+        //}
     }
+    #endregion
 }
-#endregion

@@ -23,7 +23,8 @@
     "Microsoft.Extensions.Logging.Debug": "1.0.0",
     "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0",
     "Microsoft.AspNetCore.Server.Kestrel": "1.0.0",
-    "System.Reflection": "4.1.0"
+    "System.Reflection": "4.1.0",
+    "AWS.Logger.TestUtils": "1.0.0-*"
   },
   "testRunner": "xunit",
   "frameworks": {

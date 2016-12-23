@@ -102,6 +102,10 @@
       <Project>{78312e9b-bc7c-4af8-9153-dd72bbf4fd36}</Project>
       <Name>AWS.Logger.Log4net</Name>
     </ProjectReference>
+    <ProjectReference Include="..\AWS.Logger.TestUtils\AWS.Logger.TestUtils.csproj">
+      <Project>{ab1255e0-1956-401d-a0b2-3855cfbcbf7e}</Project>
+      <Name>AWS.Logger.TestUtils</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\..\packages\AWSSDK.CloudWatchLogs.3.3.2\analyzers\dotnet\cs\AWSSDK.CloudWatchLogs.CodeAnalysis.dll" />

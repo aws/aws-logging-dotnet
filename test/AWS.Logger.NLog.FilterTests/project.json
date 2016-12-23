@@ -16,10 +16,6 @@
           "type": "platform",
           "version": "1.0.1"
         },
-		
-		"xunit": "2.1.0-*",
-		"dotnet-test-xunit": "2.2.0-*",
-		
 		"NETStandard.Library": "1.6.0",
         "System.Threading.Thread": "4.0.0",
         "System.Reflection": "4.1.0"

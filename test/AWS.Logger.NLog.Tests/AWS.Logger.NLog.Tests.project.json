@@ -9,6 +9,6 @@
     "AWSSDK.CloudWatchLogs": "3.3.2",
     "AWSSDK.Core": "3.3.7",
     "NLog": "4.4.0",
-    "xunit.runner.visualstudio": "2.2.0-beta2-build1149"
+    "xunit.runner.visualstudio": "2.2.0-beta4-build1149"
   }
 }
