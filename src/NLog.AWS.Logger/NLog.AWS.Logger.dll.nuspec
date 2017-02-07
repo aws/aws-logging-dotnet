@@ -13,15 +13,16 @@
     <copyright>Copyright 2016</copyright>
     <tags>AWS Cloudwatch Logger NLog</tags>
     <dependencies>
-
-	  <group targetFramework=".NETFramework4.5" />
-
+      <dependency id="AWS.Logger.Core" version="1.0.0" />
     </dependencies>
   </metadata>
   <files>
 
     <file src="bin\Release\NLog.AWS.Logger.dll" target="lib\net45" />
     <file src="bin\Release\NLog.AWS.Logger.pdb" target="lib\net45" />
+
+    <file src="bin\Release\netstandard1.3\NLog.AWS.Logger.dll" target="lib\netstandard1.3" />
+    <file src="bin\Release\netstandard1.3\NLog.AWS.Logger.pdb" target="lib\netstandard1.3" />
 
   </files>
 </package>
