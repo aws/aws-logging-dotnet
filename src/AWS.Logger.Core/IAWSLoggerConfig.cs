@@ -63,5 +63,7 @@ namespace AWS.Logger
         int BatchSizeInBytes { get; }
 
         int MaxQueuedMessages { get; }
+
+        string LogStreamName { get; }
     }
 }

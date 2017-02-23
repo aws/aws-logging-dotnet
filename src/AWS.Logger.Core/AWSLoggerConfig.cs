@@ -116,5 +116,7 @@ namespace AWS.Logger
             MonitorSleepTime = TimeSpan.FromMilliseconds(0);
             BatchPushInterval = TimeSpan.FromSeconds(0);
         }
+
+        public string LogStreamName { get; set; } = Guid.NewGuid().ToString();
     }
 }

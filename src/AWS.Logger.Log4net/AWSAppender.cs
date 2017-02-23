@@ -127,6 +127,12 @@ namespace AWS.Logger.Log4net
             set { _config.MaxQueuedMessages = value; }
         }
 
+        public string LogStreamName
+        {
+            get { return _config.LogStreamName; }
+            set { _config.LogStreamName = value; }
+        }
+
 
         /// <summary>
         /// Initialize the appender based on the options set.

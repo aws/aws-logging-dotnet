@@ -130,6 +130,12 @@ namespace NLog.AWS.Logger
             set { _config.MaxQueuedMessages = value; }
         }
 
+        public string LogStreamName
+        {
+            get { return _config.LogStreamName; }
+            set { _config.LogStreamName = value; }
+        }
+
         protected override void InitializeTarget()
         {
             if (_core != null)
