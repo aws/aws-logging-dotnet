@@ -64,6 +64,6 @@ namespace AWS.Logger
 
         int MaxQueuedMessages { get; }
 
-        string LogStreamName { get; }
+        string LogStreamNameSuffix { get; }
     }
 }

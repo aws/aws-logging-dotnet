@@ -2,7 +2,7 @@
   "AWS.Logging": {
     "LogGroup": "AWSILoggerGroupMultiThreadBufferFullTest",
     "Region": "us-west-2",
-    "LogStreamName": "TestStream",
+    "LogStreamNameSuffix": "TestStream",
     "MaxQueuedMessages": "100",
     "LogLevel": {
       "Default": "Debug",

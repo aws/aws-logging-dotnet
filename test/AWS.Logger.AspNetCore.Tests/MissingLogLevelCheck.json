@@ -2,6 +2,6 @@
   "AWS.Logging": {
     "LogGroup": "AWSILoggerGroup",
     "Region": "us-west-2",
-    "LogStreamName": "TestStream"
+    "LogStreamNameSuffix": "TestStream"
   }
 }

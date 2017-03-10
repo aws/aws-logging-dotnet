@@ -97,7 +97,7 @@ namespace AWS.Logger.AspNetCore.Tests
             Thread.Sleep(5000);
             string region = _configSection.Config.Region;
             string logGroupName = _configSection.Config.LogGroup;
-            string streamName = _configSection.Config.LogStreamName;
+            string streamName = _configSection.Config.LogStreamNameSuffix;
 
             AmazonCloudWatchLogsClient client = new AmazonCloudWatchLogsClient(
                 Amazon.RegionEndpoint.GetBySystemName(region));

@@ -61,7 +61,7 @@ namespace Microsoft.Extensions.Configuration
             }
             if (loggerConfigSection[LOG_STREAM_NAME] != null)
             {
-                Config.LogStreamName = loggerConfigSection[LOG_STREAM_NAME];
+                Config.LogStreamNameSuffix = loggerConfigSection[LOG_STREAM_NAME];
             }
             var logLevels = loggerConfigSection.GetSection(LOG_LEVEL);
             if (logLevels != null && logLevels.GetChildren().Count() > 0)

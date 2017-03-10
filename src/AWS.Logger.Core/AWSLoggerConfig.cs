@@ -117,6 +117,6 @@ namespace AWS.Logger
             BatchPushInterval = TimeSpan.FromSeconds(0);
         }
 
-        public string LogStreamName { get; set; } = Guid.NewGuid().ToString();
+        public string LogStreamNameSuffix { get; set; } = Guid.NewGuid().ToString();
     }
 }
