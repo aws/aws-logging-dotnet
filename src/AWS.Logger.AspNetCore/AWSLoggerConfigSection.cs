@@ -38,7 +38,7 @@ namespace Microsoft.Extensions.Configuration
         internal const string BATCH_PUSH_SIZE_IN_BYTES = "BatchPushSizeInBytes";
         internal const string LOG_LEVEL = "LogLevel";
         internal const string MAX_QUEUED_MESSAGES = "MaxQueuedMessages";
-        internal const string LOG_STREAM_NAME = "LogStreamName";
+        internal const string LOG_STREAM_NAME_SUFFIX = "LogStreamNameSuffix";
 
         public AWSLoggerConfigSection(IConfiguration loggerConfigSection)
         {
@@ -59,9 +59,9 @@ namespace Microsoft.Extensions.Configuration
             {
                 Config.MaxQueuedMessages = Int32.Parse(loggerConfigSection[MAX_QUEUED_MESSAGES]);
             }
-            if (loggerConfigSection[LOG_STREAM_NAME] != null)
+            if (loggerConfigSection[LOG_STREAM_NAME_SUFFIX] != null)
             {
-                Config.LogStreamNameSuffix = loggerConfigSection[LOG_STREAM_NAME];
+                Config.LogStreamNameSuffix = loggerConfigSection[LOG_STREAM_NAME_SUFFIX];
             }
             var logLevels = loggerConfigSection.GetSection(LOG_LEVEL);
             if (logLevels != null && logLevels.GetChildren().Count() > 0)
