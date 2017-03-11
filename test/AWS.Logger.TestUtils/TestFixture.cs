@@ -9,40 +9,38 @@ using Amazon.CloudWatchLogs.Model;
 namespace AWS.Logger.TestUtils
 {
     // This project can output the Class library as a NuGet Package.
-    // To enable this option, right-click on the project and select the Properties menu item. In the Build tab select "Produce outputs on build".
+    // To enable this option, right-click on the project and select the Properties menu item. 
+    // In the Build tab select "Produce outputs on build".
 
     //TestClass to dispose test generated LogGroups.
     public class TestFixture : IDisposable
     {
-        public List<string> logGroupNameList;
-        public List<string> regionList;
-        public AmazonCloudWatchLogsClient client;
+        public List<string> LogGroupNameList;
+        public AmazonCloudWatchLogsClient Client;
 
         public TestFixture()
         {
-            logGroupNameList = new List<string>();
-            regionList = new List<string>();
+            Client = new AmazonCloudWatchLogsClient(Amazon.RegionEndpoint.USWest2);
+            LogGroupNameList = new List<string>();
         }
 
         public void Dispose()
         {
-            var comboList = logGroupNameList.Zip(regionList, (l, r) => new { LogGroupName = l, Region = r });
-            foreach (var element in comboList)
-            {
-                if(!(string.IsNullOrEmpty(element.Region)))
-                {
-                        client = new AmazonCloudWatchLogsClient(
-                    Amazon.RegionEndpoint.GetBySystemName(element.Region));
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-                    if (!(string.IsNullOrEmpty(element.LogGroupName)))
+        protected virtual void Dispose(bool disposing)
+        {
+            foreach(var logGroupName in LogGroupNameList)
+            {
+                if (!(string.IsNullOrEmpty(logGroupName)))
+                {
+                    var response = Client.DeleteLogGroupAsync(new DeleteLogGroupRequest
                     {
-                        var response = client.DeleteLogGroupAsync(new DeleteLogGroupRequest
-                        {
-                            LogGroupName = element.LogGroupName
-                        }).Result;
-                    }
+                        LogGroupName = logGroupName
+                    }).Result;
                 }
-                
             }
         }
     }

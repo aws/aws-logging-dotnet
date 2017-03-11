@@ -16,36 +16,75 @@ using AWS.Logger.TestUtils;
 
 namespace AWS.Logger.Log4Net.Tests
 {
-    public class Log4NetTestClass : IClassFixture<TestFixture>
+    public class Log4NetTestFixture : TestFixture
     {
-        TestFixture testFixture;
-
-        public Log4NetTestClass(TestFixture testFixture)
+        public ILog Logger;
+        public void GetLog4NetLogger(string fileName,string logName)
         {
-            this.testFixture = testFixture;
+            XmlConfigurator.Configure(new System.IO.FileInfo(fileName));
+            Logger = LogManager.GetLogger(logName);
+        }
+        public bool IsLoggingDone(string logGroupName,string filterpattern)
+        {
+            try
+            {
+                DescribeLogStreamsResponse describeLogstreamsResponse = Client.
+                    DescribeLogStreamsAsync(new DescribeLogStreamsRequest
+                    {
+                        Descending = true,
+                        LogGroupName = logGroupName,
+                        OrderBy = "LastEventTime"
+                    }).Result;
+                if (describeLogstreamsResponse.LogStreams.Count > 0)
+                {
+                    List<string> logStreamNames = new List<string>();
+                    logStreamNames.Add(describeLogstreamsResponse.LogStreams[0].LogStreamName);
+                    FilterLogEventsResponse filterLogEventsResponse = Client.
+                        FilterLogEventsAsync(new FilterLogEventsRequest
+                        {
+                            FilterPattern = filterpattern,
+                            LogGroupName = logGroupName,
+                            LogStreamNames = logStreamNames
+                        }).Result;
+
+                    return filterLogEventsResponse.Events.Count == 0;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                return true;
+            }
+
+        }
+    }
+    public class Log4NetTestClass : IClassFixture<Log4NetTestFixture>
+    {
+        Log4NetTestFixture _testFixture;
+        
+        public Log4NetTestClass(Log4NetTestFixture testFixture)
+        {
+            _testFixture = testFixture;
         }
 
         #region Test Cases                                                        
-        ILog logger;
         [Fact]
         public void Log4Net()
         {
-            XmlConfigurator.Configure(new System.IO.FileInfo("log4net.config"));
-            logger = LogManager.GetLogger("Log4Net");
-            for (int i = 0; i < 10; i++)
+            _testFixture.GetLog4NetLogger("log4net.config","Log4Net");
+            for (int i = 0; i < 9; i++)
             {
-                logger.Debug(string.Format("Test logging message {0} Log4Net", i));
+                _testFixture.Logger.Debug(string.Format("Test logging message {0} Log4Net", i));
             }
+            _testFixture.Logger.Debug("LASTMESSAGE");
 
-            //Added Sleep to give sufficient time for the log stream to get posted on CloudWatch
-            Thread.Sleep(10000);
-            string region = "us-west-2";
             string logGroupName = "AWSLog4NetGroupLog4Net";
-
-            testFixture.client = new AmazonCloudWatchLogsClient(
-                Amazon.RegionEndpoint.GetBySystemName(region));
-
-            DescribeLogStreamsResponse describeLogstreamsResponse = testFixture.client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
+            while(_testFixture.IsLoggingDone(logGroupName, "LASTMESSAGE")){ }
+            
+            DescribeLogStreamsResponse describeLogstreamsResponse = _testFixture.Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
             {
                 Descending = true,
                 LogGroupName = logGroupName,
@@ -53,23 +92,20 @@ namespace AWS.Logger.Log4Net.Tests
             }).Result;
 
 
-            GetLogEventsResponse getLogEventsResponse = testFixture.client.GetLogEventsAsync(new GetLogEventsRequest
+            GetLogEventsResponse getLogEventsResponse = _testFixture.Client.GetLogEventsAsync(new GetLogEventsRequest
             {
                 LogGroupName = logGroupName,
                 LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
             }).Result;
             Assert.Equal(10, getLogEventsResponse.Events.Count());
 
-            testFixture.logGroupNameList.Add(logGroupName);
-            testFixture.regionList.Add(region);
+            _testFixture.LogGroupNameList.Add(logGroupName);
         }
 
         [Fact]
         public void MultiThreadTest()
         {
-            XmlConfigurator.Configure(new System.IO.FileInfo("log4net.config"));
-            logger = LogManager.GetLogger("MultiThreadTest");
-
+            _testFixture.GetLog4NetLogger("log4net.config", "MultiThreadTest");
             var log = LogManager.GetCurrentLoggers();
             var tasks = new List<Task>();
             var count = 200;
@@ -81,15 +117,10 @@ namespace AWS.Logger.Log4Net.Tests
             }
             Task.WaitAll(tasks.ToArray(), 10000);
 
-            //Added Sleep to give sufficient time for the log stream to get posted on CloudWatch
-            Thread.Sleep(5000);
-            string region = "us-west-2";
             string logGroupName = "AWSLog4NetGroupLog4NetMultiThreadTest";
+            while (_testFixture.IsLoggingDone(logGroupName, "LASTMESSAGE")) { }
 
-            testFixture.client = new AmazonCloudWatchLogsClient(
-                Amazon.RegionEndpoint.GetBySystemName(region));
-
-            DescribeLogStreamsResponse describeLogstreamsResponse = testFixture.client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
+            DescribeLogStreamsResponse describeLogstreamsResponse = _testFixture.Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
             {
                 Descending = true,
                 LogGroupName = logGroupName,
@@ -102,7 +133,7 @@ namespace AWS.Logger.Log4Net.Tests
             {
                 foreach (var logStream in describeLogstreamsResponse.LogStreams)
                 {
-                    GetLogEventsResponse getLogEventsResponse = testFixture.client.GetLogEventsAsync(new GetLogEventsRequest
+                    GetLogEventsResponse getLogEventsResponse = _testFixture.Client.GetLogEventsAsync(new GetLogEventsRequest
                     {
                         LogGroupName = logGroupName,
                         LogStreamName = logStream.LogStreamName
@@ -115,15 +146,13 @@ namespace AWS.Logger.Log4Net.Tests
                 }
             }
 
-            testFixture.logGroupNameList.Add(logGroupName);
-            testFixture.regionList.Add(region);
+            _testFixture.LogGroupNameList.Add(logGroupName);
         }
 
         [Fact]
         public void MultiThreadBufferFullTest()
         {
-            XmlConfigurator.Configure(new System.IO.FileInfo("log4net.config"));
-            logger = LogManager.GetLogger("MultiThreadBufferFullTest");
+            _testFixture.GetLog4NetLogger("log4net.config", "MultiThreadBufferFullTest");
 
             var tasks = new List<Task>();
             var count = 200;
@@ -135,55 +164,20 @@ namespace AWS.Logger.Log4Net.Tests
             }
             Task.WaitAll(tasks.ToArray(), 10000);
 
-            Thread.Sleep(10000);
-            string region = "us-west-2";
             string logGroupName = "AWSLog4NetGroupMultiThreadBufferFullTest";
-
-            testFixture.client = new AmazonCloudWatchLogsClient(
-                Amazon.RegionEndpoint.GetBySystemName(region));
-
-            DescribeLogStreamsResponse describeLogstreamsResponse = testFixture.client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
-            {
-                Descending = true,
-                LogGroupName = logGroupName,
-                OrderBy = "LastEventTime"
-            }).Result;
-
-            List<string> logStreamNames = new List<string>();
-            logStreamNames.Add(describeLogstreamsResponse.LogStreams[0].LogStreamName);
-            FilterLogEventsResponse filterLogEventsResponse = testFixture.client.FilterLogEventsAsync(new FilterLogEventsRequest
-            {
-                FilterPattern = "maximum",
-                LogGroupName = logGroupName,
-                LogStreamNames = logStreamNames
-            }).Result;
-
-            Assert.NotEmpty(filterLogEventsResponse.Events);
-
-            testFixture.logGroupNameList.Add(logGroupName);
-            testFixture.regionList.Add(region);
+            while (_testFixture.IsLoggingDone(logGroupName, "maximum")) { }
+            Assert.True(!(_testFixture.IsLoggingDone(logGroupName, "maximum")));
+            _testFixture.LogGroupNameList.Add(logGroupName);
         }
 
         void Log4NetThread(int count)
         {
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < count-1; i++)
             {
-                logger.Debug(string.Format("Test logging message {0} Log4Net, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
+                _testFixture.Logger.Debug(string.Format("Test logging message {0} Log4Net, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
             }
+            _testFixture.Logger.Debug("LASTMESSAGE");
         }
-
-        //public void Dispose()
-        //{
-        //    testFixture.client = new AmazonCloudWatchLogsClient(
-        //        Amazon.RegionEndpoint.GetBySystemName(region));
-
-        //    var response = testFixture.client.DeleteLogGroupAsync(new DeleteLogGroupRequest
-        //    {
-        //        LogGroupName = logGroupName
-        //    });
-
-        //    testFixture.client.Dispose();
-        //}
         #endregion
     }
 }
