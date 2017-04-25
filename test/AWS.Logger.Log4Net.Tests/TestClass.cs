@@ -24,42 +24,6 @@ namespace AWS.Logger.Log4Net.Tests
             XmlConfigurator.Configure(new System.IO.FileInfo(fileName));
             Logger = LogManager.GetLogger(logName);
         }
-        public bool IsLoggingDone(string logGroupName,string filterpattern)
-        {
-            try
-            {
-                DescribeLogStreamsResponse describeLogstreamsResponse = Client.
-                    DescribeLogStreamsAsync(new DescribeLogStreamsRequest
-                    {
-                        Descending = true,
-                        LogGroupName = logGroupName,
-                        OrderBy = "LastEventTime"
-                    }).Result;
-                if (describeLogstreamsResponse.LogStreams.Count > 0)
-                {
-                    List<string> logStreamNames = new List<string>();
-                    logStreamNames.Add(describeLogstreamsResponse.LogStreams[0].LogStreamName);
-                    FilterLogEventsResponse filterLogEventsResponse = Client.
-                        FilterLogEventsAsync(new FilterLogEventsRequest
-                        {
-                            FilterPattern = filterpattern,
-                            LogGroupName = logGroupName,
-                            LogStreamNames = logStreamNames
-                        }).Result;
-
-                    return filterLogEventsResponse.Events.Count == 0;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            catch (Exception e)
-            {
-                return true;
-            }
-
-        }
     }
     public class Log4NetTestClass : IClassFixture<Log4NetTestFixture>
     {
@@ -82,23 +46,28 @@ namespace AWS.Logger.Log4Net.Tests
             _testFixture.Logger.Debug("LASTMESSAGE");
 
             string logGroupName = "AWSLog4NetGroupLog4Net";
-            while(_testFixture.IsLoggingDone(logGroupName, "LASTMESSAGE")){ }
+            if(_testFixture.NotifyLoggingCompleted(logGroupName, "LASTMESSAGE"))
+            {
+                DescribeLogStreamsResponse describeLogstreamsResponse = _testFixture.Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
+                {
+                    Descending = true,
+                    LogGroupName = logGroupName,
+                    OrderBy = "LastEventTime"
+                }).Result;
+
+
+                GetLogEventsResponse getLogEventsResponse = _testFixture.Client.GetLogEventsAsync(new GetLogEventsRequest
+                {
+                    LogGroupName = logGroupName,
+                    LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
+                }).Result;
+                Assert.Equal(10, getLogEventsResponse.Events.Count());
+            }
+            else
+            {
+                Assert.True(false);
+            }
             
-            DescribeLogStreamsResponse describeLogstreamsResponse = _testFixture.Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
-            {
-                Descending = true,
-                LogGroupName = logGroupName,
-                OrderBy = "LastEventTime"
-            }).Result;
-
-
-            GetLogEventsResponse getLogEventsResponse = _testFixture.Client.GetLogEventsAsync(new GetLogEventsRequest
-            {
-                LogGroupName = logGroupName,
-                LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
-            }).Result;
-            Assert.Equal(10, getLogEventsResponse.Events.Count());
-
             _testFixture.LogGroupNameList.Add(logGroupName);
         }
 
@@ -118,32 +87,37 @@ namespace AWS.Logger.Log4Net.Tests
             Task.WaitAll(tasks.ToArray(), 10000);
 
             string logGroupName = "AWSLog4NetGroupLog4NetMultiThreadTest";
-            while (_testFixture.IsLoggingDone(logGroupName, "LASTMESSAGE")) { }
-
-            DescribeLogStreamsResponse describeLogstreamsResponse = _testFixture.Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
+            if (_testFixture.NotifyLoggingCompleted(logGroupName, "LASTMESSAGE"))
             {
-                Descending = true,
-                LogGroupName = logGroupName,
-                OrderBy = "LastEventTime"
-            }).Result;
-
-
-            int testCount = 0;
-            if (describeLogstreamsResponse.LogStreams.Count > 0)
-            {
-                foreach (var logStream in describeLogstreamsResponse.LogStreams)
+                DescribeLogStreamsResponse describeLogstreamsResponse = _testFixture.Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
                 {
-                    GetLogEventsResponse getLogEventsResponse = _testFixture.Client.GetLogEventsAsync(new GetLogEventsRequest
-                    {
-                        LogGroupName = logGroupName,
-                        LogStreamName = logStream.LogStreamName
-                    }).Result;
+                    Descending = true,
+                    LogGroupName = logGroupName,
+                    OrderBy = "LastEventTime"
+                }).Result;
 
-                    if (getLogEventsResponse != null)
+
+                int testCount = 0;
+                if (describeLogstreamsResponse.LogStreams.Count > 0)
+                {
+                    foreach (var logStream in describeLogstreamsResponse.LogStreams)
                     {
-                        testCount += getLogEventsResponse.Events.Count();
+                        GetLogEventsResponse getLogEventsResponse = _testFixture.Client.GetLogEventsAsync(new GetLogEventsRequest
+                        {
+                            LogGroupName = logGroupName,
+                            LogStreamName = logStream.LogStreamName
+                        }).Result;
+
+                        if (getLogEventsResponse != null)
+                        {
+                            testCount += getLogEventsResponse.Events.Count();
+                        }
                     }
                 }
+            }
+            else
+            {
+                Assert.True(false);
             }
 
             _testFixture.LogGroupNameList.Add(logGroupName);
@@ -165,8 +139,14 @@ namespace AWS.Logger.Log4Net.Tests
             Task.WaitAll(tasks.ToArray(), 10000);
 
             string logGroupName = "AWSLog4NetGroupMultiThreadBufferFullTest";
-            while (_testFixture.IsLoggingDone(logGroupName, "maximum")) { }
-            Assert.True(!(_testFixture.IsLoggingDone(logGroupName, "maximum")));
+            if (_testFixture.NotifyLoggingCompleted(logGroupName, "maximum"))
+            {
+                Assert.True(_testFixture.IsFilterPatternExists(logGroupName, "maximum"));
+            }
+            else
+            {
+                Assert.True(false);
+            }
             _testFixture.LogGroupNameList.Add(logGroupName);
         }
 

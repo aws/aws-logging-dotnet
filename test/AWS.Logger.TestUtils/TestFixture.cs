@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Amazon;
 using Amazon.CloudWatchLogs;
 using Amazon.CloudWatchLogs.Model;
+using System.Threading;
+using System.Diagnostics;
 
 namespace AWS.Logger.TestUtils
 {
@@ -41,6 +43,48 @@ namespace AWS.Logger.TestUtils
                         LogGroupName = logGroupName
                     }).Result;
                 }
+            }
+        }
+        public bool NotifyLoggingCompleted(string logGroupName, string filterPattern)
+        {
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+            while (timer.Elapsed.TotalSeconds<10) 
+            {
+                Thread.Sleep(500);
+                if(IsFilterPatternExists(logGroupName, filterPattern))
+                {
+                    break;
+                }
+            }
+            return IsFilterPatternExists(logGroupName, filterPattern);
+        }
+        public bool IsFilterPatternExists(string logGroupName, string filterPattern)
+        {
+            DescribeLogStreamsResponse describeLogstreamsResponse = Client.
+                    DescribeLogStreamsAsync(new DescribeLogStreamsRequest
+                    {
+                        Descending = true,
+                        LogGroupName = logGroupName,
+                        OrderBy = "LastEventTime"
+                    }).Result;
+            if (describeLogstreamsResponse.LogStreams.Count > 0)
+            {
+                List<string> logStreamNames = new List<string>();
+                logStreamNames.Add(describeLogstreamsResponse.LogStreams[0].LogStreamName);
+                FilterLogEventsResponse filterLogEventsResponse = Client.
+                    FilterLogEventsAsync(new FilterLogEventsRequest
+                    {
+                        FilterPattern = filterPattern,
+                        LogGroupName = logGroupName,
+                        LogStreamNames = logStreamNames
+                    }).Result;
+
+                return filterLogEventsResponse.Events.Count > 0;
+            }
+            else
+            {
+                return false;
             }
         }
     }

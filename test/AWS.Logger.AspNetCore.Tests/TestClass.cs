@@ -76,44 +76,6 @@ namespace AWS.Logger.AspNetCore.Tests
                 Logger = loggingFactory.CreateLogger<ILoggerTestClass>();
             }
         }
-
-        public bool IsLoggingDone(string filterpattern)
-        {
-            try
-            {
-                var logGroupName = ConfigSection.Config.LogGroup;
-                DescribeLogStreamsResponse describeLogstreamsResponse = Client.
-                    DescribeLogStreamsAsync(new DescribeLogStreamsRequest
-                    {
-                        Descending = true,
-                        LogGroupName = logGroupName,
-                        OrderBy = "LastEventTime"
-                    }).Result;
-                if (describeLogstreamsResponse.LogStreams.Count > 0)
-                {
-                    List<string> logStreamNames = new List<string>();
-                    logStreamNames.Add(describeLogstreamsResponse.LogStreams[0].LogStreamName);
-                    FilterLogEventsResponse filterLogEventsResponse = Client.
-                        FilterLogEventsAsync(new FilterLogEventsRequest
-                        {
-                            FilterPattern = filterpattern,
-                            LogGroupName = logGroupName,
-                            LogStreamNames = logStreamNames
-                        }).Result;
-
-                    return filterLogEventsResponse.Events.Count == 0;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            catch (Exception e)
-            {
-                return true;
-            }
-            
-        }
     }
     // This project can output the Class library as a NuGet Package.
     // To enable this option, right-click on the project and select the Properties menu item. 
@@ -141,28 +103,37 @@ namespace AWS.Logger.AspNetCore.Tests
             }
 
             _testFixture.Logger.LogDebug("LASTMESSAGE");
-            //Sleep is introduced to give suffiecient time for the logstream to get posted on CloudWatchLogs
-            while (_testFixture.IsLoggingDone("LASTMESSAGE")) { }
+
             string logGroupName = _testFixture.ConfigSection.Config.LogGroup;
 
-            DescribeLogStreamsResponse describeLogstreamsResponse = _testFixture.
+            if (_testFixture.NotifyLoggingCompleted(logGroupName, "LASTMESSAGE"))
+            {
+                DescribeLogStreamsResponse describeLogstreamsResponse = _testFixture.
                                                         Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
-            {
-                Descending = true,
-                LogGroupName = logGroupName,
-                OrderBy = "LastEventTime"
-            }).Result;
+                                                        {
+                                                            Descending = true,
+                                                            LogGroupName = logGroupName,
+                                                            OrderBy = "LastEventTime"
+                                                        }).Result;
 
 
-            GetLogEventsResponse getLogEventsResponse = _testFixture.
-                                                        Client.GetLogEventsAsync(new GetLogEventsRequest
+                GetLogEventsResponse getLogEventsResponse = _testFixture.
+                                                            Client.GetLogEventsAsync(new GetLogEventsRequest
+                                                            {
+                                                                LogGroupName = logGroupName,
+                                                                LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
+                                                            }).Result;
+                Assert.Equal(10, getLogEventsResponse.Events.Count());
+            }
+            else
             {
-                LogGroupName = logGroupName,
-                LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
-            }).Result;
-            Assert.Equal(10, getLogEventsResponse.Events.Count());
+                Assert.True(false);
+            }
+
+            
             _testFixture.LogGroupNameList.Add(logGroupName);
         }
+
 
         /// <summary>
         /// Basic test case that creates multiple threads and each thread mocks log messages
@@ -212,39 +183,43 @@ namespace AWS.Logger.AspNetCore.Tests
 
             
             Task.WaitAll(tasks.ToArray(), 10000);
-            while (_testFixture.IsLoggingDone("LASTMESSAGE")) { }
-
             string logGroupName = _testFixture.ConfigSection.Config.LogGroup;
-
-            DescribeLogStreamsResponse describeLogstreamsResponse = _testFixture.
+            if (_testFixture.NotifyLoggingCompleted(logGroupName, "LASTMESSAGE"))
+            {
+                DescribeLogStreamsResponse describeLogstreamsResponse = _testFixture.
                 Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
-            {
-                Descending = true,
-                LogGroupName = logGroupName,
-                OrderBy = "LastEventTime"
-            }).Result;
-
-            int testCount = 0;
-            if (describeLogstreamsResponse.LogStreams.Count > 0)
-            {
-                foreach(var logStream in describeLogstreamsResponse.LogStreams)
                 {
-                    GetLogEventsResponse getLogEventsResponse = _testFixture.
-                        Client.GetLogEventsAsync(new GetLogEventsRequest
-                    {
-                        LogGroupName = logGroupName,
-                        LogStreamName = logStream.LogStreamName
-                    }).Result;
+                    Descending = true,
+                    LogGroupName = logGroupName,
+                    OrderBy = "LastEventTime"
+                }).Result;
 
-                    if (getLogEventsResponse != null)
+                int testCount = 0;
+                if (describeLogstreamsResponse.LogStreams.Count > 0)
+                {
+                    foreach (var logStream in describeLogstreamsResponse.LogStreams)
                     {
-                        testCount += getLogEventsResponse.Events.Count();
+                        GetLogEventsResponse getLogEventsResponse = _testFixture.
+                            Client.GetLogEventsAsync(new GetLogEventsRequest
+                            {
+                                LogGroupName = logGroupName,
+                                LogStreamName = logStream.LogStreamName
+                            }).Result;
+
+                        if (getLogEventsResponse != null)
+                        {
+                            testCount += getLogEventsResponse.Events.Count();
+                        }
                     }
                 }
-            }
-            
 
-            Assert.Equal(totcount, testCount);
+
+                Assert.Equal(totcount, testCount);
+            }
+            else
+            {
+                Assert.True(false);
+            }
 
             _testFixture.LogGroupNameList.Add(logGroupName);
         }
@@ -270,9 +245,16 @@ namespace AWS.Logger.AspNetCore.Tests
                 totcount = totcount + count;
             }
             Task.WaitAll(tasks.ToArray(), 10000);
-            while (_testFixture.IsLoggingDone("maximum")) { }
+            var logGroupName = _testFixture.ConfigSection.Config.LogGroup;
+            if (_testFixture.NotifyLoggingCompleted(logGroupName, "maximum"))
+            {
+                Assert.True(_testFixture.IsFilterPatternExists(logGroupName, "maximum"));
+            }
+            else
+            {
+                Assert.True(false);
+            }
 
-            Assert.True(!(_testFixture.IsLoggingDone("maximum")));
             _testFixture.LogGroupNameList.Add(_testFixture.ConfigSection.Config.LogGroup);
         }
 
