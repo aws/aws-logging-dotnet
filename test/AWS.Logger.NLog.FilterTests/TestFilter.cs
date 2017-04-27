@@ -7,7 +7,7 @@ using NLog.Config;
 using NLog;
 using NLog.Filters;
 
-namespace AWS.Logger.NLog.FilterTests
+namespace AWS.Logger.NLogger.FilterTests
 {
     public class TestFilter
     {

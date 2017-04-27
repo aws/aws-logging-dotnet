@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using AWS.Logger.Core;
 using System.Collections.Concurrent;
 
-namespace AWS.Logger.NLog.FilterTests
+namespace AWS.Logger.NLogger.FilterTests
 {
     public class FakeCoreLogger : IAWSLoggerCore
     {

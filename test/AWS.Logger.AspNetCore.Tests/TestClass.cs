@@ -16,19 +16,19 @@ using AWS.Logger.TestUtils;
 
 namespace AWS.Logger.AspNetCore.Tests
 {
-    public class ILoggerTestFixture : TestFixture
+    public class ILoggerTestSetup : BaseTestClass
     {
         #region Properties
         public ILogger Logger;
         public AWSLoggerConfigSection ConfigSection;
         public IServiceCollection ServiceCollection;
         public IServiceProvider Provider;
-        #endregion
-
-        public ILoggerTestFixture()
+        public ILoggerTestSetup(TestFixture testFixture) : base(testFixture)
         {
             ServiceCollection = new ServiceCollection();
         }
+        #endregion
+
         /// <summary>
         /// Setup class that marks down the _configSection, upon which the logger object would be created
         /// </summary>
@@ -36,7 +36,7 @@ namespace AWS.Logger.AspNetCore.Tests
         /// <param name="configSectionInfoBlockName">The Json object name that contains the AWS Logging configuration information
         /// . The Default value is "AWS.Logging".</param>
         /// <param name="sourceFilePath">The source file path specifies the path for the configuration file.</param>
-        public void LoggerConfigSectionSetup(string configFileName, string configSectionInfoBlockName,
+        public void LoggingSetup(string configFileName, string configSectionInfoBlockName,
             [System.Runtime.CompilerServices.CallerFilePath]string sourceFilePath = "")
         {
             var configurationBuilder = new ConfigurationBuilder()
@@ -80,13 +80,12 @@ namespace AWS.Logger.AspNetCore.Tests
     // This project can output the Class library as a NuGet Package.
     // To enable this option, right-click on the project and select the Properties menu item. 
     // In the Build tab select "Produce outputs on build".
-    public class ILoggerTestClass : IClassFixture<ILoggerTestFixture>
+    public class ILoggerTestClass : ILoggerTestSetup
     {
-        ILoggerTestFixture _testFixture;
-        public ILoggerTestClass(ILoggerTestFixture testFixture)
+        public ILoggerTestClass(TestFixture testFixture) : base(testFixture)
         {
-            _testFixture = testFixture;
         }
+
 
         #region Tests
         /// <summary>
@@ -96,42 +95,8 @@ namespace AWS.Logger.AspNetCore.Tests
         [Fact]
         public void ILogger()
         {
-            _testFixture.LoggerConfigSectionSetup("appsettings.json",null);
-            for (int i = 0; i < 9; i++)
-            {
-                _testFixture.Logger.LogDebug(string.Format("Test logging message {0} Ilogger", i));
-            }
-
-            _testFixture.Logger.LogDebug("LASTMESSAGE");
-
-            string logGroupName = _testFixture.ConfigSection.Config.LogGroup;
-
-            if (_testFixture.NotifyLoggingCompleted(logGroupName, "LASTMESSAGE"))
-            {
-                DescribeLogStreamsResponse describeLogstreamsResponse = _testFixture.
-                                                        Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
-                                                        {
-                                                            Descending = true,
-                                                            LogGroupName = logGroupName,
-                                                            OrderBy = "LastEventTime"
-                                                        }).Result;
-
-
-                GetLogEventsResponse getLogEventsResponse = _testFixture.
-                                                            Client.GetLogEventsAsync(new GetLogEventsRequest
-                                                            {
-                                                                LogGroupName = logGroupName,
-                                                                LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
-                                                            }).Result;
-                Assert.Equal(10, getLogEventsResponse.Events.Count());
-            }
-            else
-            {
-                Assert.True(false);
-            }
-
-            
-            _testFixture.LogGroupNameList.Add(logGroupName);
+            LoggingSetup("appsettings.json",null);
+            SimpleLogging(ConfigSection.Config.LogGroup);
         }
 
 
@@ -144,22 +109,20 @@ namespace AWS.Logger.AspNetCore.Tests
         {
             var categoryName = "testlogging";
             var coreLogger = new FakeCoreLogger();
-            _testFixture.Logger = new AWSLogger(
+            Logger = new AWSLogger(
                 categoryName,
                 coreLogger, null);
             var tasks = new List<Task>();
-            var streamNames = new List<string>();
-            var count = 200;
-            int i = 0;
-            var totcount = 0;
-            for (i = 0; i < 2; i++)
+            var logMessageCount = 200;
+            var actualCount = 0;
+            for (int i = 0; i < 2; i++)
             {
-                tasks.Add(Task.Factory.StartNew(() => ILoggerThread(count)));
-                totcount = totcount + count;
+                tasks.Add(Task.Factory.StartNew(() => Logging(logMessageCount)));
+                actualCount = actualCount + logMessageCount;
             }
             Task.WaitAll(tasks.ToArray());
 
-            Assert.Equal(totcount, coreLogger.ReceivedMessages.Count);
+            Assert.Equal(actualCount, coreLogger.ReceivedMessages.Count);
         }
 
         /// <summary>
@@ -170,58 +133,8 @@ namespace AWS.Logger.AspNetCore.Tests
         [Fact]
         public void MultiThreadTest()
         {
-            var tasks = new List<Task>();
-            var streamNames = new List<string>();
-            _testFixture.LoggerConfigSectionSetup("multiThreadTest.json",null);
-            var count = 200;
-            var totcount = 0;
-            for (int i = 0; i < 2; i++)
-            {
-                tasks.Add(Task.Factory.StartNew(() => ILoggerThread(count)));
-                totcount = totcount + count;
-            }
-
-            
-            Task.WaitAll(tasks.ToArray(), 10000);
-            string logGroupName = _testFixture.ConfigSection.Config.LogGroup;
-            if (_testFixture.NotifyLoggingCompleted(logGroupName, "LASTMESSAGE"))
-            {
-                DescribeLogStreamsResponse describeLogstreamsResponse = _testFixture.
-                Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
-                {
-                    Descending = true,
-                    LogGroupName = logGroupName,
-                    OrderBy = "LastEventTime"
-                }).Result;
-
-                int testCount = 0;
-                if (describeLogstreamsResponse.LogStreams.Count > 0)
-                {
-                    foreach (var logStream in describeLogstreamsResponse.LogStreams)
-                    {
-                        GetLogEventsResponse getLogEventsResponse = _testFixture.
-                            Client.GetLogEventsAsync(new GetLogEventsRequest
-                            {
-                                LogGroupName = logGroupName,
-                                LogStreamName = logStream.LogStreamName
-                            }).Result;
-
-                        if (getLogEventsResponse != null)
-                        {
-                            testCount += getLogEventsResponse.Events.Count();
-                        }
-                    }
-                }
-
-
-                Assert.Equal(totcount, testCount);
-            }
-            else
-            {
-                Assert.True(false);
-            }
-
-            _testFixture.LogGroupNameList.Add(logGroupName);
+            LoggingSetup("multiThreadTest.json",null);
+            MultiThreadTest(ConfigSection.Config.LogGroup);
         }
 
         /// <summary>
@@ -234,41 +147,21 @@ namespace AWS.Logger.AspNetCore.Tests
         [Fact]
         public void MultiThreadBufferFullTest()
         {
-            var tasks = new List<Task>();
-            var streamNames = new List<string>();
-            _testFixture.LoggerConfigSectionSetup("multiThreadBufferFullTest.json",null);
-            var count = 200;
-            var totcount = 0;
-            for (int i = 0; i < 2; i++)
-            {
-                tasks.Add(Task.Factory.StartNew(() => ILoggerThread(count)));
-                totcount = totcount + count;
-            }
-            Task.WaitAll(tasks.ToArray(), 10000);
-            var logGroupName = _testFixture.ConfigSection.Config.LogGroup;
-            if (_testFixture.NotifyLoggingCompleted(logGroupName, "maximum"))
-            {
-                Assert.True(_testFixture.IsFilterPatternExists(logGroupName, "maximum"));
-            }
-            else
-            {
-                Assert.True(false);
-            }
-
-            _testFixture.LogGroupNameList.Add(_testFixture.ConfigSection.Config.LogGroup);
+            LoggingSetup("multiThreadBufferFullTest.json",null);
+            MultiThreadBufferFullTest(ConfigSection.Config.LogGroup);
         }
 
         /// <summary>
         /// This method posts debug messages onto CloudWatchLogs.
         /// </summary>
         /// <param name="count">The number of messages that would be posted onto CloudWatchLogs</param>
-        public void ILoggerThread(int count)
+        public override void Logging(int count)
         {
             for (int i = 0; i < count-1; i++)
             {
-                _testFixture.Logger.LogDebug(string.Format("Test logging message {0} Ilogger, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
+                Logger.LogDebug(string.Format("Test logging message {0} Ilogger, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
             }
-            _testFixture.Logger.LogDebug("LASTMESSAGE");
+            Logger.LogDebug("LASTMESSAGE");
         }
         #endregion
     }

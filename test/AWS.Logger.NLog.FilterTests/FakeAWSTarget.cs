@@ -9,7 +9,7 @@ using AWS.Logger.Core;
 using Amazon.Runtime;
 
 
-namespace AWS.Logger.NLog.FilterTests
+namespace AWS.Logger.NLogger.FilterTests
 {
     [Target("FakeAWSTarget")]
     public class FakeAWSTarget : TargetWithLayout

@@ -5,7 +5,6 @@
     "xunit": "2.2.0-*",
     "NLog.AWS.Logger": "1.0.0",
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
-    "xunit.abstractions": "2.0.1",
     "NLog": "4.4.0-beta5",
     "AWS.Logger.TestUtils": "1.0.0-*"
   },

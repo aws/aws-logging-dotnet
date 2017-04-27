@@ -10,7 +10,7 @@
       "version": "1.0.1"
     },
     "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
-    "xunit": "2.1.0-*",
+    "xunit": "2.2.0",
     "dotnet-test-xunit": "2.2.0-*",
     "AWS.Logger.AspNetCore": "1.0.0",
     "AWS.Logger.Core": "1.0.0",

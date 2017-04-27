@@ -16,147 +16,55 @@ using AWS.Logger.TestUtils;
 
 namespace AWS.Logger.Log4Net.Tests
 {
-    public class Log4NetTestFixture : TestFixture
+    public class Log4NetTestSetup : BaseTestClass
     {
         public ILog Logger;
+
+        public Log4NetTestSetup(TestFixture testFixture) : base(testFixture)
+        {
+        }
+
         public void GetLog4NetLogger(string fileName,string logName)
         {
             XmlConfigurator.Configure(new System.IO.FileInfo(fileName));
             Logger = LogManager.GetLogger(logName);
         }
     }
-    public class Log4NetTestClass : IClassFixture<Log4NetTestFixture>
+    public class Log4NetTestClass : Log4NetTestSetup
     {
-        Log4NetTestFixture _testFixture;
-        
-        public Log4NetTestClass(Log4NetTestFixture testFixture)
+        public Log4NetTestClass(TestFixture testFixture) : base(testFixture)
         {
-            _testFixture = testFixture;
         }
 
         #region Test Cases                                                        
         [Fact]
         public void Log4Net()
         {
-            _testFixture.GetLog4NetLogger("log4net.config","Log4Net");
-            for (int i = 0; i < 9; i++)
-            {
-                _testFixture.Logger.Debug(string.Format("Test logging message {0} Log4Net", i));
-            }
-            _testFixture.Logger.Debug("LASTMESSAGE");
-
-            string logGroupName = "AWSLog4NetGroupLog4Net";
-            if(_testFixture.NotifyLoggingCompleted(logGroupName, "LASTMESSAGE"))
-            {
-                DescribeLogStreamsResponse describeLogstreamsResponse = _testFixture.Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
-                {
-                    Descending = true,
-                    LogGroupName = logGroupName,
-                    OrderBy = "LastEventTime"
-                }).Result;
-
-
-                GetLogEventsResponse getLogEventsResponse = _testFixture.Client.GetLogEventsAsync(new GetLogEventsRequest
-                {
-                    LogGroupName = logGroupName,
-                    LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
-                }).Result;
-                Assert.Equal(10, getLogEventsResponse.Events.Count());
-            }
-            else
-            {
-                Assert.True(false);
-            }
-            
-            _testFixture.LogGroupNameList.Add(logGroupName);
+            GetLog4NetLogger("log4net.config","Log4Net");
+            SimpleLogging("AWSLog4NetGroupLog4Net");
         }
 
         [Fact]
         public void MultiThreadTest()
         {
-            _testFixture.GetLog4NetLogger("log4net.config", "MultiThreadTest");
-            var log = LogManager.GetCurrentLoggers();
-            var tasks = new List<Task>();
-            var count = 200;
-            var totcount = 0;
-            for (int i = 0; i < 2; i++)
-            {
-                tasks.Add(Task.Factory.StartNew(() => Log4NetThread(count)));
-                totcount = totcount + count;
-            }
-            Task.WaitAll(tasks.ToArray(), 10000);
-
-            string logGroupName = "AWSLog4NetGroupLog4NetMultiThreadTest";
-            if (_testFixture.NotifyLoggingCompleted(logGroupName, "LASTMESSAGE"))
-            {
-                DescribeLogStreamsResponse describeLogstreamsResponse = _testFixture.Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
-                {
-                    Descending = true,
-                    LogGroupName = logGroupName,
-                    OrderBy = "LastEventTime"
-                }).Result;
-
-
-                int testCount = 0;
-                if (describeLogstreamsResponse.LogStreams.Count > 0)
-                {
-                    foreach (var logStream in describeLogstreamsResponse.LogStreams)
-                    {
-                        GetLogEventsResponse getLogEventsResponse = _testFixture.Client.GetLogEventsAsync(new GetLogEventsRequest
-                        {
-                            LogGroupName = logGroupName,
-                            LogStreamName = logStream.LogStreamName
-                        }).Result;
-
-                        if (getLogEventsResponse != null)
-                        {
-                            testCount += getLogEventsResponse.Events.Count();
-                        }
-                    }
-                }
-            }
-            else
-            {
-                Assert.True(false);
-            }
-
-            _testFixture.LogGroupNameList.Add(logGroupName);
+            GetLog4NetLogger("log4net.config", "MultiThreadTest");
+            MultiThreadTest("AWSLog4NetGroupLog4NetMultiThreadTest");
         }
 
         [Fact]
         public void MultiThreadBufferFullTest()
         {
-            _testFixture.GetLog4NetLogger("log4net.config", "MultiThreadBufferFullTest");
-
-            var tasks = new List<Task>();
-            var count = 200;
-            var totcount = 0;
-            for (int i = 0; i < 2; i++)
-            {
-                tasks.Add(Task.Factory.StartNew(() => Log4NetThread(count)));
-                totcount = totcount + count;
-            }
-            Task.WaitAll(tasks.ToArray(), 10000);
-
-            string logGroupName = "AWSLog4NetGroupMultiThreadBufferFullTest";
-            if (_testFixture.NotifyLoggingCompleted(logGroupName, "maximum"))
-            {
-                Assert.True(_testFixture.IsFilterPatternExists(logGroupName, "maximum"));
-            }
-            else
-            {
-                Assert.True(false);
-            }
-            _testFixture.LogGroupNameList.Add(logGroupName);
+            GetLog4NetLogger("log4net.config", "MultiThreadBufferFullTest");
+            MultiThreadBufferFullTest("AWSLog4NetGroupMultiThreadBufferFullTest");
         }
 
-        void Log4NetThread(int count)
+        public override void Logging(int count)
         {
             for (int i = 0; i < count-1; i++)
             {
-                _testFixture.Logger.Debug(string.Format("Test logging message {0} Log4Net, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
+                Logger.Debug(string.Format("Test logging message {0} Log4Net, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
             }
-            _testFixture.Logger.Debug("LASTMESSAGE");
+            Logger.Debug("LASTMESSAGE");
         }
         #endregion
     }
