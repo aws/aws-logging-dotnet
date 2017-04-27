@@ -16,21 +16,26 @@ using AWS.Logger.TestUtils;
 
 namespace AWS.Logger.AspNetCore.Tests
 {
-    public class ILoggerTestSetup : BaseTestClass
+    // This project can output the Class library as a NuGet Package.
+    // To enable this option, right-click on the project and select the Properties menu item. 
+    // In the Build tab select "Produce outputs on build".
+    public class ILoggerTestClass : BaseTestClass
     {
         #region Properties
         public ILogger Logger;
         public AWSLoggerConfigSection ConfigSection;
         public IServiceCollection ServiceCollection;
         public IServiceProvider Provider;
-        public ILoggerTestSetup(TestFixture testFixture) : base(testFixture)
+        #endregion
+
+        public ILoggerTestClass(TestFixture testFixture) : base(testFixture)
         {
             ServiceCollection = new ServiceCollection();
         }
-        #endregion
 
         /// <summary>
         /// Setup class that marks down the _configSection, upon which the logger object would be created
+        /// and instantiates the ILogger object.
         /// </summary>
         /// <param name="configFileName">The configuration file that contains the user's config data as a Json file.</param>
         /// <param name="configSectionInfoBlockName">The Json object name that contains the AWS Logging configuration information
@@ -56,15 +61,7 @@ namespace AWS.Logger.AspNetCore.Tests
                       .Build()
                       .GetAWSLoggingConfigSection();
             }
-            LoggerSetup();
-        }
 
-        /// <summary>
-        /// This method returns an ILogger object.
-        /// </summary>
-        /// <returns></returns>
-        public void LoggerSetup()
-        {
             var loggingFactoryService = this.ServiceCollection.FirstOrDefault(x => x.ServiceType is ILoggerFactory);
             this.Provider = this.ServiceCollection.AddLogging()
                                     .BuildServiceProvider();
@@ -76,16 +73,6 @@ namespace AWS.Logger.AspNetCore.Tests
                 Logger = loggingFactory.CreateLogger<ILoggerTestClass>();
             }
         }
-    }
-    // This project can output the Class library as a NuGet Package.
-    // To enable this option, right-click on the project and select the Properties menu item. 
-    // In the Build tab select "Produce outputs on build".
-    public class ILoggerTestClass : ILoggerTestSetup
-    {
-        public ILoggerTestClass(TestFixture testFixture) : base(testFixture)
-        {
-        }
-
 
         #region Tests
         /// <summary>
@@ -96,7 +83,7 @@ namespace AWS.Logger.AspNetCore.Tests
         public void ILogger()
         {
             LoggingSetup("appsettings.json",null);
-            SimpleLogging(ConfigSection.Config.LogGroup);
+            SimpleLoggingTest(ConfigSection.Config.LogGroup);
         }
 
 
@@ -117,7 +104,7 @@ namespace AWS.Logger.AspNetCore.Tests
             var actualCount = 0;
             for (int i = 0; i < 2; i++)
             {
-                tasks.Add(Task.Factory.StartNew(() => Logging(logMessageCount)));
+                tasks.Add(Task.Factory.StartNew(() => LogMessages(logMessageCount)));
                 actualCount = actualCount + logMessageCount;
             }
             Task.WaitAll(tasks.ToArray());
@@ -155,13 +142,13 @@ namespace AWS.Logger.AspNetCore.Tests
         /// This method posts debug messages onto CloudWatchLogs.
         /// </summary>
         /// <param name="count">The number of messages that would be posted onto CloudWatchLogs</param>
-        public override void Logging(int count)
+        public override void LogMessages(int count)
         {
             for (int i = 0; i < count-1; i++)
             {
                 Logger.LogDebug(string.Format("Test logging message {0} Ilogger, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
             }
-            Logger.LogDebug("LASTMESSAGE");
+            Logger.LogDebug(LASTMESSAGE);
         }
         #endregion
     }

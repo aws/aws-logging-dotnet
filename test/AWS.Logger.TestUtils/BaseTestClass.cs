@@ -11,12 +11,13 @@ using Xunit;
 
 namespace AWS.Logger.TestUtils
 {
-    public class BaseTestClass : IClassFixture<TestFixture>
+    public abstract class BaseTestClass : IClassFixture<TestFixture>
     {
         public const int SIMPLELOGTEST_COUNT = 10;
         public const int MULTITHREADTEST_COUNT = 200;
         public const int THREAD_WAITTIME = 10;
         public const int THREAD_COUNT = 2;
+        public const string LASTMESSAGE = "LASTMESSAGE";
         public TestFixture _testFixture;
         public AmazonCloudWatchLogsClient Client;
         public BaseTestClass(TestFixture testFixture)
@@ -67,13 +68,11 @@ namespace AWS.Logger.TestUtils
             }
         }
 
-        public virtual void Logging(int count)
-        {
-        }
+        public abstract void LogMessages(int count);
 
-        public void SimpleLogging(string logGroupName)
+        public void SimpleLoggingTest(string logGroupName)
         {
-            Logging(SIMPLELOGTEST_COUNT);
+            LogMessages(SIMPLELOGTEST_COUNT);
             GetLogEventsResponse getLogEventsResponse = new GetLogEventsResponse();
             if (NotifyLoggingCompleted(logGroupName, "LASTMESSAGE"))
             {
@@ -107,7 +106,7 @@ namespace AWS.Logger.TestUtils
             var totalCount = 0;
             for (int i = 0; i < THREAD_COUNT; i++)
             {
-                tasks.Add(Task.Factory.StartNew(() => Logging(count)));
+                tasks.Add(Task.Factory.StartNew(() => LogMessages(count)));
                 totalCount = totalCount + count;
             }
 
@@ -158,7 +157,7 @@ namespace AWS.Logger.TestUtils
             var totalCount = 0;
             for (int i = 0; i < THREAD_COUNT; i++)
             {
-                tasks.Add(Task.Factory.StartNew(() => Logging(count)));
+                tasks.Add(Task.Factory.StartNew(() => LogMessages(count)));
                 totalCount = totalCount + count;
             }
             Task.WaitAll(tasks.ToArray(), TimeSpan.FromSeconds(THREAD_WAITTIME));

@@ -16,22 +16,15 @@ using AWS.Logger.TestUtils;
 
 namespace AWS.Logger.Log4Net.Tests
 {
-    public class Log4NetTestSetup : BaseTestClass
+    public class Log4NetTestClass : BaseTestClass
     {
         public ILog Logger;
 
-        public Log4NetTestSetup(TestFixture testFixture) : base(testFixture)
-        {
-        }
-
-        public void GetLog4NetLogger(string fileName,string logName)
+        public void GetLog4NetLogger(string fileName, string logName)
         {
             XmlConfigurator.Configure(new System.IO.FileInfo(fileName));
             Logger = LogManager.GetLogger(logName);
         }
-    }
-    public class Log4NetTestClass : Log4NetTestSetup
-    {
         public Log4NetTestClass(TestFixture testFixture) : base(testFixture)
         {
         }
@@ -41,7 +34,7 @@ namespace AWS.Logger.Log4Net.Tests
         public void Log4Net()
         {
             GetLog4NetLogger("log4net.config","Log4Net");
-            SimpleLogging("AWSLog4NetGroupLog4Net");
+            SimpleLoggingTest("AWSLog4NetGroupLog4Net");
         }
 
         [Fact]
@@ -58,13 +51,13 @@ namespace AWS.Logger.Log4Net.Tests
             MultiThreadBufferFullTest("AWSLog4NetGroupMultiThreadBufferFullTest");
         }
 
-        public override void Logging(int count)
+        public override void LogMessages(int count)
         {
             for (int i = 0; i < count-1; i++)
             {
                 Logger.Debug(string.Format("Test logging message {0} Log4Net, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
             }
-            Logger.Debug("LASTMESSAGE");
+            Logger.Debug(LASTMESSAGE);
         }
         #endregion
     }

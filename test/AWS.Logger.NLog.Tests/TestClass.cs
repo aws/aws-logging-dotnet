@@ -13,13 +13,11 @@ using AWS.Logger.TestUtils;
 
 namespace AWS.Logger.NLogger.Tests
 {
-    public class NLogTestSetup : BaseTestClass
+    // This project can output the Class library as a NuGet Package.
+    // To enable this option, right-click on the project and select the Properties menu item. In the Build tab select "Produce outputs on build".
+    public class NLogTestClass: BaseTestClass
     {
         public NLog.Logger Logger;
-        public NLogTestSetup(TestFixture testFixture) : base(testFixture)
-        {
-            CreateLoggerFromConfiguration();
-        }
 
         private void CreateLoggerFromConfiguration()
         {
@@ -32,15 +30,9 @@ namespace AWS.Logger.NLogger.Tests
                 LogManager.Configuration = new XmlLoggingConfiguration("./test/AWS.Logger.NLog.Tests/Regular.config");
             }
         }
-        
-
-    }
-    // This project can output the Class library as a NuGet Package.
-    // To enable this option, right-click on the project and select the Properties menu item. In the Build tab select "Produce outputs on build".
-    public class NLogTestClass: NLogTestSetup
-    {
         public NLogTestClass(TestFixture testFixture) : base(testFixture)
         {
+            CreateLoggerFromConfiguration();
         }
 
         #region Test Cases  
@@ -48,7 +40,7 @@ namespace AWS.Logger.NLogger.Tests
         public void Nlog()
         {
             Logger = LogManager.GetLogger("loggerRegular");
-            SimpleLogging("AWSNLogGroup");
+            SimpleLoggingTest("AWSNLogGroup");
         }
 
         [Fact]
@@ -65,13 +57,13 @@ namespace AWS.Logger.NLogger.Tests
             MultiThreadBufferFullTest("AWSNLogGroupMultiThreadBufferFullTest");
         }
 
-        public override void Logging(int count)
+        public override void LogMessages(int count)
         {
             for (int i = 0; i < count-1; i++)
             {
                 Logger.Debug(string.Format("Test logging message {0} NLog, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
             }
-            Logger.Debug("LASTMESSAGE");
+            Logger.Debug(LASTMESSAGE);
         }
     }
     #endregion
