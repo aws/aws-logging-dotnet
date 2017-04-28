@@ -271,7 +271,7 @@ namespace AWS.Logger.Core
                 {
                     await _client.CreateLogGroupAsync(new CreateLogGroupRequest { LogGroupName = _config.LogGroup }, token);
                 }
-                _currentStreamName = DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss") + " - " + Guid.NewGuid();
+                _currentStreamName = DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss") + " - " + _config.LogStreamNameSuffix;
 
                 var streamResponse = await _client.CreateLogStreamAsync(new CreateLogStreamRequest
                 {

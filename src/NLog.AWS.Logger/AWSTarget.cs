@@ -130,6 +130,19 @@ namespace NLog.AWS.Logger
             set { _config.MaxQueuedMessages = value; }
         }
 
+        /// <summary>
+        /// Gets and sets the LogStreamNameSuffix property. The LogStreamName consists of a DateTimeStamp as the prefix and a user defined suffix value that can 
+        /// be set using the LogStreamNameSuffix property defined here.
+        /// <para>
+        /// The default is going to a Guid.
+        /// </para>
+        /// </summary>
+        public string LogStreamNameSuffix
+        {
+            get { return _config.LogStreamNameSuffix; }
+            set { _config.LogStreamNameSuffix = value; }
+        }
+
         protected override void InitializeTarget()
         {
             if (_core != null)

@@ -2,6 +2,7 @@
   "AWS.Logging": {
     "LogGroup": "AWSILoggerGroup",
     "Region": "us-west-2",
+    "LogStreamNameSuffix": "TestStream",
     "LogLevel": {
       "System": "Information",
       "Microsoft": "Information",
