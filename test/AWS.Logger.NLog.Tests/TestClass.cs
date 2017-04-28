@@ -19,26 +19,26 @@ namespace AWS.Logger.NLogger.Tests
     {
         public NLog.Logger Logger;
 
-        private void CreateLoggerFromConfiguration()
+        private void CreateLoggerFromConfiguration(string configFileName)
         {
             try
             {
-                LogManager.Configuration = new XmlLoggingConfiguration("Regular.config");
+                LogManager.Configuration = new XmlLoggingConfiguration(configFileName);
             }
             catch (FileNotFoundException)
             {
-                LogManager.Configuration = new XmlLoggingConfiguration("./test/AWS.Logger.NLog.Tests/Regular.config");
+                LogManager.Configuration = new XmlLoggingConfiguration("./test/AWS.Logger.NLog.Tests/" + configFileName);
             }
         }
         public NLogTestClass(TestFixture testFixture) : base(testFixture)
         {
-            CreateLoggerFromConfiguration();
         }
 
         #region Test Cases  
         [Fact]
         public void Nlog()
         {
+            CreateLoggerFromConfiguration("Regular.config");
             Logger = LogManager.GetLogger("loggerRegular");
             SimpleLoggingTest("AWSNLogGroup");
         }
@@ -46,6 +46,7 @@ namespace AWS.Logger.NLogger.Tests
         [Fact]
         public void MultiThreadTest()
         {
+            CreateLoggerFromConfiguration("AWSNLogGroupMultiThreadTest.config");
             Logger = LogManager.GetLogger("loggerMultiThread");
             MultiThreadTest("AWSNLogGroupMultiThreadTest");
         }
@@ -53,6 +54,7 @@ namespace AWS.Logger.NLogger.Tests
         [Fact]
         public void MultiThreadBufferFullTest()
         {
+            CreateLoggerFromConfiguration("AWSNLogGroupMultiThreadBufferFullTest.config");
             Logger = LogManager.GetLogger("loggerMultiThreadBufferFull");
             MultiThreadBufferFullTest("AWSNLogGroupMultiThreadBufferFullTest");
         }

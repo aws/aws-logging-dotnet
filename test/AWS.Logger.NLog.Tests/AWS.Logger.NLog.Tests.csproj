@@ -90,6 +90,8 @@
     <Analyzer Include="..\..\packages\AWSSDK.CloudWatchLogs.3.3.2\analyzers\dotnet\cs\AWSSDK.CloudWatchLogs.CodeAnalysis.dll" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="AWSNLogGroupMultiThreadBufferFullTest.config" />
+    <None Include="AWSNLogGroupMultiThreadTest.config" />
     <None Include="Regular.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -101,7 +103,9 @@
     <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.2.0-beta4-build1194\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.2.0-beta4-build1194\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Q  /Y ..\..\Regular.config</PostBuildEvent>
+    <PostBuildEvent>xcopy /Q  /Y ..\..\Regular.config
+xcopy /Q  /Y ..\..\AWSNLogGroupMultiThreadBufferFullTest.config
+xcopy /Q  /Y ..\..\AWSNLogGroupMultiThreadTest.config</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

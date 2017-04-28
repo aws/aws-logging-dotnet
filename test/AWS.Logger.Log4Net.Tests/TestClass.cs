@@ -40,14 +40,14 @@ namespace AWS.Logger.Log4Net.Tests
         [Fact]
         public void MultiThreadTest()
         {
-            GetLog4NetLogger("log4net.config", "MultiThreadTest");
+            GetLog4NetLogger("MultiThreadTest.config", "MultiThreadTest");
             MultiThreadTest("AWSLog4NetGroupLog4NetMultiThreadTest");
         }
 
         [Fact]
         public void MultiThreadBufferFullTest()
         {
-            GetLog4NetLogger("log4net.config", "MultiThreadBufferFullTest");
+            GetLog4NetLogger("MultiThreadBufferFullTest.config", "MultiThreadBufferFullTest");
             MultiThreadBufferFullTest("AWSLog4NetGroupMultiThreadBufferFullTest");
         }
 
