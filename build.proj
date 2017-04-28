@@ -13,21 +13,21 @@
       <Exec Command=".\.nuget\Nuget.exe restore .\src\AWS.Logger.Core\AWS.Logger.Core.csproj -SolutionDirectory ." />
       <Exec Command=".\.nuget\Nuget.exe restore .\src\AWS.Logger.Log4net\packages.config -SolutionDirectory ." />
       <Exec Command=".\.nuget\Nuget.exe restore .\src\NLog.AWS.Logger\NLog.AWS.Logger.csproj -SolutionDirectory ." />
-	  <Exec Command=".\.nuget\Nuget.exe restore .\test\AWS.Logger.Log4Net.Tests\packages.config -SolutionDirectory ." />
+	    <Exec Command=".\.nuget\Nuget.exe restore .\test\AWS.Logger.Log4Net.Tests\packages.config -SolutionDirectory ." />
       <Exec Command=".\.nuget\Nuget.exe restore .\test\AWS.Logger.NLog.Tests\AWS.Logger.NLog.Tests.csproj -SolutionDirectory ." />
       <Exec Command=".\.nuget\Nuget.exe restore .\test\AWS.Logger.NLog.FilterTests\AWS.Logger.NLog.FilterTests.csproj -SolutionDirectory ." />
       <Exec Command=".\.nuget\Nuget.exe restore .\test\AWS.Logger.Log4Net.FilterTests\AWS.Logger.Log4Net.FilterTests.csproj -SolutionDirectory ." />
-      	  
+      <Exec Command=".\.nuget\Nuget.exe restore .\test\AWS.Logger.TestUtils\AWS.Logger.TestUtils.csproj -SolutionDirectory ." />
 	  <MSBuild Projects=".\AWS.Logger.sln" Targets="Clean;Build" Properties="Configuration=Release;AWSKeyFile=$(CustomSnkFileLocation)" />
     </Target>
 
     <Target Name = "Nuget" DependsOnTargets="Compile;Test45;Test">
     <!-- You could use the MSBuild Copy task here to move the compiled code into
            a structure that fits your desired package format -->
-    <Exec Command="if exist Deployment rmdir /S/Q Deployment"/> 
-    <Exec Command="mkdir Deployment"/>  
+    <Exec Command="if exist Deployment rmdir /S/Q Deployment"/>
+    <Exec Command="mkdir Deployment"/>
 		<Exec Command=".\.nuget\Nuget.exe pack .\src\AWS.Logger.Core\AWS.Logger.Core.dll.nuspec -OutputDirectory .\Deployment"/>
-		<Exec Command=".\.nuget\Nuget.exe pack .\src\AWS.Logger.AspNetCore\AWS.Logger.AspNetCore.dll.nuspec -OutputDirectory .\Deployment"/>		   
+		<Exec Command=".\.nuget\Nuget.exe pack .\src\AWS.Logger.AspNetCore\AWS.Logger.AspNetCore.dll.nuspec -OutputDirectory .\Deployment"/>
 		<Exec Command=".\.nuget\Nuget.exe pack .\src\AWS.Logger.Log4net\AWS.Logger.Log4net.dll.nuspec -OutputDirectory .\Deployment"/>
     <Exec Command=".\.nuget\NuGet.exe pack .\src\NLog.AWS.Logger\NLog.AWS.Logger.dll.nuspec -OutputDirectory .\Deployment"/>
 
@@ -47,4 +47,3 @@
 	  <Exec Command="dotnet test .\test\AWS.Logger.NLog.FilterTests"/>
     </Target>
 </Project>
-
