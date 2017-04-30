@@ -41,13 +41,25 @@ namespace AWS.Logger.TestUtils
         }
         public bool FilterPatternExists(string logGroupName, string filterPattern)
         {
-            DescribeLogStreamsResponse describeLogstreamsResponse = Client.
+            DescribeLogGroupsResponse describeLogGroupsRequest = Client.DescribeLogGroupsAsync(new DescribeLogGroupsRequest
+            {
+                LogGroupNamePrefix = logGroupName
+            }).Result;
+            DescribeLogStreamsResponse describeLogstreamsResponse;
+            try
+            {
+                describeLogstreamsResponse = Client.
                     DescribeLogStreamsAsync(new DescribeLogStreamsRequest
                     {
                         Descending = true,
                         LogGroupName = logGroupName,
                         OrderBy = "LastEventTime"
                     }).Result;
+            }
+            catch (Exception e) {
+                return false;
+            }
+            
             if (describeLogstreamsResponse.LogStreams.Count > 0)
             {
                 List<string> logStreamNames = new List<string>();
