@@ -52,7 +52,7 @@ namespace AWS.Logger.TestUtils
                         OrderBy = "LastEventTime"
                     }).Result;
             }
-            catch (ResourceNotFoundException e) {
+            catch (Exception e) {
                 return false;
             }
             
