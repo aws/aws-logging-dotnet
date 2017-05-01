@@ -41,10 +41,6 @@ namespace AWS.Logger.TestUtils
         }
         public bool FilterPatternExists(string logGroupName, string filterPattern)
         {
-            DescribeLogGroupsResponse describeLogGroupsRequest = Client.DescribeLogGroupsAsync(new DescribeLogGroupsRequest
-            {
-                LogGroupNamePrefix = logGroupName
-            }).Result;
             DescribeLogStreamsResponse describeLogstreamsResponse;
             try
             {
@@ -56,7 +52,7 @@ namespace AWS.Logger.TestUtils
                         OrderBy = "LastEventTime"
                     }).Result;
             }
-            catch (Exception e) {
+            catch (ResourceNotFoundException e) {
                 return false;
             }
             
