@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>AWS.Logger.Log4net</id>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <authors>Amazon Web Services</authors>
     <owners>Amazon Web Services</owners>
     <licenseUrl>http://aws.amazon.com/apache2.0/</licenseUrl>
@@ -16,7 +16,7 @@
 
 
       <group targetFramework="net452">
-        <dependency id="AWS.Logger.Core" version="1.0.0" />
+        <dependency id="AWS.Logger.Core" version="1.1.0" />
         <dependency id="log4net" version="2.0.5" />
         <dependency id="AWSSDK.Core" version="[3.3.7, 3.4)" />
       </group>

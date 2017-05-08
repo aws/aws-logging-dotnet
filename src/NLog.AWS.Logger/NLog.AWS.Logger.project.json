@@ -7,6 +7,6 @@
   },
   "dependencies": {
     "AWSSDK.Core": "3.3.7",
-    "NLog": "4.4.0"
+    "NLog": "4.4.9"
   }
 }

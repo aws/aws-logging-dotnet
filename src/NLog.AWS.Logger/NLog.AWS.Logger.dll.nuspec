@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>AWS.Logger.NLog</id>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <authors>Amazon Web Services</authors>
     <owners>Amazon Web Services</owners>
     <licenseUrl>http://aws.amazon.com/apache2.0/</licenseUrl>
@@ -13,16 +13,13 @@
     <copyright>Copyright 2016</copyright>
     <tags>AWS Cloudwatch Logger NLog</tags>
     <dependencies>
-      <dependency id="AWS.Logger.Core" version="1.0.0" />
+      <dependency id="NLog" version="4.4.9" />
+      <dependency id="AWS.Logger.Core" version="1.1.0" />
     </dependencies>
   </metadata>
   <files>
 
     <file src="bin\Release\NLog.AWS.Logger.dll" target="lib\net45" />
     <file src="bin\Release\NLog.AWS.Logger.pdb" target="lib\net45" />
-
-    <file src="bin\Release\netstandard1.3\NLog.AWS.Logger.dll" target="lib\netstandard1.3" />
-    <file src="bin\Release\netstandard1.3\NLog.AWS.Logger.pdb" target="lib\netstandard1.3" />
-
   </files>
 </package>
