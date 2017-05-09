@@ -8,6 +8,7 @@ using System.Text;
 using System.Linq;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 #if CORECLR
 using System.Runtime.Loader;
 #endif
@@ -35,6 +36,7 @@ namespace AWS.Logger.Core
         {
             _config = config;
             _logType = logType;
+
             var credentials = DetermineCredentials(config);
 
             if (_config.Region != null)
@@ -136,7 +138,7 @@ namespace AWS.Logger.Core
                     Timestamp = DateTime.Now,
                     Message = message,
                 });
-            }   
+            }
         }
 
         ~AWSLoggerCore()
@@ -179,7 +181,7 @@ namespace AWS.Logger.Core
                             InputLogEvent ev;
                             if (_pendingMessageQueue.TryDequeue(out ev))
                             {
-                               
+
                                 // See if new message will cause the current batch to violote the size constraint.
                                 // If so send the current batch now before adding more to the batch of messages to send.
                                 if (_repo.IsSizeConstraintViolated(ev.Message))
@@ -192,7 +194,7 @@ namespace AWS.Logger.Core
                                 {
                                     await SendMessages(token).ConfigureAwait(false);
                                 }
-                                
+
                             }
                         }
                     }
@@ -200,7 +202,7 @@ namespace AWS.Logger.Core
                     {
                         // If the logger is being terminated and all the messages have been sent exit out of loop.
                         // If there are messages keep pushing the remaining messages before the process dies.
-                        if(_isTerminated && _repo._request.LogEvents.Count == 0)
+                        if (_isTerminated && _repo._request.LogEvents.Count == 0)
                         {
                             break;
                         }
@@ -212,20 +214,15 @@ namespace AWS.Logger.Core
                     }
                 }
             }
-            catch(OperationCanceledException)
+            catch (OperationCanceledException oc)
             {
+                LogLibraryError(oc,_config.LibraryLogFileName);
                 throw;
             }
-#if DEBUG
             catch (Exception e)
             {
-                Console.WriteLine("{0} Exception caught in the AWS Logger Monitor ", e);
+                LogLibraryError(e, _config.LibraryLogFileName);
             }
-#else
-            catch(Exception)
-            {
-            }
-#endif            
 
         }
 
@@ -241,14 +238,16 @@ namespace AWS.Logger.Core
                 var response = await _client.PutLogEventsAsync(_repo._request, token).ConfigureAwait(false);
                 _repo.Reset(response.NextSequenceToken);
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException tc)
             {
+                LogLibraryError(tc, _config.LibraryLogFileName);
                 throw;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 //In case the NextSequenceToken is invalid for the last sent message, a new stream would be 
                 //created for the said application.
+                LogLibraryError(e, _config.LibraryLogFileName);
                 await LogEventTransmissionSetup(token).ConfigureAwait(false);
             }
         }
@@ -281,11 +280,12 @@ namespace AWS.Logger.Core
 
                 _repo = new LogEventBatch(_config.LogGroup, _currentStreamName, Convert.ToInt32(_config.BatchPushInterval.TotalSeconds), _config.BatchSizeInBytes);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                LogLibraryError(e, _config.LibraryLogFileName);
                 throw;
             }
-            
+
         }
 
         /// <summary>
@@ -367,6 +367,25 @@ namespace AWS.Logger.Core
                 return;
 
             args.Headers[UserAgentHeader] = args.Headers[UserAgentHeader] + " AWSLogger/" + _logType;
+        }
+
+        public static void LogLibraryError(Exception ex,string LibraryLogFileName)
+        {
+            try
+            {
+                using (StreamWriter w = File.AppendText(LibraryLogFileName))
+                {
+                    w.WriteLine("Log Entry : ");
+                    w.WriteLine("{0}", DateTime.Now.ToString());
+                    w.WriteLine("  :");
+                    w.WriteLine("  :{0}", ex.ToString());
+                    w.WriteLine("-------------------------------");
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Exception caught when writing error log to file" + e.ToString());
+            }
         }
     }
 }
