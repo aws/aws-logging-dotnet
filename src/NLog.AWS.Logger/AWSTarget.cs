@@ -159,7 +159,8 @@ namespace NLog.AWS.Logger
                 ProfilesLocation = ProfilesLocation,
                 BatchPushInterval = BatchPushInterval,
                 BatchSizeInBytes = BatchSizeInBytes,
-                MaxQueuedMessages = MaxQueuedMessages
+                MaxQueuedMessages = MaxQueuedMessages,
+                LogStreamNameSuffix = LogStreamNameSuffix
             };
             _core = new AWSLoggerCore(config, "NLog");
         }

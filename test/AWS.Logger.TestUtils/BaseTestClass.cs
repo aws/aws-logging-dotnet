@@ -18,6 +18,7 @@ namespace AWS.Logger.TestUtils
         public const int THREAD_WAITTIME = 10;
         public const int THREAD_COUNT = 2;
         public const string LASTMESSAGE = "LASTMESSAGE";
+        public const string CUSTOMSTREAMSUFFIX = "Custom";
         public TestFixture _testFixture;
         public AmazonCloudWatchLogsClient Client;
         public BaseTestClass(TestFixture testFixture)
@@ -92,13 +93,15 @@ namespace AWS.Logger.TestUtils
                                                             OrderBy = "LastEventTime"
                                                         }).Result;
 
-
+                
                 getLogEventsResponse = Client.GetLogEventsAsync(new GetLogEventsRequest
                 {
                     LogGroupName = logGroupName,
                     LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
                 }).Result;
 
+                var customStreamSuffix = describeLogstreamsResponse.LogStreams[0].LogStreamName.Split('-').Last().Trim();
+                Assert.Equal(CUSTOMSTREAMSUFFIX, customStreamSuffix);
             }
             Assert.Equal(SIMPLELOGTEST_COUNT, getLogEventsResponse.Events.Count());
 

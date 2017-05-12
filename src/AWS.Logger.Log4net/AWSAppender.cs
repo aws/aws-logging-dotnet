@@ -160,7 +160,8 @@ namespace AWS.Logger.Log4net
                 ProfilesLocation = ProfilesLocation,
                 BatchPushInterval = BatchPushInterval,
                 BatchSizeInBytes = BatchSizeInBytes,
-                MaxQueuedMessages = MaxQueuedMessages
+                MaxQueuedMessages = MaxQueuedMessages,
+                LogStreamNameSuffix = LogStreamNameSuffix
             };
             _core = new AWSLoggerCore(config, "Log4net");
         }
