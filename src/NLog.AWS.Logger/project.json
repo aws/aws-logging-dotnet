@@ -9,10 +9,10 @@
   "dependencies": {
     "NETStandard.Library": "1.6.0",
     "AWS.Logger.Core": "1.0.0",
-    "NLog": "4.4.0-beta5"
+    "NLog": "5.0.0-beta07"
   },
   "frameworks": {
-    "netstandard1.3": {
+    "netstandard1.5": {
       "imports": [ "dnxcore50" ]
     }
   }

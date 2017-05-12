@@ -16,7 +16,7 @@
     "System.Threading.Timer": "4.0.1"
   },
   "frameworks": {
-    "netstandard1.3": {
+    "netstandard1.5": {
       "imports": [ "dnxcore50" ],
       "dependencies": {
         "System.Runtime.Loader": "4.0.0",
