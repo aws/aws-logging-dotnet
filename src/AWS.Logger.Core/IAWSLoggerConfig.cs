@@ -62,8 +62,30 @@ namespace AWS.Logger
         /// </summary>
         int BatchSizeInBytes { get; }
 
+        /// <summary>
+        /// Gets and sets the MaxQueuedMessages property. This specifies the maximum number of log messages that could be stored in-memory. MaxQueuedMessages 
+        /// dictates the total number of log messages that can be stored in-memory. If this exceeded, incoming log messages will be dropped.
+        /// <para>
+        /// The default is 10000.
+        /// </para>
+        /// </summary>
         int MaxQueuedMessages { get; }
 
+        /// <summary>
+        /// Gets and sets the LogStreamNameSuffix property. The LogStreamName consists of a DateTimeStamp as the prefix and a user defined suffix value that can 
+        /// be set using the LogStreamNameSuffix property defined here.
+        /// <para>
+        /// The default is going to a Guid.
+        /// </para>
+        /// </summary>
         string LogStreamNameSuffix { get; }
+
+        /// <summary>
+        /// Gets and sets the LibraryLogFileName property. This is the name of the file into which errors from the AWS.Logger.Core library will be wriiten into.
+        /// <para>
+        /// The default is going to "aws-logger-errors.txt".
+        /// </para>
+        /// </summary>
+        string LibraryLogFileName { get; }
     }
 }

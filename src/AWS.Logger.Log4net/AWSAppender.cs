@@ -140,6 +140,17 @@ namespace AWS.Logger.Log4net
             set { _config.LogStreamNameSuffix = value; }
         }
 
+        /// <summary>
+        /// Gets and sets the LibraryLogFileName property. This is the name of the file into which errors from the AWS.Logger.Core library will be wriiten into.
+        /// <para>
+        /// The default is going to "aws-logger-errors.txt".
+        /// </para>
+        /// </summary>
+        public string LibraryLogFileName
+        {
+            get { return _config.LibraryLogFileName; }
+            set { _config.LibraryLogFileName = value; }
+        }
 
         /// <summary>
         /// Initialize the appender based on the options set.
@@ -161,7 +172,8 @@ namespace AWS.Logger.Log4net
                 BatchPushInterval = BatchPushInterval,
                 BatchSizeInBytes = BatchSizeInBytes,
                 MaxQueuedMessages = MaxQueuedMessages,
-                LogStreamNameSuffix = LogStreamNameSuffix
+				LogStreamNameSuffix = LogStreamNameSuffix,
+				LibraryLogFileName = LibraryLogFileName
             };
             _core = new AWSLoggerCore(config, "Log4net");
         }
