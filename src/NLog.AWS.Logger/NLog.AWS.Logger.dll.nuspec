@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/aws/aws-logging-dotnet</projectUrl>
     <iconUrl>http://media.amazonwebservices.com/aws_singlebox_01.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>An AWS NLog target that records logging messages to Amazon CloudWatch Logs.</description>
+    <description>An AWS NLog target that records logging messages to Amazon CloudWatch Logs. To use the Netstandard1.5 version of the library, simply add the nuget package NLog v5.0.0-beta07 to your project.</description>
     <copyright>Copyright 2016</copyright>
     <tags>AWS Cloudwatch Logger NLog</tags>
     <dependencies>
