@@ -19,8 +19,9 @@ namespace Microsoft.Extensions.Logging
         /// </summary>
         /// <param name="factory"></param>
         /// <param name="config">Configuration on how to connect to AWS and how the log messages should be sent.</param>
+        /// <param name="formatter">A custom formatter which accepts a LogLevel, a state, and an exception and returns the formatted log message.</param>
         /// <returns></returns>
-        public static ILoggerFactory AddAWSProvider(this ILoggerFactory factory, AWSLoggerConfig config)
+        public static ILoggerFactory AddAWSProvider(this ILoggerFactory factory, AWSLoggerConfig config, Func<LogLevel, object, Exception, string> formatter = null)
         {
             // If config is null. Assuming the logger is being activated in a debug environment
             // and skip adding the provider. We don't want to prevent developers running their application
@@ -31,7 +32,7 @@ namespace Microsoft.Extensions.Logging
                 return factory;
             }
 
-            var provider = new AWSLoggerProvider(config);
+            var provider = new AWSLoggerProvider(config, formatter);
             factory.AddProvider(provider);
             return factory;
         }
@@ -41,8 +42,9 @@ namespace Microsoft.Extensions.Logging
         /// </summary>
         /// <param name="factory"></param>
         /// <param name="configSection">Configuration and loglevels on how to connect to AWS and how the log messages should be sent.</param>
+        /// <param name="formatter">A custom formatter which accepts a LogLevel, a state, and an exception and returns the formatted log message.</param>
         /// <returns></returns>
-        public static ILoggerFactory AddAWSProvider(this ILoggerFactory factory, AWSLoggerConfigSection configSection)
+        public static ILoggerFactory AddAWSProvider(this ILoggerFactory factory, AWSLoggerConfigSection configSection, Func<LogLevel, object, Exception, string> formatter = null)
         {
             // If configSection is null. Assuming the logger is being activated in a debug environment
             // and skip adding the provider. We don't want to prevent developers running their application
@@ -53,7 +55,7 @@ namespace Microsoft.Extensions.Logging
                 return factory;
             }
 
-            var provider = new AWSLoggerProvider(configSection);
+            var provider = new AWSLoggerProvider(configSection, formatter);
             factory.AddProvider(provider);
             return factory;
         }
@@ -67,7 +69,7 @@ namespace Microsoft.Extensions.Logging
         /// <returns></returns>
         public static ILoggerFactory AddAWSProvider(this ILoggerFactory factory, AWSLoggerConfig config, LogLevel minLevel)
         {
-            var provider = new AWSLoggerProvider(config,minLevel);
+            var provider = new AWSLoggerProvider(config, minLevel);
             factory.AddProvider(provider);
             return factory;
         }
