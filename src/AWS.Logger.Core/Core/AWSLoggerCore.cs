@@ -9,6 +9,7 @@ using System.Linq;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 #if CORECLR
 using System.Runtime.Loader;
 #endif
@@ -30,7 +31,9 @@ namespace AWS.Logger.Core
         private bool _isTerminated = false;
         private DateTime _maxBufferTimeStamp = new DateTime();
         private string _logType;
+        private int requestCount = 5;
         const double MAX_BUFFER_TIMEDIFF = 5;
+        const string INVALID_SEQUENCE_TOKEN_MESSAGE = "The given sequenceToken is invalid. The next expected sequenceToken is";
         #endregion
         public AWSLoggerCore(AWSLoggerConfig config, string logType)
         {
@@ -237,18 +240,35 @@ namespace AWS.Logger.Core
             {
                 var response = await _client.PutLogEventsAsync(_repo._request, token).ConfigureAwait(false);
                 _repo.Reset(response.NextSequenceToken);
+                if (requestCount < 5)
+                {
+                    requestCount++;
+                }
             }
             catch (TaskCanceledException tc)
             {
                 LogLibraryError(tc, _config.LibraryLogFileName);
                 throw;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 //In case the NextSequenceToken is invalid for the last sent message, a new stream would be 
                 //created for the said application.
-                LogLibraryError(e, _config.LibraryLogFileName);
-                await LogEventTransmissionSetup(token).ConfigureAwait(false);
+                LogLibraryError(ex, _config.LibraryLogFileName);
+                if (ex.GetBaseException() is InvalidSequenceTokenException)
+                {
+                    if (requestCount - 1 >= 0)
+                    {
+                        var regex = new Regex(INVALID_SEQUENCE_TOKEN_MESSAGE + @": (\d+)");
+                        _repo._request.SequenceToken = regex.Match(ex.GetBaseException().Message).Groups[1].Value;
+                        await SendMessages(token).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        await LogEventTransmissionSetup(token).ConfigureAwait(false);
+                        requestCount = 5;
+                    }
+                }
             }
         }
 
