@@ -258,6 +258,10 @@ namespace AWS.Logger.Core
                     _repo._request.SequenceToken = regex.Match(ex.Message).Groups[1].Value;
                     await SendMessages(token).ConfigureAwait(false);
                 }
+                else
+                {
+                    await LogEventTransmissionSetup(token).ConfigureAwait(false);
+                }
                 LogLibraryError(ex, _config.LibraryLogFileName);
             }
             catch (Exception e)
