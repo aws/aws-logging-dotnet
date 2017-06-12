@@ -31,7 +31,7 @@ namespace AWS.Logger.Core
         private bool _isTerminated = false;
         private DateTime _maxBufferTimeStamp = new DateTime();
         private string _logType;
-        private int requestCount = 5;
+        private static int requestCount = 5;
         const double MAX_BUFFER_TIMEDIFF = 5;
         const string INVALID_SEQUENCE_TOKEN_MESSAGE = "The given sequenceToken is invalid. The next expected sequenceToken is";
         #endregion
@@ -241,10 +241,7 @@ namespace AWS.Logger.Core
             {
                 var response = await _client.PutLogEventsAsync(_repo._request, token).ConfigureAwait(false);
                 _repo.Reset(response.NextSequenceToken);
-                if (requestCount < 5)
-                {
-                    requestCount++;
-                }
+                requestCount = 5;
             }
             catch (TaskCanceledException tc)
             {
@@ -254,19 +251,12 @@ namespace AWS.Logger.Core
             {
                 //In case the NextSequenceToken is invalid for the last sent message, a new stream would be 
                 //created for the said application.
-                if (ex is InvalidSequenceTokenException)
+
+                if (requestCount>0)
                 {
-                    if (requestCount - 1 >= 0)
-                    {
-                        var regex = new Regex(INVALID_SEQUENCE_TOKEN_MESSAGE + @": (\d+)");
-                        _repo._request.SequenceToken = regex.Match(ex.Message).Groups[1].Value;
-                        await SendMessages(token).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        await LogEventTransmissionSetup(token).ConfigureAwait(false);
-                        requestCount = 5;
-                    }
+                    var regex = new Regex(INVALID_SEQUENCE_TOKEN_MESSAGE + @": (\d+)");
+                    _repo._request.SequenceToken = regex.Match(ex.Message).Groups[1].Value;
+                    await SendMessages(token).ConfigureAwait(false);
                 }
                 LogLibraryError(ex, _config.LibraryLogFileName);
             }
