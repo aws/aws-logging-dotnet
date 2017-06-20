@@ -140,7 +140,6 @@ The configuration is setup in the [appsettings.json](/samples/AspNetCore/WebSamp
 
 ```json
 "AWS.Logging": {
-  "Region": "us-east-1",
   "LogGroup": "AspNetCore.WebSample",
   "LogLevel": {
     "Default": "Debug",
@@ -161,6 +160,7 @@ public Startup(IHostingEnvironment env)
         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
         .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
         .AddEnvironmentVariables();
+		
     Configuration = builder.Build();
 }
 ```
@@ -169,11 +169,19 @@ The `Configure` method is used to configure the services added to the dependency
 log providers are configured. For the `AWS.Logger.AspNetCore` the configuration for the provider is loaded from 
 the Configuration property and the AWS provider is added to the `ILoggerFactory`.
 
+The AWS provider expects an IAmazonCloudWatchLogs client which can be supplied configuring AWS SDK as explained in
+[Configuring the AWS SDK for .NET with .NET Core](http://docs.aws.amazon.com/sdk-for-net/v3/developer-guide/net-dg-config-netcore.html).
+
+After that, a client can be injected to the log provider as shown below:
+
 ```csharp
 public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
 {
     // Create a logging provider based on the configuration information passed through the appsettings.json
-    loggerFactory.AddAWSProvider(this.Configuration.GetAWSLoggingConfigSection());
+	// using the injected IAmazonCloudWatchLogs client implementation
+    loggerFactory.AddAWSProvider(Configuration.GetAWSOptions().CreateServiceClient<IAmazonCloudWatchLogs>(), Configuration.GetAWSLoggingConfigSection());
 
     ...
 ```
+
+All credential information is managed by the AWS SDK and automatically supplied to the IAmazonCloudWatchLogs client. Check the documentation specified above for more information.
