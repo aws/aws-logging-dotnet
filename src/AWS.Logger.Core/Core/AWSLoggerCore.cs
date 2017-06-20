@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Text;
 using System.Linq;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 #if CORECLR
 using System.Runtime.Loader;
@@ -32,33 +31,25 @@ namespace AWS.Logger.Core
         private string _logType;
         const double MAX_BUFFER_TIMEDIFF = 5;
         #endregion
-        public AWSLoggerCore(AWSLoggerConfig config, string logType)
+
+        public AWSLoggerCore(IAmazonCloudWatchLogs client, AWSLoggerConfig config, string logType)
         {
             _config = config;
             _logType = logType;
-
-            var credentials = DetermineCredentials(config);
-
-            if (_config.Region != null)
-            {
-                _client = new AmazonCloudWatchLogsClient(credentials, Amazon.RegionEndpoint.GetBySystemName(_config.Region));
-            }
-            else
-            {
-                _client = new AmazonCloudWatchLogsClient(credentials);
-            }
+            _client = client;
 
             ((AmazonCloudWatchLogsClient)this._client).BeforeRequestEvent += ServiceClientBeforeRequestEvent;
 
             StartMonitor();
             RegisterShutdownHook();
         }
+        
+        #if CORECLR
 
-
-#if CORECLR
         private void RegisterShutdownHook()
         {
             var currentAssembly = typeof(AWSLoggerCore).GetTypeInfo().Assembly;
+
             AssemblyLoadContext.GetLoadContext(currentAssembly).Unloading += this.OnAssemblyLoadContextUnloading;
         }
 
@@ -67,7 +58,7 @@ namespace AWS.Logger.Core
             this.Close();
         }
         
-#elif NET452
+        #elif NET452
 
         private void RegisterShutdownHook()
         {
@@ -79,33 +70,20 @@ namespace AWS.Logger.Core
         {
             Close();
         }
-#endif
 
-        private static AWSCredentials DetermineCredentials(AWSLoggerConfig config)
-        {
-            if (config.Credentials != null)
-            {
-                return config.Credentials;
-            }
-            if (!string.IsNullOrEmpty(config.Profile) && StoredProfileAWSCredentials.IsProfileKnown(config.Profile, config.ProfilesLocation))
-            {
-                return new StoredProfileAWSCredentials(config.Profile, config.ProfilesLocation);
-            }
-
-            return FallbackCredentialsFactory.GetCredentials();
-        }
+        #endif
 
         public void Close()
         {
             _isTerminated = true;
             _cancelStartSource.Cancel();
             _config.ShutDown();
+
             Task.Run(async () =>
             {
                 await Monitor(CancellationToken.None);
             }).Wait();
         }
-
 
         /// <summary>
         /// A Concurrent Queue is used to store the messages from 
@@ -118,12 +96,15 @@ namespace AWS.Logger.Core
             {
                 message = EMPTY_MESSAGE;
             }
+
             if (_pendingMessageQueue.Count >= _config.MaxQueuedMessages)
             {
                 if ((_maxBufferTimeStamp == DateTime.MinValue) || (DateTime.Now > _maxBufferTimeStamp.Add(TimeSpan.FromMinutes(MAX_BUFFER_TIMEDIFF))))
                 {
                     _maxBufferTimeStamp = DateTime.Now;
+
                     message = "The AWS Logger in-memory buffer has reached maximum capacity";
+
                     _pendingMessageQueue.Enqueue(new InputLogEvent
                     {
                         Timestamp = DateTime.Now,
@@ -145,6 +126,7 @@ namespace AWS.Logger.Core
         {
             _cancelStartSource.Dispose();
         }
+
         /// <summary>
         /// Kicks off the Poller Thread to keep tabs on the PutLogEvent request and the
         /// Concurrent Queue
@@ -153,6 +135,7 @@ namespace AWS.Logger.Core
         public void StartMonitor()
         {
             _cancelStartSource = new CancellationTokenSource();
+
             Task.Run(async () =>
             {
                 await Monitor(_cancelStartSource.Token);
@@ -168,20 +151,20 @@ namespace AWS.Logger.Core
             try
             {
                 token.ThrowIfCancellationRequested();
+
                 if (_currentStreamName == null)
                 {
                     await LogEventTransmissionSetup(token).ConfigureAwait(false);
                 }
+
                 while (!token.IsCancellationRequested)
                 {
                     if (!_pendingMessageQueue.IsEmpty)
                     {
                         while (!_pendingMessageQueue.IsEmpty)
                         {
-                            InputLogEvent ev;
-                            if (_pendingMessageQueue.TryDequeue(out ev))
+                            if (_pendingMessageQueue.TryDequeue(out InputLogEvent ev))
                             {
-
                                 // See if new message will cause the current batch to violote the size constraint.
                                 // If so send the current batch now before adding more to the batch of messages to send.
                                 if (_repo.IsSizeConstraintViolated(ev.Message))
@@ -190,11 +173,11 @@ namespace AWS.Logger.Core
                                 }
 
                                 _repo.AddMessage(ev);
+
                                 if (_repo.ShouldSendRequest && !_isTerminated)
                                 {
                                     await SendMessages(token).ConfigureAwait(false);
                                 }
-
                             }
                         }
                     }
@@ -206,7 +189,9 @@ namespace AWS.Logger.Core
                         {
                             break;
                         }
+
                         await Task.Delay(Convert.ToInt32(_config.MonitorSleepTime.TotalMilliseconds));
+
                         if (_repo.ShouldSendRequest)
                         {
                             await SendMessages(token).ConfigureAwait(false);
@@ -217,13 +202,13 @@ namespace AWS.Logger.Core
             catch (OperationCanceledException oc)
             {
                 LogLibraryError(oc,_config.LibraryLogFileName);
+
                 throw;
             }
             catch (Exception e)
             {
                 LogLibraryError(e, _config.LibraryLogFileName);
             }
-
         }
 
         /// <summary>
@@ -236,11 +221,13 @@ namespace AWS.Logger.Core
             try
             {
                 var response = await _client.PutLogEventsAsync(_repo._request, token).ConfigureAwait(false);
+
                 _repo.Reset(response.NextSequenceToken);
             }
             catch (TaskCanceledException tc)
             {
                 LogLibraryError(tc, _config.LibraryLogFileName);
+
                 throw;
             }
             catch (Exception e)
@@ -248,6 +235,7 @@ namespace AWS.Logger.Core
                 //In case the NextSequenceToken is invalid for the last sent message, a new stream would be 
                 //created for the said application.
                 LogLibraryError(e, _config.LibraryLogFileName);
+
                 await LogEventTransmissionSetup(token).ConfigureAwait(false);
             }
         }
@@ -261,31 +249,42 @@ namespace AWS.Logger.Core
         {
             try
             {
-                var logGroupResponse = await _client.DescribeLogGroupsAsync(new DescribeLogGroupsRequest
+                if (_config.CheckLogGroupExistance)
                 {
-                    LogGroupNamePrefix = _config.LogGroup
-                }, token).ConfigureAwait(false);
+                    var logGroupResponse = await _client.DescribeLogGroupsAsync(new DescribeLogGroupsRequest
+                    {
+                        LogGroupNamePrefix = _config.LogGroup
+                    }, token).ConfigureAwait(false);
 
-                if (logGroupResponse.LogGroups.FirstOrDefault(x => string.Equals(x.LogGroupName, _config.LogGroup, StringComparison.Ordinal)) == null)
-                {
-                    await _client.CreateLogGroupAsync(new CreateLogGroupRequest { LogGroupName = _config.LogGroup }, token);
+                    if (logGroupResponse.LogGroups.FirstOrDefault(x => string.Equals(x.LogGroupName, _config.LogGroup, StringComparison.Ordinal)) == null)
+                    {
+                        await _client.CreateLogGroupAsync(new CreateLogGroupRequest { LogGroupName = _config.LogGroup }, token);
+                    }
                 }
-                _currentStreamName = DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss") + " - " + _config.LogStreamNameSuffix;
 
-                var streamResponse = await _client.CreateLogStreamAsync(new CreateLogStreamRequest
+                if (string.IsNullOrEmpty(_config.LogStream))
                 {
-                    LogGroupName = _config.LogGroup,
-                    LogStreamName = _currentStreamName
-                }, token).ConfigureAwait(false);
+                    _currentStreamName = DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss") + " - " + _config.LogStreamNameSuffix;
+
+                    var streamResponse = await _client.CreateLogStreamAsync(new CreateLogStreamRequest
+                    {
+                        LogGroupName = _config.LogGroup,
+                        LogStreamName = _currentStreamName
+                    }, token).ConfigureAwait(false);
+                }
+                else
+                {
+                    _currentStreamName = _config.LogStream;
+                }
 
                 _repo = new LogEventBatch(_config.LogGroup, _currentStreamName, Convert.ToInt32(_config.BatchPushInterval.TotalSeconds), _config.BatchSizeInBytes);
             }
             catch (Exception e)
             {
                 LogLibraryError(e, _config.LibraryLogFileName);
+
                 throw;
             }
-
         }
 
         /// <summary>
@@ -318,25 +317,26 @@ namespace AWS.Logger.Core
 
             int _totalMessageSize { get; set; }
             DateTime _nextPushTime;
-            public PutLogEventsRequest _request = new PutLogEventsRequest();
-            public LogEventBatch()
-            {
 
-            }
+            public PutLogEventsRequest _request = new PutLogEventsRequest();
+
+            public LogEventBatch() { }
+
             public LogEventBatch(string logGroupName, string streamName, int timeIntervalBetweenPushes, int maxBatchSize)
             {
                 _request.LogGroupName = logGroupName;
                 _request.LogStreamName = streamName;
                 TimeIntervalBetweenPushes = TimeSpan.FromSeconds(timeIntervalBetweenPushes);
                 MaxBatchSize = maxBatchSize;
+
                 Reset(null);
             }
-
 
             public bool IsSizeConstraintViolated(string message)
             {
                 Encoding unicode = Encoding.Unicode;
                 int prospectiveLength = _totalMessageSize + unicode.GetMaxByteCount(message.Length);
+
                 if (MaxBatchSize < prospectiveLength)
                     return true;
 
@@ -347,12 +347,14 @@ namespace AWS.Logger.Core
             {
                 Encoding unicode = Encoding.Unicode;
                 _totalMessageSize += unicode.GetMaxByteCount(ev.Message.Length);
+
                 _request.LogEvents.Add(ev);
             }
 
             public void Reset(string SeqToken)
             {
                 _request.LogEvents.Clear();
+
                 _totalMessageSize = 0;
                 _request.SequenceToken = SeqToken;
                 _nextPushTime = DateTime.Now.Add(TimeIntervalBetweenPushes);
@@ -360,16 +362,18 @@ namespace AWS.Logger.Core
         }
 
         const string UserAgentHeader = "User-Agent";
+
         void ServiceClientBeforeRequestEvent(object sender, RequestEventArgs e)
         {
-            Amazon.Runtime.WebServiceRequestEventArgs args = e as Amazon.Runtime.WebServiceRequestEventArgs;
+            WebServiceRequestEventArgs args = e as WebServiceRequestEventArgs;
+
             if (args == null || !args.Headers.ContainsKey(UserAgentHeader))
                 return;
 
             args.Headers[UserAgentHeader] = args.Headers[UserAgentHeader] + " AWSLogger/" + _logType;
         }
 
-        public static void LogLibraryError(Exception ex,string LibraryLogFileName)
+        public static void LogLibraryError(Exception ex, string LibraryLogFileName)
         {
             try
             {

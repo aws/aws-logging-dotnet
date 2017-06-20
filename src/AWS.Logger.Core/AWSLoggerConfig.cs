@@ -1,19 +1,11 @@
 ﻿using System;
 
-using Amazon.Runtime;
 namespace AWS.Logger
 {
     /// <summary>
     /// This class contains all the configuration options for logging messages to AWS. As messages from the application are 
     /// sent to the logger they are queued up in a batch. The batch will be sent when either BatchPushInterval or BatchSizeInBytes
     /// are exceeded.
-    /// 
-    /// <para>
-    /// AWS Credentials are determined using the following steps.
-    /// 1) If the Credentials property is set
-    /// 2) If the Profile property is set and the can be found
-    /// 3) Use the AWS SDK for .NET fall back mechanism to find enviroment credentials.
-    /// </para>
     /// </summary>
     public class AWSLoggerConfig : IAWSLoggerConfig
     {
@@ -26,37 +18,19 @@ namespace AWS.Logger
         public string LogGroup { get; set; }
 
         /// <summary>
-        /// Gets and sets the Profile property. The profile is used to look up AWS credentials in the profile store.
+        /// Gets the CheckLogGroupExistance property. If this is set to True, some checks are
+        /// performed to ensure that the specified LogGroup exists. If not, the LogGroup is created.
         /// <para>
-        /// For understanding how credentials are determine view the top level documentation for AWSLoggerConfig class.
+        /// The default is False.
         /// </para>
         /// </summary>
-        public string Profile { get; set; }
+        public bool CheckLogGroupExistance { get; set; } = false;
 
         /// <summary>
-        /// Gets and sets the ProfilesLocation property. If this is not set the default profile store is used by the AWS SDK for .NET 
-        /// to look up credentials. This is most commonly used when you are running an application of on-priemse under a service account.
-        /// <para>
-        /// For understanding how credentials are determine view the top level documentation for AWSLoggerConfig class.
-        /// </para>
+        /// Gets the LogStream property. This is the name of the CloudWatch Logs stream within the
+        /// specified LogGroup. If a LogStream is not specified, one gets created automatically.
         /// </summary>
-        public string ProfilesLocation { get; set; }
-
-        /// <summary>
-        /// Gets and sets the Credentials property. These are the AWS credentials used by the AWS SDK for .NET to make service calls.
-        /// <para>
-        /// For understanding how credentials are determine view the top level documentation for AWSLoggerConfig class.
-        /// </para>
-        /// </summary>
-        public AWSCredentials Credentials { get; set; }
-
-
-        /// <summary>
-        /// Gets and sets the Region property. This is the AWS Region that will be used for CloudWatch Logs. If this is not
-        /// the AWS SDK for .NET will use its fall back logic to try and determine the region through environment variables and EC2 instance metadata.
-        /// If the Region is not set and no region is found by the SDK's fall back logic then an exception will be thrown.
-        /// </summary>
-        public string Region { get; set; }
+        public string LogStream { get; set; }
 
         /// <summary>
         /// Gets and sets the BatchPushInterval property. For performance the log messages are sent to AWS in batch sizes. BatchPushInterval 
@@ -98,9 +72,7 @@ namespace AWS.Logger
         /// <summary>
         /// Default Constructor
         /// </summary>
-        public AWSLoggerConfig()
-        {
-        }
+        public AWSLoggerConfig() { }
 
         /// <summary>
         /// Construct instance and sets the LogGroup
