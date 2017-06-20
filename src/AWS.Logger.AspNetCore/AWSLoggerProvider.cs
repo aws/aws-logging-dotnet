@@ -3,6 +3,7 @@ using AWS.Logger.Core;
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
+using Amazon.CloudWatchLogs;
 
 namespace AWS.Logger.AspNetCore
 {
@@ -14,12 +15,13 @@ namespace AWS.Logger.AspNetCore
         private IAWSLoggerCore _core;
         private Func<string, LogLevel, bool> _filter;
         private AWSLoggerConfigSection _configSection;
+
         /// <summary>
         /// Creates the logging provider with the configuration information to connect to AWS and how the messages should be sent.
         /// </summary>
         /// <param name="config">Configuration on how to connect to AWS and how the log messages should be sent.</param>
-        public AWSLoggerProvider(AWSLoggerConfig config)
-            : this(config, LogLevel.Trace)
+        public AWSLoggerProvider(IAmazonCloudWatchLogs client, AWSLoggerConfig config)
+            : this(client, config, LogLevel.Trace)
         {
         }
 
@@ -28,8 +30,8 @@ namespace AWS.Logger.AspNetCore
         /// </summary>
         /// <param name="config">Configuration on how to connect to AWS and how the log messages should be sent.</param>
         /// <param name="minLevel">The minimum log level for messages to be written.</param>
-        public AWSLoggerProvider(AWSLoggerConfig config, LogLevel minLevel)
-            : this(config, CreateLogLevelFilter(minLevel))
+        public AWSLoggerProvider(IAmazonCloudWatchLogs client, AWSLoggerConfig config, LogLevel minLevel)
+            : this(client, config, CreateLogLevelFilter(minLevel))
         {
         }
 
@@ -38,9 +40,9 @@ namespace AWS.Logger.AspNetCore
         /// </summary>
         /// <param name="config">Configuration on how to connect to AWS and how the log messages should be sent.</param>
         /// <param name="filter">A filter function that has the logger category name and log level which can be used to filter messages being sent to AWS.</param>
-        public AWSLoggerProvider(AWSLoggerConfig config, Func<string, LogLevel, bool> filter)
+        public AWSLoggerProvider(IAmazonCloudWatchLogs client, AWSLoggerConfig config, Func<string, LogLevel, bool> filter)
         {
-            _core = new AWSLoggerCore(config, "ILogger");
+            _core = new AWSLoggerCore(client, config, "ILogger");
             _filter = filter;
         }
 
@@ -48,10 +50,10 @@ namespace AWS.Logger.AspNetCore
         /// Creates the logging provider with the configuration section information to connect to AWS and how the messages should be sent. Also contains the LogLevel details
         /// </summary>
         /// <param name="configSection">Contains configuration on how to connect to AWS and how the log messages should be sent. Also contains the LogeLevel details based upon which the filter values would be set</param>
-        public AWSLoggerProvider(AWSLoggerConfigSection configSection)
+        public AWSLoggerProvider(IAmazonCloudWatchLogs client, AWSLoggerConfigSection configSection)
         {
             _configSection = configSection;
-            _core = new AWSLoggerCore(_configSection.Config, "ILogger");
+            _core = new AWSLoggerCore(client, _configSection.Config, "ILogger");
         }
 
         /// <summary>
@@ -65,6 +67,7 @@ namespace AWS.Logger.AspNetCore
             {
                 _filter = CreateConfigSectionFilter(_configSection.LogLevels, categoryName);
             }
+
             return new AWSLogger(categoryName, _core, _filter);
         }
 
@@ -94,17 +97,17 @@ namespace AWS.Logger.AspNetCore
         public static Func<string, LogLevel, bool> CreateConfigSectionFilter(IConfiguration logLevels, string categoryName)
         {
             string name = categoryName;
+
             foreach (var prefix in GetKeyPrefixes(name))
             {
-                LogLevel level;
-                if (TryGetSwitch(prefix, logLevels, out level))
+                if (TryGetSwitch(prefix, logLevels, out LogLevel level))
                 {
                     return (n, l) => l >= level;
                 }
             }
+
             return (n, l) => false;
         }
-
 
         /// <summary>
         /// This method fetches the prefix name from the supplied category name of the logger. In case of no prefix match "Default" value is returned.
@@ -116,12 +119,16 @@ namespace AWS.Logger.AspNetCore
             while (!string.IsNullOrEmpty(name))
             {
                 yield return name;
+
                 var lastIndexOfDot = name.LastIndexOf('.');
+
                 if (lastIndexOfDot == -1)
                 {
                     yield return "Default";
+
                     break;
                 }
+
                 name = name.Substring(0, lastIndexOfDot);
             }
         }
@@ -136,6 +143,7 @@ namespace AWS.Logger.AspNetCore
         public static bool TryGetSwitch(string name, IConfiguration logLevels, out LogLevel level)
         {
             var switches = logLevels;
+
             if (switches == null)
             {
                 level = LogLevel.Trace;
@@ -143,9 +151,11 @@ namespace AWS.Logger.AspNetCore
             }
 
             var value = switches[name];
+
             if (string.IsNullOrEmpty(value))
             {
                 level = LogLevel.None;
+
                 return false;
             }
             else if (Enum.TryParse<LogLevel>(value, out level))
@@ -154,8 +164,7 @@ namespace AWS.Logger.AspNetCore
             }
             else
             {
-                var message = $"Configuration value '{value}' for category '{name}' is not supported.";
-                throw new InvalidOperationException(message);
+                throw new InvalidOperationException($"Configuration value '{value}' for category '{name}' is not supported.");
             }
         }
     }

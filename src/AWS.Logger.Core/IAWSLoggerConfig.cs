@@ -1,5 +1,4 @@
 ﻿using System;
-using Amazon.Runtime;
 
 namespace AWS.Logger
 {
@@ -12,37 +11,16 @@ namespace AWS.Logger
         string LogGroup { get; }
 
         /// <summary>
-        /// Gets the Profile property. The profile is used to look up AWS credentials in the profile store.
-        /// <para>
-        /// For understanding how credentials are determine view the top level documentation for AWSLoggerConfig class.
-        /// </para>
+        /// Gets the CheckLogGroupExistance property. If this is set to True, some checks are
+        /// performed to ensure that the specified LogGroup exists. If not, the LogGroup is created.
         /// </summary>
-        string Profile { get;  }
+        bool CheckLogGroupExistance { get; }
 
         /// <summary>
-        /// Gets the ProfilesLocation property. If this is not set the default profile store is used by the AWS SDK for .NET 
-        /// to look up credentials. This is most commonly used when you are running an application of on-priemse under a service account.
-        /// <para>
-        /// For understanding how credentials are determine view the top level documentation for AWSLoggerConfig class.
-        /// </para>
+        /// Gets the LogStream property. This is the name of the CloudWatch Logs stream within the
+        /// specified LogGroup. If a LogStream is not specified, one gets created automatically.
         /// </summary>
-        string ProfilesLocation { get;  }
-
-        /// <summary>
-        /// Gets the Credentials property. These are the AWS credentials used by the AWS SDK for .NET to make service calls.
-        /// <para>
-        /// For understanding how credentials are determine view the top level documentation for AWSLoggerConfig class.
-        /// </para>
-        /// </summary>
-        AWSCredentials Credentials { get;  }
-
-
-        /// <summary>
-        /// Gets the Region property. This is the AWS Region that will be used for CloudWatch Logs. If this is not
-        /// the AWS SDK for .NET will use its fall back logic to try and determine the region through environment variables and EC2 instance metadata.
-        /// If the Region is not set and no region is found by the SDK's fall back logic then an exception will be thrown.
-        /// </summary>
-        string Region { get;  }
+        string LogStream { get; }
 
         /// <summary>
         /// Gets the BatchPushInterval property. For performance the log messages are sent to AWS in batch sizes. BatchPushInterval 

@@ -1,11 +1,11 @@
-﻿using AWS.Logger;
+﻿using Amazon.CloudWatchLogs;
+using AWS.Logger;
 using AWS.Logger.AspNetCore;
 using Microsoft.Extensions.Configuration;
 using System;
 #if CORECLR
 using System.Runtime.Loader;
 #endif
-using System.Reflection;
 
 namespace Microsoft.Extensions.Logging
 {
@@ -20,7 +20,7 @@ namespace Microsoft.Extensions.Logging
         /// <param name="factory"></param>
         /// <param name="config">Configuration on how to connect to AWS and how the log messages should be sent.</param>
         /// <returns></returns>
-        public static ILoggerFactory AddAWSProvider(this ILoggerFactory factory, AWSLoggerConfig config)
+        public static ILoggerFactory AddAWSProvider(this ILoggerFactory factory, IAmazonCloudWatchLogs client, AWSLoggerConfig config)
         {
             // If config is null. Assuming the logger is being activated in a debug environment
             // and skip adding the provider. We don't want to prevent developers running their application
@@ -31,8 +31,10 @@ namespace Microsoft.Extensions.Logging
                 return factory;
             }
 
-            var provider = new AWSLoggerProvider(config);
+            var provider = new AWSLoggerProvider(client, config);
+
             factory.AddProvider(provider);
+
             return factory;
         }
 
@@ -42,7 +44,7 @@ namespace Microsoft.Extensions.Logging
         /// <param name="factory"></param>
         /// <param name="configSection">Configuration and loglevels on how to connect to AWS and how the log messages should be sent.</param>
         /// <returns></returns>
-        public static ILoggerFactory AddAWSProvider(this ILoggerFactory factory, AWSLoggerConfigSection configSection)
+        public static ILoggerFactory AddAWSProvider(this ILoggerFactory factory, IAmazonCloudWatchLogs client, AWSLoggerConfigSection configSection)
         {
             // If configSection is null. Assuming the logger is being activated in a debug environment
             // and skip adding the provider. We don't want to prevent developers running their application
@@ -50,11 +52,14 @@ namespace Microsoft.Extensions.Logging
             if (configSection == null)
             {
                 factory.CreateLogger("AWS.Logging.AspNetCore").LogWarning("AWSLoggerConfigSection is null. LogGroup is likely not configured in config files. Skipping adding AWS Logging provider.");
+
                 return factory;
             }
 
-            var provider = new AWSLoggerProvider(configSection);
+            var provider = new AWSLoggerProvider(client, configSection);
+
             factory.AddProvider(provider);
+
             return factory;
         }
 
@@ -65,10 +70,12 @@ namespace Microsoft.Extensions.Logging
         /// <param name="config">Configuration on how to connect to AWS and how the log messages should be sent.</param>
         /// <param name="minLevel">The minimum log level for messages to be written.</param>
         /// <returns></returns>
-        public static ILoggerFactory AddAWSProvider(this ILoggerFactory factory, AWSLoggerConfig config, LogLevel minLevel)
+        public static ILoggerFactory AddAWSProvider(this ILoggerFactory factory, IAmazonCloudWatchLogs client, AWSLoggerConfig config, LogLevel minLevel)
         {
-            var provider = new AWSLoggerProvider(config,minLevel);
+            var provider = new AWSLoggerProvider(client, config, minLevel);
+
             factory.AddProvider(provider);
+
             return factory;
         }
 
@@ -79,10 +86,12 @@ namespace Microsoft.Extensions.Logging
         /// <param name="config">Configuration on how to connect to AWS and how the log messages should be sent.</param>
         /// <param name="filter">A filter function that has the logger category name and log level which can be used to filter messages being sent to AWS.</param>
         /// <returns></returns>
-        public static ILoggerFactory AddAWSProvider(this ILoggerFactory factory, AWSLoggerConfig config, Func<string, LogLevel, bool> filter)
+        public static ILoggerFactory AddAWSProvider(this ILoggerFactory factory, IAmazonCloudWatchLogs client, AWSLoggerConfig config, Func<string, LogLevel, bool> filter)
         {
-            var provider = new AWSLoggerProvider(config, filter);
+            var provider = new AWSLoggerProvider(client, config, filter);
+
             factory.AddProvider(provider);
+
             return factory;
         }
     }
