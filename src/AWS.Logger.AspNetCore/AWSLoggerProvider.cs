@@ -14,12 +14,15 @@ namespace AWS.Logger.AspNetCore
         private IAWSLoggerCore _core;
         private Func<string, LogLevel, bool> _filter;
         private AWSLoggerConfigSection _configSection;
+        private Func<LogLevel, object, Exception, string> _customFormatter;
+
         /// <summary>
         /// Creates the logging provider with the configuration information to connect to AWS and how the messages should be sent.
         /// </summary>
         /// <param name="config">Configuration on how to connect to AWS and how the log messages should be sent.</param>
-        public AWSLoggerProvider(AWSLoggerConfig config)
-            : this(config, LogLevel.Trace)
+        /// <param name="formatter">A custom formatter which accepts a LogLevel, a state, and an exception and returns the formatted log message.</param>
+        public AWSLoggerProvider(AWSLoggerConfig config, Func<LogLevel, object, Exception, string> formatter = null)
+            : this(config, LogLevel.Trace, formatter)
         {
         }
 
@@ -28,8 +31,9 @@ namespace AWS.Logger.AspNetCore
         /// </summary>
         /// <param name="config">Configuration on how to connect to AWS and how the log messages should be sent.</param>
         /// <param name="minLevel">The minimum log level for messages to be written.</param>
-        public AWSLoggerProvider(AWSLoggerConfig config, LogLevel minLevel)
-            : this(config, CreateLogLevelFilter(minLevel))
+        /// <param name="formatter">A custom formatter which accepts a LogLevel, a state, and an exception and returns the formatted log message.</param>
+        public AWSLoggerProvider(AWSLoggerConfig config, LogLevel minLevel, Func<LogLevel, object, Exception, string> formatter = null)
+            : this(config, CreateLogLevelFilter(minLevel), formatter)
         {
         }
 
@@ -38,10 +42,18 @@ namespace AWS.Logger.AspNetCore
         /// </summary>
         /// <param name="config">Configuration on how to connect to AWS and how the log messages should be sent.</param>
         /// <param name="filter">A filter function that has the logger category name and log level which can be used to filter messages being sent to AWS.</param>
-        public AWSLoggerProvider(AWSLoggerConfig config, Func<string, LogLevel, bool> filter)
+        /// <param name="formatter">A custom formatter which accepts a LogLevel, a state, and an exception and returns the formatted log message.</param>
+        public AWSLoggerProvider(AWSLoggerConfig config, Func<string, LogLevel, bool> filter, Func<LogLevel, object, Exception, string> formatter = null)
         {
             _core = new AWSLoggerCore(config, "ILogger");
             _filter = filter;
+            _customFormatter = formatter;
+        }
+
+        public AWSLoggerProvider(AWSLoggerConfigSection configSection, Func<LogLevel, object, Exception, string> formatter = null) 
+            : this(configSection)
+        {
+            _customFormatter = formatter;
         }
 
         /// <summary>
@@ -52,7 +64,7 @@ namespace AWS.Logger.AspNetCore
         {
             _configSection = configSection;
             _core = new AWSLoggerCore(_configSection.Config, "ILogger");
-        }
+        }        
 
         /// <summary>
         /// Called by the ILoggerFactory to create an ILogger
@@ -65,7 +77,7 @@ namespace AWS.Logger.AspNetCore
             {
                 _filter = CreateConfigSectionFilter(_configSection.LogLevels, categoryName);
             }
-            return new AWSLogger(categoryName, _core, _filter);
+            return new AWSLogger(categoryName, _core, _filter, _customFormatter);
         }
 
         /// <summary>

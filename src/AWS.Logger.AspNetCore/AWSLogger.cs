@@ -12,6 +12,7 @@ namespace AWS.Logger.AspNetCore
         private readonly string _categoryName;
         private readonly IAWSLoggerCore _core;
         private readonly Func<string, LogLevel, bool> _filter;
+        private readonly Func<LogLevel, object, Exception, string> _customFormatter;
 
         /// <summary>
         /// Construct an instance of AWSLogger
@@ -19,11 +20,13 @@ namespace AWS.Logger.AspNetCore
         /// <param name="categoryName">The category name for the logger which can be used for filtering.</param>
         /// <param name="core">The core logger that is used to send messages to AWS.</param>
         /// <param name="filter">Filter function that will only allow messages to be sent to AWS if it returns true. If the value is null all messages are sent.</param>
-        public AWSLogger(string categoryName, IAWSLoggerCore core, Func<string, LogLevel, bool> filter)
+        /// <param name="customFormatter">A custom formatter which accepts a LogLevel, a state, and an exception and returns the formatted log message.</param>
+        public AWSLogger(string categoryName, IAWSLoggerCore core, Func<string, LogLevel, bool> filter, Func<LogLevel, object, Exception, string> customFormatter = null)
         {
             _categoryName = categoryName;
             _core = core;
             _filter = filter;
+            _customFormatter = customFormatter;
         }
 
         /// <summary>
@@ -64,7 +67,7 @@ namespace AWS.Logger.AspNetCore
             {
                 return;
             }
-            var message = formatter(state, exception);
+            var message = _customFormatter != null ? _customFormatter(logLevel, state, exception) : formatter(state, exception);
             _core.AddMessage(message);
         }
 

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Hosting;
+using System;
 
 namespace WebSample
 {
@@ -32,7 +33,9 @@ namespace WebSample
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             // Create a logging provider based on the configuration information passed through the appsettings.json
-            loggerFactory.AddAWSProvider(this.Configuration.GetAWSLoggingConfigSection());
+            // You can even provide your custom formatting.
+            loggerFactory.AddAWSProvider(this.Configuration.GetAWSLoggingConfigSection(), 
+                formatter: (logLevel, message, exception) => $"[{DateTime.UtcNow}] {logLevel}: {message}");
 
             // Create a logger instance from the loggerFactory
             var logger = loggerFactory.CreateLogger<Program>();
