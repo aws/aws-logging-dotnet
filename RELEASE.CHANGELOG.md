@@ -1,3 +1,7 @@
+### Release 2017-06-22 21:30 UTC
+* **AWS.Logger.AspNetCore (1.2.0)**
+    * Pull request [#14](https://github.com/aws/aws-logging-dotnet/pull/14), adding support for custom formatters. Thanks to [Peter Deme](https://github.com/peterdeme).
+
 ### Release 2017-05-18 14:30 UTC
 * **AWS.Logger.Core (1.1.1)**
     * Added LibraryLogFileName property to log errors encountered by AWSLoggerCore
