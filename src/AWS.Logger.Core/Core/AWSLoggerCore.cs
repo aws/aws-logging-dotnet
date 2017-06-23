@@ -143,7 +143,10 @@ namespace AWS.Logger.Core
 
         ~AWSLoggerCore()
         {
-            _cancelStartSource.Dispose();
+            if (_cancelStartSource != null)
+            {
+                _cancelStartSource.Dispose();
+            }
         }
         /// <summary>
         /// Kicks off the Poller Thread to keep tabs on the PutLogEvent request and the
