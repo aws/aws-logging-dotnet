@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>AWS.Logger.NLog</id>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
     <authors>Amazon Web Services</authors>
     <owners>Amazon Web Services</owners>
     <licenseUrl>http://aws.amazon.com/apache2.0/</licenseUrl>
@@ -18,7 +18,7 @@
       </group>
 
       <group>
-        <dependency id="AWS.Logger.Core" version="1.1.1" />
+        <dependency id="AWS.Logger.Core" version="1.1.2" />
       </group>
 
     </dependencies>
