@@ -1,3 +1,13 @@
+### Release 2017-06-23 21:30 UTC
+* **AWS.Logger.Core (1.1.2)**
+    * Pull request [#19](https://github.com/aws/aws-logging-dotnet/pull/19), fixing a NPE. Thanks to [Andrew Kazyrevich](https://github.com/andreister)
+* **AWS.Logger.AspNetCore (1.2.1)**
+    * Updated dependency to latest AWS.Logger.Core
+* **AWS.Logger.Log4net (1.1.2)**
+    * Updated dependency to latest AWS.Logger.Core
+* **AWS.Logger.NLog (1.1.2)**
+    * Updated dependency to latest AWS.Logger.Core
+	
 ### Release 2017-06-22 21:30 UTC
 * **AWS.Logger.AspNetCore (1.2.0)**
     * Pull request [#14](https://github.com/aws/aws-logging-dotnet/pull/14), adding support for custom formatters. Thanks to [Peter Deme](https://github.com/peterdeme).
