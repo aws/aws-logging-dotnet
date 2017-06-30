@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using System;
 using log4net.Repository;
 using AWS.Logger.TestUtils;
-using AWS.Logger.Log4net;
 
 namespace AWS.Logger.Log4Net.Tests
 {
