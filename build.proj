@@ -7,21 +7,13 @@
     </PropertyGroup>
 
     <!-- <Target Name="FullBuild" DependsOnTargets="Compile;Nuget;Test45;Test" /> -->
-    <Target Name="FullBuild" DependsOnTargets="Compile;Test45;Test;Nuget" />
+    <Target Name="FullBuild" DependsOnTargets="Compile;Test;Nuget" />
     <Target Name = "Compile">
-      <Exec Command="dotnet restore"/>
-      <Exec Command=".\.nuget\Nuget.exe restore .\src\AWS.Logger.Core\AWS.Logger.Core.csproj -SolutionDirectory ." />
-      <Exec Command=".\.nuget\Nuget.exe restore .\src\AWS.Logger.Log4net\packages.config -SolutionDirectory ." />
-      <Exec Command=".\.nuget\Nuget.exe restore .\src\NLog.AWS.Logger\NLog.AWS.Logger.csproj -SolutionDirectory ." />
-	    <Exec Command=".\.nuget\Nuget.exe restore .\test\AWS.Logger.Log4Net.Tests\packages.config -SolutionDirectory ." />
-      <Exec Command=".\.nuget\Nuget.exe restore .\test\AWS.Logger.NLog.Tests\AWS.Logger.NLog.Tests.csproj -SolutionDirectory ." />
-      <Exec Command=".\.nuget\Nuget.exe restore .\test\AWS.Logger.NLog.FilterTests\AWS.Logger.NLog.FilterTests.csproj -SolutionDirectory ." />
-      <Exec Command=".\.nuget\Nuget.exe restore .\test\AWS.Logger.Log4Net.FilterTests\AWS.Logger.Log4Net.FilterTests.csproj -SolutionDirectory ." />
-      <Exec Command=".\.nuget\Nuget.exe restore .\test\AWS.Logger.TestUtils\AWS.Logger.TestUtils.csproj -SolutionDirectory ." />
-	  <MSBuild Projects=".\AWS.Logger.sln" Targets="Clean;Build" Properties="Configuration=Release;AWSKeyFile=$(CustomSnkFileLocation)" />
+      <Exec Command="dotnet restore AWS.Logger.sln"/>
+	    <MSBuild Projects=".\AWS.Logger.sln" Targets="Rebuild" Properties="Configuration=Release;AWSKeyFile=$(CustomSnkFileLocation)" />
     </Target>
 
-    <Target Name = "Nuget" DependsOnTargets="Compile;Test45;Test">
+    <Target Name = "Nuget" DependsOnTargets="Compile;Test">
     <!-- You could use the MSBuild Copy task here to move the compiled code into
            a structure that fits your desired package format -->
     <Exec Command="if exist Deployment rmdir /S/Q Deployment"/>
@@ -33,17 +25,11 @@
 
     </Target>
 
-    <UsingTask AssemblyFile = "packages\xunit.runner.msbuild.2.2.0-beta4-build3444\build\portable-net45+win8+wp8+wpa81\xunit.runner.msbuild.dll" TaskName="Xunit.Runner.MSBuild.xunit"/>
-    <Target Name = "Test45" DependsOnTargets="Compile">
-      <xunit Assemblies=".\test\AWS.Logger.Log4Net.Tests\bin\Release\AWS.Logger.Log4Net.Tests.dll" />
-      <xunit Assemblies=".\test\AWS.Logger.NLog.Tests\bin\Release\AWS.Logger.NLog.Tests.dll" />
-      <xunit Assemblies=".\test\AWS.Logger.Log4Net.FilterTests\bin\Release\AWS.Logger.Log4Net.FilterTests.dll" />
-      <xunit Assemblies=".\test\AWS.Logger.NLog.FilterTests\bin\Release\AWS.Logger.NLog.FilterTests.dll" />
-    </Target>
-
     <Target Name = "Test" DependsOnTargets="Compile">
-      <Exec Command="dotnet test .\test\AWS.Logger.NLog.Tests"/>
-      <Exec Command="dotnet test .\test\AWS.Logger.AspNetCore.Tests"/>
-	  <Exec Command="dotnet test .\test\AWS.Logger.NLog.FilterTests"/>
+      <Exec Command="dotnet test .\test\AWS.Logger.NLog.Tests\AWS.Logger.NLog.Tests.csproj"/>
+      <Exec Command="dotnet test .\test\AWS.Logger.AspNetCore.Tests\AWS.Logger.AspNetCore.Tests.csproj"/>
+	    <Exec Command="dotnet test .\test\AWS.Logger.NLog.FilterTests\AWS.Logger.NLog.FilterTests.csproj"/>
+      <Exec Command="dotnet test .\test\AWS.Logger.Log4Net.Tests\AWS.Logger.Log4Net.Tests.csproj"/>
+      <Exec Command="dotnet test .\test\AWS.Logger.Log4Net.FilterTests\AWS.Logger.Log4Net.FilterTests.csproj"/>
     </Target>
 </Project>

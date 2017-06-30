@@ -1,12 +1,6 @@
-﻿using System;
-
+﻿
 using NLog.Targets;
-using NLog.Config;
 using NLog;
-
-using AWS.Logger;
-using AWS.Logger.Core;
-using Amazon.Runtime;
 
 
 namespace AWS.Logger.NLogger.FilterTests

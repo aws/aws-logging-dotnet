@@ -53,7 +53,7 @@ namespace AWS.Logger.TestUtils
                         OrderBy = "LastEventTime"
                     }).Result;
             }
-            catch (Exception e) {
+            catch (Exception) {
                 return false;
             }
             

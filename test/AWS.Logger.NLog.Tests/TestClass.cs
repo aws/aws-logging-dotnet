@@ -21,14 +21,7 @@ namespace AWS.Logger.NLogger.Tests
 
         private void CreateLoggerFromConfiguration(string configFileName)
         {
-            try
-            {
-                LogManager.Configuration = new XmlLoggingConfiguration(configFileName);
-            }
-            catch (FileNotFoundException)
-            {
-                LogManager.Configuration = new XmlLoggingConfiguration("./test/AWS.Logger.NLog.Tests/" + configFileName);
-            }
+            LogManager.Configuration = new XmlLoggingConfiguration(configFileName);
         }
         public NLogTestClass(TestFixture testFixture) : base(testFixture)
         {

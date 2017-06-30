@@ -71,13 +71,17 @@
     <Compile Include="TestFilter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AWS.Logger.Core\AWS.Logger.Core.csproj">
-      <Project>{7cff5520-83cf-4fc4-9669-7a017e2612d5}</Project>
-      <Name>AWS.Logger.Core</Name>
-    </ProjectReference>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+    <ProjectReference Include="..\..\src\AWS.Logger.Core\AWS.Logger.Core.csproj">
+      <Project>{1d79e360-24d9-46fd-b744-63eabb17a1f6}</Project>
+      <Name>AWS.Logger.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\AWS.Logger.Log4net\AWS.Logger.Log4net.csproj">
+      <Project>{78312e9b-bc7c-4af8-9153-dd72bbf4fd36}</Project>
+      <Name>AWS.Logger.Log4net</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

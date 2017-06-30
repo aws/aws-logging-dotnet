@@ -16,12 +16,12 @@
 
       <group targetFramework="netstandard1.5">
         <dependency id="AWSSDK.CloudWatchLogs" version="[3.3.2, 3.4)" />
-        <dependency id="System.Collections.Concurrent" version="4.0.12" />
-        <dependency id="System.Globalization" version="4.0.11" />
-        <dependency id="System.Runtime.Loader" version="4.0.0" />
-        <dependency id="System.Threading.Tasks"  version="4.0.11"/>
+        <dependency id="System.Collections.Concurrent" version="4.3.0" />
+        <dependency id="System.Globalization" version="4.3.0" />
+        <dependency id="System.Runtime.Loader" version="4.3.0" />
+        <dependency id="System.Threading.Tasks"  version="4.3.0"/>
         <dependency id="System.Threading.ThreadPool" version= "4.0.10"/>
-        <dependency id="System.Threading.Timer" version= "4.0.1"/>
+        <dependency id="System.Threading.Timer" version= "4.3.0"/>
       </group>
 
         <group targetFramework="net452">
@@ -33,8 +33,8 @@
   <file src="bin\Release\netstandard1.5\AWS.Logger.Core.dll" target="lib\netstandard1.5" />
   <file src="bin\Release\netstandard1.5\AWS.Logger.Core.pdb" target="lib\netstandard1.5" />
 
-  <file src="bin\Release\AWS.Logger.Core.dll" target="lib\net45" />
-  <file src="bin\Release\AWS.Logger.Core.pdb" target="lib\net45" />
+  <file src="bin\Release\net45\AWS.Logger.Core.dll" target="lib\net45" />
+  <file src="bin\Release\net45\AWS.Logger.Core.pdb" target="lib\net45" />
 
 </files>
 </package>

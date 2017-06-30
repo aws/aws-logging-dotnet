@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -55,7 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\AWS.Logger.Core\AWS.Logger.Core.csproj">
-      <Project>{7cff5520-83cf-4fc4-9669-7a017e2612d5}</Project>
+      <Project>{1d79e360-24d9-46fd-b744-63eabb17a1f6}</Project>
       <Name>AWS.Logger.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\src\AWS.Logger.Log4net\AWS.Logger.Log4net.csproj">
