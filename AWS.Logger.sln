@@ -64,7 +64,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "AWS.Logger.TestUtils (.NET 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWS.Logger.TestUtils", "test\AWS.Logger.TestUtils\AWS.Logger.TestUtils.csproj", "{AB1255E0-1956-401D-A0B2-3855CFBCBF7E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "UnitTest", "test\UnitTests\UnitTest.xproj", "{0CDF585C-CED0-456F-95EA-F2AAB8B9F4E7}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "AWS.Logger.UnitTest", "test\AWS.Logger.UnitTests\AWS.Logger.UnitTest.xproj", "{0CDF585C-CED0-456F-95EA-F2AAB8B9F4E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
