@@ -1,3 +1,13 @@
+### Release 2017-07-25 10:30 UTC
+* **AWS.Logger.Core (1.1.3)**
+    * Updated the logic in AWSLoggerCore for creating a logstream. AWSLoggerCore library will try to use the sequence token in the response message of a log PutLogEventsAsync request for a maximum of 5 attempts, before creating a new logstream.
+* **AWS.Logger.AspNetCore (1.2.2)**
+    * Updated dependency to latest AWS.Logger.Core
+* **AWS.Logger.Log4net (1.1.3)**
+    * Updated dependency to latest AWS.Logger.Core
+* **AWS.Logger.NLog (1.1.3)**
+    * Updated dependency to latest AWS.Logger.Core
+
 ### Release 2017-06-23 21:30 UTC
 * **AWS.Logger.Core (1.1.2)**
     * Pull request [#19](https://github.com/aws/aws-logging-dotnet/pull/19), fixing a NPE. Thanks to [Andrew Kazyrevich](https://github.com/andreister)
