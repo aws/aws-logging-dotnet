@@ -9,6 +9,7 @@ using System.Linq;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 #if CORECLR
 using System.Runtime.Loader;
 #endif
@@ -30,7 +31,10 @@ namespace AWS.Logger.Core
         private bool _isTerminated = false;
         private DateTime _maxBufferTimeStamp = new DateTime();
         private string _logType;
+        private static int requestCount = 5;
         const double MAX_BUFFER_TIMEDIFF = 5;
+        private readonly static Regex invalid_sequence_token_regex = new 
+            Regex(@"The given sequenceToken is invalid. The next expected sequenceToken is: (\d+)");
         #endregion
         public AWSLoggerCore(AWSLoggerConfig config, string logType)
         {
@@ -118,7 +122,7 @@ namespace AWS.Logger.Core
             {
                 message = EMPTY_MESSAGE;
             }
-            if (_pendingMessageQueue.Count >= _config.MaxQueuedMessages)
+            if (_pendingMessageQueue.Count > _config.MaxQueuedMessages)
             {
                 if ((_maxBufferTimeStamp == DateTime.MinValue) || (DateTime.Now > _maxBufferTimeStamp.Add(TimeSpan.FromMinutes(MAX_BUFFER_TIMEDIFF))))
                 {
@@ -193,7 +197,7 @@ namespace AWS.Logger.Core
                                 }
 
                                 _repo.AddMessage(ev);
-                                if (_repo.ShouldSendRequest && !_isTerminated)
+                                if (_repo.ShouldSendRequest(_config.MaxQueuedMessages) && !_isTerminated)
                                 {
                                     await SendMessages(token).ConfigureAwait(false);
                                 }
@@ -210,7 +214,7 @@ namespace AWS.Logger.Core
                             break;
                         }
                         await Task.Delay(Convert.ToInt32(_config.MonitorSleepTime.TotalMilliseconds));
-                        if (_repo.ShouldSendRequest)
+                        if (_repo.ShouldSendRequest(_config.MaxQueuedMessages))
                         {
                             await SendMessages(token).ConfigureAwait(false);
                         }
@@ -240,18 +244,36 @@ namespace AWS.Logger.Core
             {
                 var response = await _client.PutLogEventsAsync(_repo._request, token).ConfigureAwait(false);
                 _repo.Reset(response.NextSequenceToken);
+                requestCount = 5;
             }
             catch (TaskCanceledException tc)
             {
-                LogLibraryError(tc, _config.LibraryLogFileName);
                 throw;
             }
-            catch (Exception e)
+            catch (InvalidSequenceTokenException ex)
             {
                 //In case the NextSequenceToken is invalid for the last sent message, a new stream would be 
                 //created for the said application.
+                LogLibraryError(ex, _config.LibraryLogFileName);
+                if (requestCount > 0)
+                {
+                    requestCount--;
+                    var regexResult = invalid_sequence_token_regex.Match(ex.Message);
+                    if (regexResult.Success)
+                    {
+                        _repo._request.SequenceToken = regexResult.Groups[1].Value;
+                        await SendMessages(token).ConfigureAwait(false);
+                    }
+                }
+                else
+                {
+                    await LogEventTransmissionSetup(token).ConfigureAwait(false);
+                }
+            }
+            catch (Exception e)
+            {
                 LogLibraryError(e, _config.LibraryLogFileName);
-                await LogEventTransmissionSetup(token).ConfigureAwait(false);
+                throw;
             }
         }
 
@@ -300,32 +322,23 @@ namespace AWS.Logger.Core
             public TimeSpan TimeIntervalBetweenPushes { get; private set; }
             public int MaxBatchSize { get; private set; }
 
-            public const int MAX_EVENT_COUNT = 8000;
-
-            public bool ShouldSendRequest
+            public bool ShouldSendRequest(int maxQueuedMessages)
             {
-                get
-                {
-                    if (_request.LogEvents.Count == 0)
-                        return false;
-
-                    if (_nextPushTime < DateTime.Now)
-                        return true;
-
-                    if (MAX_EVENT_COUNT < _request.LogEvents.Count)
-                        return true;
-
+                if (_request.LogEvents.Count == 0)
                     return false;
-                }
+
+                if (_nextPushTime < DateTime.Now)
+                    return true;
+
+                if (maxQueuedMessages <= _request.LogEvents.Count)
+                    return true;
+
+                return false;
             }
 
             int _totalMessageSize { get; set; }
             DateTime _nextPushTime;
             public PutLogEventsRequest _request = new PutLogEventsRequest();
-            public LogEventBatch()
-            {
-
-            }
             public LogEventBatch(string logGroupName, string streamName, int timeIntervalBetweenPushes, int maxBatchSize)
             {
                 _request.LogGroupName = logGroupName;
@@ -335,6 +348,9 @@ namespace AWS.Logger.Core
                 Reset(null);
             }
 
+            public LogEventBatch()
+            {
+            }
 
             public bool IsSizeConstraintViolated(string message)
             {

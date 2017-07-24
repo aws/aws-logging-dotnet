@@ -53,6 +53,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWS.Logger.Core", "src\AWS.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWS.Logger.AspNetCore.Tests", "test\AWS.Logger.AspNetCore.Tests\AWS.Logger.AspNetCore.Tests.csproj", "{5A310E6B-DE9C-41F6-B03F-6BE7718FFF27}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWS.Logger.UnitTests", "test\AWS.Logger.UnitTests\AWS.Logger.UnitTests.csproj", "{14E1469E-4799-486D-ABD9-873283BF31EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +125,10 @@ Global
 		{5A310E6B-DE9C-41F6-B03F-6BE7718FFF27}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A310E6B-DE9C-41F6-B03F-6BE7718FFF27}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A310E6B-DE9C-41F6-B03F-6BE7718FFF27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14E1469E-4799-486D-ABD9-873283BF31EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14E1469E-4799-486D-ABD9-873283BF31EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14E1469E-4799-486D-ABD9-873283BF31EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14E1469E-4799-486D-ABD9-873283BF31EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -147,5 +153,6 @@ Global
 		{19DC3D22-096E-4A3C-9AF3-8FC49B198588} = {E3018A04-6209-4500-B8F2-706514407F90}
 		{1D79E360-24D9-46FD-B744-63EABB17A1F6} = {E3018A04-6209-4500-B8F2-706514407F90}
 		{5A310E6B-DE9C-41F6-B03F-6BE7718FFF27} = {5646565D-E0F8-4EB3-AE6A-6C288B831C7A}
+		{14E1469E-4799-486D-ABD9-873283BF31EE} = {5646565D-E0F8-4EB3-AE6A-6C288B831C7A}
 	EndGlobalSection
 EndGlobal
