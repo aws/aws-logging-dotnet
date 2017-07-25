@@ -10,7 +10,7 @@
     <Target Name="FullBuild" DependsOnTargets="Compile;Test;Nuget" />
     <Target Name = "Compile">
       <Exec Command="dotnet restore AWS.Logger.sln"/>
-	    <MSBuild Projects=".\AWS.Logger.sln" Targets="Rebuild" Properties="Configuration=Release;AWSKeyFile=$(CustomSnkFileLocation)" />
+      <Exec Command="dotnet msbuild AWS.Logger.sln /p:Configuration=Release /p:AWSKeyFile=$(CustomSnkFileLocation)"/>
     </Target>
 
     <Target Name = "Nuget" DependsOnTargets="Compile;Test">
