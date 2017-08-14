@@ -21,6 +21,7 @@ namespace AWS.Logger.Core
     {
         #region Private Members
         private Object addMessagesLock = new Object();
+        private static string[] TransientErrorCodes = { "ThrottlingException" };
         const string EMPTY_MESSAGE = "\t";
         private ConcurrentQueue<InputLogEvent> _pendingMessageQueue = new ConcurrentQueue<InputLogEvent>();
         private string _currentStreamName = null;
@@ -226,9 +227,16 @@ namespace AWS.Logger.Core
                 LogLibraryError(oc,_config.LibraryLogFileName);
                 throw;
             }
-            catch (Exception e)
+            catch(AmazonServiceException amazonEx)
             {
-                LogLibraryError(e, _config.LibraryLogFileName);
+                LogLibraryError(amazonEx, _config.LibraryLogFileName);
+                
+                if (!TransientErrorCodes.Any(x => amazonEx.ErrorCode.Equals(x)))
+                    throw;                
+            }
+            catch (Exception ex)
+            {
+                LogLibraryError(ex, _config.LibraryLogFileName);
             }
 
         }
