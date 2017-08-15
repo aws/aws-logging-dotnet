@@ -49,7 +49,7 @@ namespace AWS.Logger.NLogger.Tests
         {
             CreateLoggerFromConfiguration("AWSNLogGroupMultiThreadBufferFullTest.config");
             Logger = LogManager.GetLogger("loggerMultiThreadBufferFull");
-            MultiThreadBufferFullTest("AWSNLogGroupMultiThreadBufferFullTest");
+            MultiThreadBufferFullTest("AWSNLogGroupMultiThreadBufferFullTest", waitMilliSec: 8000);
         }
 
         public override void LogMessages(int count)

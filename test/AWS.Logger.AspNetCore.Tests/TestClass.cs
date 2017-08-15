@@ -2,16 +2,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using Xunit;
-using AWS.Logger.AspNetCore;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Amazon.CloudWatchLogs;
-using Amazon.CloudWatchLogs.Model;
 using AWS.Logger.TestUtils;
 
 namespace AWS.Logger.AspNetCore.Tests
@@ -135,7 +131,47 @@ namespace AWS.Logger.AspNetCore.Tests
         public void MultiThreadBufferFullTest()
         {
             LoggingSetup("multiThreadBufferFullTest.json",null);
-            MultiThreadBufferFullTest(ConfigSection.Config.LogGroup);
+            MultiThreadBufferFullTest(ConfigSection.Config.LogGroup, waitMilliSec: 4000);
+        }
+
+        [Fact]
+        public void HugeChunksGettingSplitted()
+        {
+            LoggingSetup("multiThreadTest.json", null);
+            for (int i = 0; i < 9999; i++)
+            {
+                Logger.LogDebug(new string('ß', 14));
+            }
+            Logger.LogDebug(LASTMESSAGE);
+
+            Thread.Sleep(4000);
+
+            var lastMessageLogs = FilterLogStream(ConfigSection.Config.LogGroup, LASTMESSAGE);
+
+            Assert.Equal(1, lastMessageLogs.Count);
+        }
+
+        [Theory]
+        [InlineData(6, 1500, 3000)]
+        [InlineData(9, 2000, 8000)]
+        [InlineData(20, 40, 3000)]
+        public void PerformanceTest(int threadCount, int messagePerThread, int sleepMillisec)
+        {
+            LoggingSetup("multiThreadTest.json", null);
+
+            List<Task> tasks = new List<Task>();
+            for (int i = 0; i < threadCount; i++)
+            {
+                tasks.Add(Task.Factory.StartNew(() => LogMessages(messagePerThread)));
+            }
+
+            Task.WaitAll(tasks.ToArray());
+
+            Thread.Sleep(sleepMillisec);
+
+            var lastMessageLogs = FilterLogStream(ConfigSection.Config.LogGroup, LASTMESSAGE);
+
+            Assert.Equal(threadCount, lastMessageLogs.Count);
         }
 
         /// <summary>

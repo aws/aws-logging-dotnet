@@ -48,7 +48,7 @@ namespace AWS.Logger.Log4Net.Tests
         public void MultiThreadBufferFullTest()
         {
             GetLog4NetLogger("MultiThreadBufferFullTest.config", "MultiThreadBufferFullTest");
-            MultiThreadBufferFullTest("AWSLog4NetGroupMultiThreadBufferFullTest");
+            MultiThreadBufferFullTest("AWSLog4NetGroupMultiThreadBufferFullTest", waitMilliSec: 4000);
         }
 
         public override void LogMessages(int count)
