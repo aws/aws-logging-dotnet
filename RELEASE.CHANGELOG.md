@@ -1,3 +1,7 @@
+### Release 2017-08-22 00:02 UTC
+* **AWS.Logger.AspNetCore (1.2.2)**
+    * Fixed issue with **Profile** setting not getting used.
+
 ### Release 2017-07-25 10:30 UTC
 * **AWS.Logger.Core (1.1.3)**
     * Updated the logic in AWSLoggerCore for creating a logstream. AWSLoggerCore library will try to use the sequence token in the response message of a log PutLogEventsAsync request for a maximum of 5 attempts, before creating a new logstream.
