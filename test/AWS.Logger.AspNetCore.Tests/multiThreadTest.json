@@ -2,6 +2,7 @@
   "AWS.Logging": {
     "LogGroup": "AWSGroupILogger",
     "Region": "us-west-2",
+    "BatchSizeInBytes": "512000",
     "LogLevel": {
       "Default": "Debug",
       "System": "Information",

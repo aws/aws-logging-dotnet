@@ -3,7 +3,7 @@
     "LogGroup": "AWSILoggerGroupMultiThreadBufferFullTest",
     "Region": "us-west-2",
     "LogStreamNameSuffix": "TestStream",
-    "MaxQueuedMessages": "100",
+    "MaxQueuedMessages": "30",
     "LogLevel": {
       "Default": "Debug",
       "System": "Information",

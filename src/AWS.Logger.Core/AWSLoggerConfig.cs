@@ -65,7 +65,7 @@ namespace AWS.Logger
         /// The default is 3 seconds.
         /// </para>
         /// </summary>
-        [Obsolete("Obsolete. The batch will be pushed in every MonitorSleepTime millisec.")]
+        [Obsolete("The batch will be pushed in every MonitorSleepTime millisec.")]
         public TimeSpan BatchPushInterval { get; set; } = TimeSpan.FromMilliseconds(3000);
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace AWS.Logger
         public int MaxQueuedMessages { get; set; } = 10000;
 
         /// <summary>
-        /// Internal MonitorSleepTime property. This specifies the timespan after which the Monitor wakes up. MonitorSleepTime 
+        /// Internal MonitorSleepTime property. This specifies the timespan after which the Monitor wakes up. Recommended to keep it between 200 and 500 millisec. MonitorSleepTime 
         /// dictates the timespan after which the Monitor checks the size and time constarint on the batch log event and the existing in-memory buffer for new messages. 
         /// <para>
         /// The value is 500 Milliseconds.
@@ -110,12 +110,6 @@ namespace AWS.Logger
         public AWSLoggerConfig(string logGroup)
         {
             LogGroup = logGroup;
-        }
-
-        internal void ShutDown()
-        {
-            MonitorSleepTime = TimeSpan.FromMilliseconds(0);
-            BatchPushInterval = TimeSpan.FromSeconds(0);
         }
 
         /// <summary>

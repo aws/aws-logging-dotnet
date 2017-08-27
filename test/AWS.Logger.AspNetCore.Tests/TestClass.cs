@@ -144,17 +144,17 @@ namespace AWS.Logger.AspNetCore.Tests
             }
             Logger.LogDebug(LASTMESSAGE);
 
-            Thread.Sleep(4000);
+            Thread.Sleep(8000);
 
             var lastMessageLogs = FilterLogStream(ConfigSection.Config.LogGroup, LASTMESSAGE);
 
             Assert.Equal(1, lastMessageLogs.Count);
         }
 
-        [Theory]
-        [InlineData(6, 1500, 3000)]
-        [InlineData(9, 2000, 8000)]
-        [InlineData(20, 40, 3000)]
+        [Theory] 
+        [InlineData(6, 1500, 6000)]
+        [InlineData(9, 2000, 12000)] //Reason of high wait time: it is sent in 17 batches because of the size constraint, it takes a while
+        [InlineData(20, 40, 5000)]
         public void PerformanceTest(int threadCount, int messagePerThread, int sleepMillisec)
         {
             LoggingSetup("multiThreadTest.json", null);
@@ -180,7 +180,7 @@ namespace AWS.Logger.AspNetCore.Tests
         /// <param name="count">The number of messages that would be posted onto CloudWatchLogs</param>
         public override void LogMessages(int count)
         {
-            for (int i = 0; i < count-1; i++)
+            for (int i = 1; i < count; i++)
             {
                 Logger.LogDebug(string.Format("Test logging message {0} Ilogger, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
             }

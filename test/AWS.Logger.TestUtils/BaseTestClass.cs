@@ -145,7 +145,7 @@ namespace AWS.Logger.TestUtils
 
             Task.WaitAll(tasks.ToArray(), TimeSpan.FromSeconds(THREAD_WAITTIME));
 
-            Thread.Sleep(3000);
+            Thread.Sleep(6000);
 
             var lastMessageEvents = FilterLogStream(logGroupName, LASTMESSAGE);
 
