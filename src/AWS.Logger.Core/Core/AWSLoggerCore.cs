@@ -312,16 +312,31 @@ namespace AWS.Logger.Core
 
                 if (!logGroupResponse.LogGroups.Any(x => string.Equals(x.LogGroupName, _config.LogGroup, StringComparison.Ordinal)))
                 {
-                    await _client.CreateLogGroupAsync(new CreateLogGroupRequest { LogGroupName = _config.LogGroup }, token).ConfigureAwait(false);
+                    try
+                    {
+                        await _client.CreateLogGroupAsync(new CreateLogGroupRequest { LogGroupName = _config.LogGroup }, token).ConfigureAwait(false);
+                    }
+                    catch (ResourceAlreadyExistsException)
+                    {
+                        // Suppressed due to possible race conditions
+                    }
                 }
 
                 var streamName = DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss") + " - " + _config.LogStreamNameSuffix;
 
-                var streamResponse = await _client.CreateLogStreamAsync(new CreateLogStreamRequest
+                try
                 {
-                    LogGroupName = _config.LogGroup,
-                    LogStreamName = streamName
-                }, token).ConfigureAwait(false);
+                    await _client.CreateLogStreamAsync(new CreateLogStreamRequest
+                    {
+                        LogGroupName = _config.LogGroup,
+                        LogStreamName = streamName
+                    }, token).ConfigureAwait(false);
+                }
+                catch (ResourceAlreadyExistsException)
+                {
+                    // Suppressed due to possible race conditions
+                }
+
 
                 return streamName;
             }
