@@ -2,16 +2,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using Xunit;
-using AWS.Logger.AspNetCore;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Amazon.CloudWatchLogs;
-using Amazon.CloudWatchLogs.Model;
 using AWS.Logger.TestUtils;
 
 namespace AWS.Logger.AspNetCore.Tests
@@ -135,7 +131,47 @@ namespace AWS.Logger.AspNetCore.Tests
         public void MultiThreadBufferFullTest()
         {
             LoggingSetup("multiThreadBufferFullTest.json",null);
-            MultiThreadBufferFullTest(ConfigSection.Config.LogGroup);
+            MultiThreadBufferFullTest(ConfigSection.Config.LogGroup, waitMilliSec: 4000);
+        }
+
+        [Fact]
+        public void HugeChunksGettingSplitted()
+        {
+            LoggingSetup("multiThreadTest.json", null);
+            for (int i = 0; i < 9999; i++)
+            {
+                Logger.LogDebug(new string('ß', 14));
+            }
+            Logger.LogDebug(LASTMESSAGE);
+
+            Thread.Sleep(8000);
+
+            var lastMessageLogs = FilterLogStream(ConfigSection.Config.LogGroup, LASTMESSAGE);
+
+            Assert.Equal(1, lastMessageLogs.Count);
+        }
+
+        [Theory] 
+        [InlineData(6, 1500, 6000)]
+        [InlineData(9, 2000, 12000)] //Reason of high wait time: it is sent in 17 batches because of the size constraint, it takes a while
+        [InlineData(20, 40, 5000)]
+        public void PerformanceTest(int threadCount, int messagePerThread, int sleepMillisec)
+        {
+            LoggingSetup("multiThreadTest.json", null);
+
+            List<Task> tasks = new List<Task>();
+            for (int i = 0; i < threadCount; i++)
+            {
+                tasks.Add(Task.Factory.StartNew(() => LogMessages(messagePerThread)));
+            }
+
+            Task.WaitAll(tasks.ToArray());
+
+            Thread.Sleep(sleepMillisec);
+
+            var lastMessageLogs = FilterLogStream(ConfigSection.Config.LogGroup, LASTMESSAGE);
+
+            Assert.Equal(threadCount, lastMessageLogs.Count);
         }
 
         /// <summary>
@@ -144,7 +180,7 @@ namespace AWS.Logger.AspNetCore.Tests
         /// <param name="count">The number of messages that would be posted onto CloudWatchLogs</param>
         public override void LogMessages(int count)
         {
-            for (int i = 0; i < count-1; i++)
+            for (int i = 1; i < count; i++)
             {
                 Logger.LogDebug(string.Format("Test logging message {0} Ilogger, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
             }

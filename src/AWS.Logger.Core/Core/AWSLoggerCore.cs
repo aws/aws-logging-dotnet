@@ -6,10 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
 using System.Linq;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 #if CORECLR
 using System.Runtime.Loader;
 #endif
@@ -20,21 +20,23 @@ namespace AWS.Logger.Core
     public class AWSLoggerCore : IAWSLoggerCore
     {
         #region Private Members
-        private Object addMessagesLock = new Object();
-        const string EMPTY_MESSAGE = "\t";
-        private ConcurrentQueue<InputLogEvent> _pendingMessageQueue = new ConcurrentQueue<InputLogEvent>();
+        private Object _sequenceTokenLock = new Object();
+        private static string[] TransientErrorCodes = { "ThrottlingException" };
+        private const string EMPTY_MESSAGE = "\t";
+        private Queue<InputLogEvent> _pendingMessageQueue = new Queue<InputLogEvent>(200000);
+        private string SequenceToken = null;
         private string _currentStreamName = null;
-        private LogEventBatch _repo = new LogEventBatch();
         private CancellationTokenSource _cancelStartSource;
         private AWSLoggerConfig _config;
         private IAmazonCloudWatchLogs _client;
         private bool _isTerminated = false;
-        private DateTime _maxBufferTimeStamp = new DateTime();
+        private Stopwatch _terminationStopWatch = new Stopwatch();
         private string _logType;
-        private static int requestCount = 5;
-        const double MAX_BUFFER_TIMEDIFF = 5;
-        private readonly static Regex invalid_sequence_token_regex = new 
-            Regex(@"The given sequenceToken is invalid. The next expected sequenceToken is: (\d+)");
+        private static int MaxTryCount = 5;
+        private const double MAX_BUFFER_TIMEDIFF = 5;
+        private const string UserAgentHeader = "User-Agent";
+        private readonly static Regex Invalid_sequence_token_regex = new Regex(
+            @"The given sequenceToken is invalid. The next expected sequenceToken is: (\d+)");
         #endregion
         public AWSLoggerCore(AWSLoggerConfig config, string logType)
         {
@@ -68,9 +70,9 @@ namespace AWS.Logger.Core
 
         internal void OnAssemblyLoadContextUnloading(AssemblyLoadContext obj)
         {
-            this.Close();
+            Close();
         }
-        
+
 #elif NET452
 
         private void RegisterShutdownHook()
@@ -102,11 +104,11 @@ namespace AWS.Logger.Core
         public void Close()
         {
             _isTerminated = true;
+            _terminationStopWatch.Start();
             _cancelStartSource.Cancel();
-            _config.ShutDown();
             Task.Run(async () =>
             {
-                await Monitor(CancellationToken.None);
+                await Monitor(CancellationToken.None).ConfigureAwait(false);
             }).Wait();
         }
 
@@ -122,36 +124,16 @@ namespace AWS.Logger.Core
             {
                 message = EMPTY_MESSAGE;
             }
-            if (_pendingMessageQueue.Count > _config.MaxQueuedMessages)
+
+            _pendingMessageQueue.Enqueue(new InputLogEvent
             {
-                if ((_maxBufferTimeStamp == DateTime.MinValue) || (DateTime.Now > _maxBufferTimeStamp.Add(TimeSpan.FromMinutes(MAX_BUFFER_TIMEDIFF))))
-                {
-                    _maxBufferTimeStamp = DateTime.Now;
-                    message = "The AWS Logger in-memory buffer has reached maximum capacity";
-                    _pendingMessageQueue.Enqueue(new InputLogEvent
-                    {
-                        Timestamp = DateTime.Now,
-                        Message = message,
-                    });
-                }
-            }
-            else
-            {
-                _pendingMessageQueue.Enqueue(new InputLogEvent
-                {
-                    Timestamp = DateTime.Now,
-                    Message = message,
-                });
-            }
+                Timestamp = DateTime.Now,
+                Message = message,
+            });
         }
 
-        ~AWSLoggerCore()
-        {
-            if (_cancelStartSource != null)
-            {
-                _cancelStartSource.Dispose();
-            }
-        }
+        ~AWSLoggerCore() => _cancelStartSource?.Dispose();
+
         /// <summary>
         /// Kicks off the Poller Thread to keep tabs on the PutLogEvent request and the
         /// Concurrent Queue
@@ -162,7 +144,26 @@ namespace AWS.Logger.Core
             _cancelStartSource = new CancellationTokenSource();
             Task.Run(async () =>
             {
-                await Monitor(_cancelStartSource.Token);
+                byte errorCount = 0;
+                while (true)
+                {
+                    if (_isTerminated) break;
+
+                    try
+                    {
+                        await Monitor(_cancelStartSource.Token).ConfigureAwait(false);
+                    }
+                    catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException)
+                    {
+                        break;
+                    }
+                    catch (Exception)
+                    {
+                        errorCount++;
+                        if (errorCount > 5)
+                            throw;
+                    }
+                }
             });
         }
 
@@ -175,60 +176,56 @@ namespace AWS.Logger.Core
             try
             {
                 token.ThrowIfCancellationRequested();
+
                 if (_currentStreamName == null)
                 {
-                    await LogEventTransmissionSetup(token).ConfigureAwait(false);
+                    _currentStreamName = await CreateLogStreamAsync(token).ConfigureAwait(false);
                 }
+
                 while (!token.IsCancellationRequested)
                 {
-                    if (!_pendingMessageQueue.IsEmpty)
+                    if (_pendingMessageQueue.Count > 0)
                     {
-                        while (!_pendingMessageQueue.IsEmpty)
+                        var pendingMessages = Interlocked.Exchange(ref _pendingMessageQueue, new Queue<InputLogEvent>(200000));
+
+                        var batches = LogEventBatch.CreateBatches(pendingMessages, _currentStreamName, _config);
+
+                        foreach (var batch in batches)
                         {
-                            InputLogEvent ev;
-                            if (_pendingMessageQueue.TryDequeue(out ev))
-                            {
-
-                                // See if new message will cause the current batch to violote the size constraint.
-                                // If so send the current batch now before adding more to the batch of messages to send.
-                                if (_repo.IsSizeConstraintViolated(ev.Message))
-                                {
-                                    await SendMessages(token).ConfigureAwait(false);
-                                }
-
-                                _repo.AddMessage(ev);
-                                if (_repo.ShouldSendRequest(_config.MaxQueuedMessages) && !_isTerminated)
-                                {
-                                    await SendMessages(token).ConfigureAwait(false);
-                                }
-
-                            }
+                            await SendBatchAsync(batch, token).ConfigureAwait(false);
                         }
                     }
                     else
                     {
-                        // If the logger is being terminated and all the messages have been sent exit out of loop.
-                        // If there are messages keep pushing the remaining messages before the process dies.
-                        if (_isTerminated && _repo._request.LogEvents.Count == 0)
+                        // If the logger is being terminated and all the messages have been sent, then exit out of loop.
+                        // If there are messages left, then keep aggressively polling the message queue until it gets empty, so the process can die, but maximum it has 5 sec.
+                        if (_isTerminated)
                         {
-                            break;
+                            if (_pendingMessageQueue.Count == 0 || _terminationStopWatch.ElapsedMilliseconds > 5000)
+                                break;
+                            else
+                                continue;
                         }
-                        await Task.Delay(Convert.ToInt32(_config.MonitorSleepTime.TotalMilliseconds));
-                        if (_repo.ShouldSendRequest(_config.MaxQueuedMessages))
-                        {
-                            await SendMessages(token).ConfigureAwait(false);
-                        }
+
+                        await Task.Delay(TimeSpan.FromMilliseconds(_config.MonitorSleepTime.TotalMilliseconds)).ConfigureAwait(false);
                     }
                 }
             }
             catch (OperationCanceledException oc)
             {
-                LogLibraryError(oc,_config.LibraryLogFileName);
+                LogLibraryError(oc, _config.LibraryLogFileName);
                 throw;
             }
-            catch (Exception e)
+            catch (AmazonServiceException amazonEx)
             {
-                LogLibraryError(e, _config.LibraryLogFileName);
+                LogLibraryError(amazonEx, _config.LibraryLogFileName);
+
+                if (!TransientErrorCodes.Any(x => amazonEx.ErrorCode.Equals(x)))
+                    throw;
+            }
+            catch (Exception ex)
+            {
+                LogLibraryError(ex, _config.LibraryLogFileName);
             }
 
         }
@@ -238,37 +235,59 @@ namespace AWS.Logger.Core
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        private async Task SendMessages(CancellationToken token)
+        private async Task SendBatchAsync(LogEventBatch logBatch, CancellationToken token)
         {
+            if (!logBatch.ShouldSendRequest)
+                return;
+
             try
             {
-                var response = await _client.PutLogEventsAsync(_repo._request, token).ConfigureAwait(false);
-                _repo.Reset(response.NextSequenceToken);
-                requestCount = 5;
-            }
-            catch (TaskCanceledException tc)
-            {
-                throw;
+                lock (_sequenceTokenLock)
+                    logBatch.Request.SequenceToken = SequenceToken;
+
+                var response = await _client.PutLogEventsAsync(logBatch.Request, token).ConfigureAwait(false);
+
+                lock (_sequenceTokenLock)
+                    SequenceToken = response.NextSequenceToken;
+
+                MaxTryCount = 5;
             }
             catch (InvalidSequenceTokenException ex)
             {
                 //In case the NextSequenceToken is invalid for the last sent message, a new stream would be 
                 //created for the said application.
                 LogLibraryError(ex, _config.LibraryLogFileName);
-                if (requestCount > 0)
+                if (MaxTryCount > 0)
                 {
-                    requestCount--;
-                    var regexResult = invalid_sequence_token_regex.Match(ex.Message);
+                    MaxTryCount--;
+                    var regexResult = Invalid_sequence_token_regex.Match(ex.Message);
                     if (regexResult.Success)
                     {
-                        _repo._request.SequenceToken = regexResult.Groups[1].Value;
-                        await SendMessages(token).ConfigureAwait(false);
+                        lock (_sequenceTokenLock)
+                            SequenceToken = logBatch.Request.SequenceToken = regexResult.Groups[1].Value;
+
+                        await SendBatchAsync(logBatch, token).ConfigureAwait(false);
                     }
                 }
                 else
                 {
-                    await LogEventTransmissionSetup(token).ConfigureAwait(false);
+                    _currentStreamName = await CreateLogStreamAsync(token).ConfigureAwait(false);
+
+                    lock (_sequenceTokenLock)
+                        SequenceToken = null;
                 }
+            }
+            catch(AmazonUnmarshallingException)
+            {
+                // Giving it one more chance here. 
+                // TODO: Create RetryManager class and retry transient errors
+                lock (_sequenceTokenLock)
+                    logBatch.Request.SequenceToken = SequenceToken;
+
+                var response = await _client.PutLogEventsAsync(logBatch.Request, token).ConfigureAwait(false);
+
+                lock (_sequenceTokenLock)
+                    SequenceToken = response.NextSequenceToken;
             }
             catch (Exception e)
             {
@@ -278,11 +297,11 @@ namespace AWS.Logger.Core
         }
 
         /// <summary>
-        /// Creates and Allocates resources for message trasnmission
+        /// Creates a logstream and returns its name.
         /// </summary>
         /// <returns></returns>
         /// 
-        private async Task LogEventTransmissionSetup(CancellationToken token)
+        private async Task<string> CreateLogStreamAsync(CancellationToken token)
         {
             try
             {
@@ -291,19 +310,35 @@ namespace AWS.Logger.Core
                     LogGroupNamePrefix = _config.LogGroup
                 }, token).ConfigureAwait(false);
 
-                if (logGroupResponse.LogGroups.FirstOrDefault(x => string.Equals(x.LogGroupName, _config.LogGroup, StringComparison.Ordinal)) == null)
+                if (!logGroupResponse.LogGroups.Any(x => string.Equals(x.LogGroupName, _config.LogGroup, StringComparison.Ordinal)))
                 {
-                    await _client.CreateLogGroupAsync(new CreateLogGroupRequest { LogGroupName = _config.LogGroup }, token);
+                    try
+                    {
+                        await _client.CreateLogGroupAsync(new CreateLogGroupRequest { LogGroupName = _config.LogGroup }, token).ConfigureAwait(false);
+                    }
+                    catch (ResourceAlreadyExistsException)
+                    {
+                        // Suppressed due to possible race conditions
+                    }
                 }
-                _currentStreamName = DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss") + " - " + _config.LogStreamNameSuffix;
 
-                var streamResponse = await _client.CreateLogStreamAsync(new CreateLogStreamRequest
+                var streamName = DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss") + " - " + _config.LogStreamNameSuffix;
+
+                try
                 {
-                    LogGroupName = _config.LogGroup,
-                    LogStreamName = _currentStreamName
-                }, token).ConfigureAwait(false);
+                    await _client.CreateLogStreamAsync(new CreateLogStreamRequest
+                    {
+                        LogGroupName = _config.LogGroup,
+                        LogStreamName = streamName
+                    }, token).ConfigureAwait(false);
+                }
+                catch (ResourceAlreadyExistsException)
+                {
+                    // Suppressed due to possible race conditions
+                }
 
-                _repo = new LogEventBatch(_config.LogGroup, _currentStreamName, Convert.ToInt32(_config.BatchPushInterval.TotalSeconds), _config.BatchSizeInBytes);
+
+                return streamName;
             }
             catch (Exception e)
             {
@@ -314,71 +349,75 @@ namespace AWS.Logger.Core
         }
 
         /// <summary>
-        /// Class to handle PutLogEvent request and associated parameters. 
-        /// Also has the requisite checks to determine when the object is ready for Transmission.
+        /// Class to handle PutLogEvent request and associated parameters.
         /// </summary>
         private class LogEventBatch
         {
-            public TimeSpan TimeIntervalBetweenPushes { get; private set; }
-            public int MaxBatchSize { get; private set; }
+            public PutLogEventsRequest Request = new PutLogEventsRequest();
+            public int Count => Request.LogEvents.Count;
+            public bool IsEmpty => Count == 0;
+            public bool ShouldSendRequest => Count != 0;
 
-            public bool ShouldSendRequest(int maxQueuedMessages)
+            private LogEventBatch(List<InputLogEvent> logs, string logGroupName, string streamName)
             {
-                if (_request.LogEvents.Count == 0)
-                    return false;
-
-                if (_nextPushTime < DateTime.Now)
-                    return true;
-
-                if (maxQueuedMessages <= _request.LogEvents.Count)
-                    return true;
-
-                return false;
+                Request.LogEvents = logs;
+                Request.LogGroupName = logGroupName;
+                Request.LogStreamName = streamName;
             }
 
-            int _totalMessageSize { get; set; }
-            DateTime _nextPushTime;
-            public PutLogEventsRequest _request = new PutLogEventsRequest();
-            public LogEventBatch(string logGroupName, string streamName, int timeIntervalBetweenPushes, int maxBatchSize)
+            internal static IEnumerable<LogEventBatch> CreateBatches(Queue<InputLogEvent> allLogEvents, string currentStreamName, AWSLoggerConfig config)
             {
-                _request.LogGroupName = logGroupName;
-                _request.LogStreamName = streamName;
-                TimeIntervalBetweenPushes = TimeSpan.FromSeconds(timeIntervalBetweenPushes);
-                MaxBatchSize = maxBatchSize;
-                Reset(null);
-            }
+                while (allLogEvents.Count > 0)
+                {
+                    var currentLogEvents = new List<InputLogEvent>();
+                    long currentBatchSizeInBytes = 0;
 
-            public LogEventBatch()
-            {
-            }
+                    while (allLogEvents.Count > 0)
+                    {
+                        var logEvent = allLogEvents.Dequeue();
 
-            public bool IsSizeConstraintViolated(string message)
-            {
-                Encoding unicode = Encoding.Unicode;
-                int prospectiveLength = _totalMessageSize + unicode.GetMaxByteCount(message.Length);
-                if (MaxBatchSize < prospectiveLength)
-                    return true;
+                        if (logEvent == null) continue;
 
-                return false;
-            }
+                        var logEventSize = Encoding.Unicode.GetMaxByteCount(logEvent.Message.Length);
 
-            public void AddMessage(InputLogEvent ev)
-            {
-                Encoding unicode = Encoding.Unicode;
-                _totalMessageSize += unicode.GetMaxByteCount(ev.Message.Length);
-                _request.LogEvents.Add(ev);
-            }
+                        if (currentBatchSizeInBytes + logEventSize <= config.BatchSizeInBytes
+                          && currentLogEvents.Count < config.MaxQueuedMessages)
+                        {
+                            currentBatchSizeInBytes += logEventSize;
+                            currentLogEvents.Add(logEvent);
 
-            public void Reset(string SeqToken)
-            {
-                _request.LogEvents.Clear();
-                _totalMessageSize = 0;
-                _request.SequenceToken = SeqToken;
-                _nextPushTime = DateTime.Now.Add(TimeIntervalBetweenPushes);
+                            if (allLogEvents.Count == 0)
+                            {
+                                yield return new LogEventBatch
+                                (
+                                   currentLogEvents.OrderBy(x => x.Timestamp).ToList(),
+                                   config.LogGroup,
+                                   currentStreamName
+                                );
+
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            // A constraint is violated, this logEvent will be sent in the next batch
+                            allLogEvents.Enqueue(logEvent);
+
+                            yield return new LogEventBatch
+                            (
+                               currentLogEvents.OrderBy(x => x.Timestamp).ToList(),
+                               config.LogGroup,
+                               currentStreamName
+                            );
+
+                            currentLogEvents.Clear();
+                            currentBatchSizeInBytes = 0;
+                        }
+                    }
+                }
             }
         }
 
-        const string UserAgentHeader = "User-Agent";
         void ServiceClientBeforeRequestEvent(object sender, RequestEventArgs e)
         {
             Amazon.Runtime.WebServiceRequestEventArgs args = e as Amazon.Runtime.WebServiceRequestEventArgs;
@@ -388,7 +427,7 @@ namespace AWS.Logger.Core
             args.Headers[UserAgentHeader] = args.Headers[UserAgentHeader] + " AWSLogger/" + _logType;
         }
 
-        public static void LogLibraryError(Exception ex,string LibraryLogFileName)
+        public static void LogLibraryError(Exception ex, string LibraryLogFileName)
         {
             try
             {
@@ -401,7 +440,7 @@ namespace AWS.Logger.Core
                     w.WriteLine("-------------------------------");
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine("Exception caught when writing error log to file" + e.ToString());
             }
