@@ -16,7 +16,7 @@ namespace AWS.Logger.AspNetCore.Tests
         public void CustomFormatter_Must_Be_Applied(string message, LogLevel logLevel)
         {
             Func<LogLevel, object, Exception, string> customFormatter 
-                = (level, state, ex) => level + "hello world" + state.ToString();
+                = (level, state, ex) => level + " hello world" + state.ToString();
 
             Func<string, LogLevel, bool> filter = (categoryName, level) => true;
 
@@ -28,7 +28,7 @@ namespace AWS.Logger.AspNetCore.Tests
 
             string expectedMessage = customFormatter(logLevel, message, null);
 
-            Assert.Equal(expectedMessage, coreLogger.ReceivedMessages.First());
+            Assert.Equal(expectedMessage, coreLogger.ReceivedMessages.First().Replace("\r\n", string.Empty));
         }
     }
 }

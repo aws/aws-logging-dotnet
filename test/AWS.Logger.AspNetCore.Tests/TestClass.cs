@@ -86,7 +86,19 @@ namespace AWS.Logger.AspNetCore.Tests
             SimpleLoggingTest(ConfigSection.Config.LogGroup);
         }
 
-
+        [Fact]
+        public void ExceptionMockTest()
+        {
+            var categoryName = "testlogging";
+            var coreLogger = new FakeCoreLogger();
+            Logger = new AWSLogger(
+                categoryName,
+                coreLogger, null);
+            var tasks = new List<Task>();
+            var logMessageCount = 10;
+            LogMessages(logMessageCount);
+            Assert.True(coreLogger.ReceivedMessages.Contains("Error message\r\nSystem.Exception: Exception message.\r\n"));
+        }
         /// <summary>
         /// Basic test case that creates multiple threads and each thread mocks log messages
         /// onto the FakeCoreLogger. The results are then verified.
@@ -144,7 +156,8 @@ namespace AWS.Logger.AspNetCore.Tests
         /// <param name="count">The number of messages that would be posted onto CloudWatchLogs</param>
         public override void LogMessages(int count)
         {
-            for (int i = 0; i < count-1; i++)
+            Logger.LogError(0, new Exception("Exception message."), "Error message");
+            for (int i = 0; i < count-2; i++)
             {
                 Logger.LogDebug(string.Format("Test logging message {0} Ilogger, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
             }

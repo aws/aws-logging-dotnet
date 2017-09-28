@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using AWS.Logger.Core;
+using System.Text;
 
 namespace AWS.Logger.AspNetCore
 {
@@ -63,12 +64,20 @@ namespace AWS.Logger.AspNetCore
         /// <param name="formatter"></param>
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
+            StringBuilder formattedMessage = null;
             if (!IsEnabled(logLevel))
             {
                 return;
             }
             var message = _customFormatter != null ? _customFormatter(logLevel, state, exception) : formatter(state, exception);
-            _core.AddMessage(message);
+            formattedMessage = new StringBuilder();
+            formattedMessage.AppendLine(message);
+            if (exception != null && _customFormatter==null)
+            {
+                formattedMessage.AppendLine(exception.ToString());
+            }
+            _core.AddMessage(formattedMessage.ToString());
+
         }
 
         private class DisposableScope : IDisposable
