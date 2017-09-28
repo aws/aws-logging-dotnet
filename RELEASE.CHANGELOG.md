@@ -1,6 +1,6 @@
 ### Release 2017-28-09 00:02 UTC
 * **AWS.Logger.AspNetCore (1.2.4)**
-    * Added exception logging for default aspNetCore filters.
+    * Added exception logging for default ASP.NET Core formatter.
 
 ### Release 2017-08-22 00:02 UTC
 * **AWS.Logger.AspNetCore (1.2.2)**
