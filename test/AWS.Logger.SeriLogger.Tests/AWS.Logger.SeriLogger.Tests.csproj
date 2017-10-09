@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <AssemblyName>AWS.Logger.SeriLogger.Tests</AssemblyName>
+    <PackageId>AWS.Logger.SeriLogger.Tests</PackageId>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50;portable-net451+win8</PackageTargetFallback>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)|$(Platform)'=='netcoreapp1.0|AnyCPU'">
+    <DefineConstants>CORECLR</DefineConstants>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Remove="AWSNLogGroupMultiThreadBufferFullTest.json" />
+    <None Remove="AWSNLogGroupMultiThreadTest.json" />
+    <None Remove="AWSSeriLoggerGroup.json" />
+    <None Remove="AWSSeriLoggerGroupMultiThreadBufferFullTest.json" />
+    <None Remove="AWSSeriLoggerGroupMultiThreadTest.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="AWSSeriLoggerGroup.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AWSSeriLoggerGroupMultiThreadBufferFullTest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AWSSeriLoggerGroupMultiThreadTest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AWS.Logger.SeriLogger\AWS.Logger.SeriLogger.csproj" />
+    <ProjectReference Include="..\AWS.Logger.TestUtils\AWS.Logger.TestUtils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="Serilog" Version="2.5.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="1.0.2" />
+    <PackageReference Include="xunit" Version="2.2.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
+    <PackageReference Include="Serilog.Settings.Configuration" Version="2.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+
+</Project>
