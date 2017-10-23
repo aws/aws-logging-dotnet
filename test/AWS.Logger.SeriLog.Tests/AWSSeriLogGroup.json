@@ -1,0 +1,10 @@
+﻿{
+  "Serilog": {
+    "Using": [ "AWS.Logger.SeriLog" ],
+    "MinimumLevel": "Debug",
+    "LogGroup": "AWSSeriLogGroup",
+    "Region": "us-west-2",
+    "LogStreamNameSuffix": "Custom",
+    "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ]
+  }
+}

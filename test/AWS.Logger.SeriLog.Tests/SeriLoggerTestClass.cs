@@ -4,8 +4,9 @@ using Serilog;
 using System;
 using System.Threading;
 using Xunit;
+using AWS.Logger.SeriLog;
 
-namespace AWS.Logger.SeriLogger.Tests
+namespace AWS.Logger.SeriLog.Tests
 {
     // This project can output the Class library as a NuGet Package.
     // To enable this option, right-click on the project and select the Properties menu item. 
@@ -24,29 +25,29 @@ namespace AWS.Logger.SeriLogger.Tests
 
             Log.Logger = new LoggerConfiguration().
                 ReadFrom.Configuration(configuration).
-                 WriteTo.AWSSeriLogger(configuration).CreateLogger();
+                 WriteTo.AWSSeriLog(configuration).CreateLogger();
         }
         #region Test Cases  
 
         [Fact]
         public void SeriLogger()
         {
-            CreateLoggerFromConfiguration("AWSSeriLoggerGroup.json");
-            SimpleLoggingTest("AWSSeriLoggerGroup");
+            CreateLoggerFromConfiguration("AWSSeriLogGroup.json");
+            SimpleLoggingTest("AWSSeriLogGroup");
         }
 
         [Fact]
         public void MultiThreadTest()
         {
-            CreateLoggerFromConfiguration("AWSSeriLoggerGroupMultiThreadTest.json");
-            MultiThreadTest("AWSSeriLoggerGroupMultiThreadTest");
+            CreateLoggerFromConfiguration("AWSSeriLogGroupMultiThreadTest.json");
+            MultiThreadTest("AWSSeriLogGroupMultiThreadTest");
         }
 
         [Fact]
         public void MultiThreadBufferFullTest()
         {
-            CreateLoggerFromConfiguration("AWSSeriLoggerGroupMultiThreadBufferFullTest.json");
-            MultiThreadBufferFullTest("AWSSeriLoggerGroupMultiThreadBufferFullTest");
+            CreateLoggerFromConfiguration("AWSSeriLogGroupMultiThreadBufferFullTest.json");
+            MultiThreadBufferFullTest("AWSSeriLogGroupMultiThreadBufferFullTest");
         }
 
         /// <summary>
@@ -57,7 +58,7 @@ namespace AWS.Logger.SeriLogger.Tests
         {
             for (int i = 0; i < count - 1; i++)
             {
-                Log.Debug(string.Format("Test logging message {0} SeriLogger, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
+                Log.Debug(string.Format("Test logging message {0} SeriLog, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
             }
             Log.Debug(LASTMESSAGE);
         }

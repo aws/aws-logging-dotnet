@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>An AWS NLog target that records logging messages to Amazon CloudWatch Logs.</Description>
-    <AssemblyTitle>AWS.Logger.SeriLogger</AssemblyTitle>
+    <Description>An AWS SeriLog sink that records logging messages to Amazon CloudWatch Logs.</Description>
+    <AssemblyTitle>AWS.Logger.SeriLog</AssemblyTitle>
     <Authors>Amazon Web Services</Authors>
     <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
-    <AssemblyName>AWS.Logger.SeriLogger</AssemblyName>
-    <PackageId>AWS.Logger.SeriLogger</PackageId>
+    <AssemblyName>AWS.Logger.SeriLog</AssemblyName>
+    <PackageId>AWS.Logger.SeriLog</PackageId>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -28,11 +28,5 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AWS.Logger.Core\AWS.Logger.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
   </ItemGroup>
 </Project>

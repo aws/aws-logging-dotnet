@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp1.0</TargetFramework>
-    <AssemblyName>AWS.Logger.SeriLogger.Tests</AssemblyName>
-    <PackageId>AWS.Logger.SeriLogger.Tests</PackageId>
+    <AssemblyName>AWS.Logger.SeriLog.Tests</AssemblyName>
+    <PackageId>AWS.Logger.SeriLog.Tests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50;portable-net451+win8</PackageTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
@@ -19,25 +19,22 @@
   <ItemGroup>
     <None Remove="AWSNLogGroupMultiThreadBufferFullTest.json" />
     <None Remove="AWSNLogGroupMultiThreadTest.json" />
-    <None Remove="AWSSeriLoggerGroup.json" />
-    <None Remove="AWSSeriLoggerGroupMultiThreadBufferFullTest.json" />
-    <None Remove="AWSSeriLoggerGroupMultiThreadTest.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="AWSSeriLoggerGroup.json">
+    <EmbeddedResource Include="AWSSeriLogGroup.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="AWSSeriLoggerGroupMultiThreadBufferFullTest.json">
+    <EmbeddedResource Include="AWSSeriLogGroupMultiThreadBufferFullTest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="AWSSeriLoggerGroupMultiThreadTest.json">
+    <EmbeddedResource Include="AWSSeriLogGroupMultiThreadTest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AWS.Logger.SeriLogger\AWS.Logger.SeriLogger.csproj" />
+    <ProjectReference Include="..\..\src\AWS.Logger.SeriLog\AWS.Logger.SeriLog.csproj" />
     <ProjectReference Include="..\AWS.Logger.TestUtils\AWS.Logger.TestUtils.csproj" />
   </ItemGroup>
 

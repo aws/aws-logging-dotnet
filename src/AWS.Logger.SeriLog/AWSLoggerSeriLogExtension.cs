@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 
-namespace AWS.Logger.SeriLogger
+namespace AWS.Logger.SeriLog
 {
-    public static class AWSLoggerSeriLoggerExtension
+    public static class AWSLoggerSeriLogExtension
     {
         internal const string LOG_GROUP = "Serilog:LogGroup";
         internal const string REGION = "Serilog:Region";
@@ -26,7 +26,7 @@ namespace AWS.Logger.SeriLogger
         /// <param name="loggerConfiguration"></param>
         /// <param name="configuration"></param>
         /// <returns></returns>
-        public static LoggerConfiguration AWSSeriLogger(
+        public static LoggerConfiguration AWSSeriLog(
                   this LoggerSinkConfiguration loggerConfiguration,
                   IConfiguration configuration)
         {
@@ -61,7 +61,7 @@ namespace AWS.Logger.SeriLogger
             {
                 config.LibraryLogFileName = configuration[LIBRARY_LOG_FILE_NAME];
             }
-            return AWSSeriLogger(loggerConfiguration, config);
+            return AWSSeriLog(loggerConfiguration, config);
         }
         /// <summary>
         /// AWSSeriLogger target that is called when the customer
@@ -71,11 +71,11 @@ namespace AWS.Logger.SeriLogger
         /// <param name="loggerConfiguration"></param>
         /// <param name="configuration"></param>
         /// <returns></returns>
-        public static LoggerConfiguration AWSSeriLogger(
+        public static LoggerConfiguration AWSSeriLog(
                   this LoggerSinkConfiguration loggerConfiguration,
                   AWSLoggerConfig configuration = null)
         {
-            return loggerConfiguration.Sink(new AWSLogger(configuration));
+            return loggerConfiguration.Sink(new AWSSink(configuration));
         }
     }
 }

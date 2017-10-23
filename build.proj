@@ -21,7 +21,8 @@
 		<Exec Command=".\.nuget\Nuget.exe pack .\src\AWS.Logger.Core\AWS.Logger.Core.dll.nuspec -OutputDirectory .\Deployment"/>
 		<Exec Command=".\.nuget\Nuget.exe pack .\src\AWS.Logger.AspNetCore\AWS.Logger.AspNetCore.dll.nuspec -OutputDirectory .\Deployment"/>
 		<Exec Command=".\.nuget\Nuget.exe pack .\src\AWS.Logger.Log4net\AWS.Logger.Log4net.dll.nuspec -OutputDirectory .\Deployment"/>
-    <Exec Command=".\.nuget\NuGet.exe pack .\src\NLog.AWS.Logger\NLog.AWS.Logger.dll.nuspec -OutputDirectory .\Deployment"/>
+    		<Exec Command=".\.nuget\NuGet.exe pack .\src\NLog.AWS.Logger\NLog.AWS.Logger.dll.nuspec -OutputDirectory .\Deployment"/>
+		<Exec Command=".\.nuget\NuGet.exe pack .\src\AWS.Logger.SeriLog\AWS.Logger.SeriLog.dll.nuspec -OutputDirectory .\Deployment"/>
 
     </Target>
 
@@ -31,5 +32,6 @@
 	    <Exec Command="dotnet test .\test\AWS.Logger.NLog.FilterTests\AWS.Logger.NLog.FilterTests.csproj"/>
       <Exec Command="dotnet test .\test\AWS.Logger.Log4Net.Tests\AWS.Logger.Log4Net.Tests.csproj"/>
       <Exec Command="dotnet test .\test\AWS.Logger.Log4Net.FilterTests\AWS.Logger.Log4Net.FilterTests.csproj"/>
+      <Exec Command="dotnet test .\test\AWS.Logger.SeriLog.Tests\AWS.Logger.SeriLog.Tests.csproj"/>
     </Target>
 </Project>

@@ -9,12 +9,12 @@ using AWS.Logger.Core;
 using System.Linq;
 using System.Text;
 
-namespace AWS.Logger.SeriLogger
+namespace AWS.Logger.SeriLog
 {
     /// <summary>
     /// A Serilog sink that can be used with the Serilogger logging library to send messages to AWS.
     /// </summary>
-    public class AWSLogger: ILogEventSink
+    public class AWSSink: ILogEventSink
     {
         AWSLoggerCore _core = null;
         IFormatProvider _iformatDriver;
@@ -22,7 +22,7 @@ namespace AWS.Logger.SeriLogger
         /// <summary>
         /// Default constructor
         /// </summary>
-        public AWSLogger()
+        public AWSSink()
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace AWS.Logger.SeriLogger
         /// </summary>
         /// <param name="loggerConfiguration"></param>
         /// <param name="iFormatProvider"></param>
-        public AWSLogger(AWSLoggerConfig loggerConfiguration,IFormatProvider iFormatProvider = null)
+        public AWSSink(AWSLoggerConfig loggerConfiguration,IFormatProvider iFormatProvider = null)
         {
             _core = new AWSLoggerCore(loggerConfiguration, "SeriLogger");
             _iformatDriver = iFormatProvider;

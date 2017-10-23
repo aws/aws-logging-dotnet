@@ -1,3 +1,7 @@
+### Release 2017-10-23 00:02 UTC
+* **AWS.Logger.SeriLog (1.0.0)**
+    * Added logging for SeriLog library.
+
 ### Release 2017-28-09 00:02 UTC
 * **AWS.Logger.AspNetCore (1.2.4)**
     * Added exception logging for default ASP.NET Core formatter.
