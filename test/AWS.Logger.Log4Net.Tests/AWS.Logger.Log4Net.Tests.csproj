@@ -11,16 +11,16 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
-	 <NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
   </ItemGroup>
-    <ItemGroup>
-  
-   
+  <ItemGroup>
+
+
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\xunit.abstractions.2.0.1\lib\net35\xunit.abstractions.dll</HintPath>
       <Private>True</Private>
@@ -37,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-        <None Include="MultiThreadBufferFullTest.config">
+    <None Include="MultiThreadBufferFullTest.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="MultiThreadTest.config">
@@ -62,7 +62,7 @@
     <Error Condition="!Exists('..\..\packages\xunit.runner.msbuild.2.2.0-beta4-build3444\build\portable-net45+win8+wp8+wpa81\xunit.runner.msbuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.msbuild.2.2.0-beta4-build3444\build\portable-net45+win8+wp8+wpa81\xunit.runner.msbuild.props'))" />
     <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.2.0-beta4-build1194\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.2.0-beta4-build1194\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
-    <ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\src\AWS.Logger.Log4Net\AWS.Logger.Log4Net.csproj" />
     <ProjectReference Include="..\AWS.Logger.TestUtils\AWS.Logger.TestUtils.csproj" />
   </ItemGroup>
