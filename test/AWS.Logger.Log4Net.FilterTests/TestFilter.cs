@@ -12,14 +12,15 @@ namespace AWS.Logger.Log4Net.FilterTests
 {
     public class TestFilter
     {
-        
+        static Assembly repositoryAssembly = typeof(TestFilter).GetTypeInfo().Assembly;
+
 
         [Fact]
         public void FilterLogLevel()
         {
             FakeAWSAppender awsAppender;
             ILog logger;
-            Hierarchy hierarchy = (Hierarchy)LogManager.GetRepository();
+            Hierarchy hierarchy = (Hierarchy)LogManager.GetRepository(repositoryAssembly);
             PatternLayout patternLayout = new PatternLayout();
 
             patternLayout.ConversionPattern = "%-4timestamp [%thread] %-5level %logger %ndc - %message%newline";
@@ -39,7 +40,7 @@ namespace AWS.Logger.Log4Net.FilterTests
 
             hierarchy.Root.Level = Level.All;
             hierarchy.Configured = true;
-            logger = LogManager.GetLogger("FilterLogLevel");
+            logger = LogManager.GetLogger(repositoryAssembly, "FilterLogLevel");
 
             logger.Debug("debug");
             logger.Info("information");
@@ -58,7 +59,7 @@ namespace AWS.Logger.Log4Net.FilterTests
         {
             FakeAWSAppender awsAppender;
             ILog logger;
-            Hierarchy hierarchy = (Hierarchy)LogManager.GetRepository();
+            Hierarchy hierarchy = (Hierarchy)LogManager.GetRepository(repositoryAssembly);
             PatternLayout patternLayout = new PatternLayout();
 
             patternLayout.ConversionPattern = "%logger %ndc - %message%newline";
@@ -79,7 +80,7 @@ namespace AWS.Logger.Log4Net.FilterTests
             hierarchy.Root.Level = Level.All;
             hierarchy.Configured = true;
 
-            logger = LogManager.GetLogger("goodCategory");
+            logger = LogManager.GetLogger(repositoryAssembly,"goodCategory");
 
             logger.Debug("trace");
             logger.Warn("warning");
@@ -92,7 +93,7 @@ namespace AWS.Logger.Log4Net.FilterTests
                 awsAppender._core.ReceivedMessages.TryDequeue(out val);
             }
 
-            logger = LogManager.GetLogger("badCategory");
+            logger = LogManager.GetLogger(repositoryAssembly,"badCategory");
 
             logger.Debug("trace");
             logger.Warn("warning");
