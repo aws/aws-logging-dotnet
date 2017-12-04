@@ -246,7 +246,7 @@ namespace AWS.Logger.Core
                 _repo.Reset(response.NextSequenceToken);
                 requestCount = 5;
             }
-            catch (TaskCanceledException tc)
+            catch (TaskCanceledException)
             {
                 throw;
             }
