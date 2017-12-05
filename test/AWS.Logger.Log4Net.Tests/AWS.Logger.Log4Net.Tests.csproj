@@ -1,6 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\packages\xunit.runner.visualstudio.2.2.0-beta4-build1194\build\net20\xunit.runner.visualstudio.props" Condition="Exists('..\..\packages\xunit.runner.visualstudio.2.2.0-beta4-build1194\build\net20\xunit.runner.visualstudio.props')" />
-  <Import Project="..\..\packages\xunit.runner.msbuild.2.2.0-beta4-build3444\build\portable-net45+win8+wp8+wpa81\xunit.runner.msbuild.props" Condition="Exists('..\..\packages\xunit.runner.msbuild.2.2.0-beta4-build3444\build\portable-net45+win8+wp8+wpa81\xunit.runner.msbuild.props')" />
   <PropertyGroup>
     <TargetFrameworks>netcoreapp1.0;net45</TargetFrameworks>
     <AssemblyName>AWS.Logger.Log4Net.Tests</AssemblyName>
@@ -11,30 +9,15 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-  </ItemGroup>
-  <ItemGroup>
+  <PropertyGroup Condition="'$(TargetFramework)|$(Platform)'=='netcoreapp1.0|AnyCPU'">
+    <DefineConstants>CORECLR</DefineConstants>
+  </PropertyGroup>
 
-
-    <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\xunit.abstractions.2.0.1\lib\net35\xunit.abstractions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="xunit.assert, Version=2.2.0.3444, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\xunit.assert.2.2.0-beta4-build3444\lib\netstandard1.0\xunit.assert.dll</HintPath>
-    </Reference>
-    <Reference Include="xunit.core, Version=2.2.0.3444, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\xunit.extensibility.core.2.2.0-beta4-build3444\lib\net45\xunit.core.dll</HintPath>
-    </Reference>
-    <Reference Include="xunit.execution.desktop, Version=2.2.0.3444, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\xunit.extensibility.execution.2.2.0-beta4-build3444\lib\net45\xunit.execution.desktop.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+  <PropertyGroup Condition="'$(TargetFramework)|$(Platform)'=='net45|AnyCPU'">
+    <DefineConstants>NET452</DefineConstants>
+  </PropertyGroup>
 
   <ItemGroup>
     <None Include="MultiThreadBufferFullTest.config">
@@ -52,25 +35,22 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
+
   <ItemGroup>
-    <Analyzer Include="..\..\packages\AWSSDK.CloudWatchLogs.3.3.2\analyzers\dotnet\cs\AWSSDK.CloudWatchLogs.CodeAnalysis.dll" />
-  </ItemGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\xunit.runner.msbuild.2.2.0-beta4-build3444\build\portable-net45+win8+wp8+wpa81\xunit.runner.msbuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.msbuild.2.2.0-beta4-build3444\build\portable-net45+win8+wp8+wpa81\xunit.runner.msbuild.props'))" />
-    <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.2.0-beta4-build1194\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.2.0-beta4-build1194\build\net20\xunit.runner.visualstudio.props'))" />
-  </Target>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\AWS.Logger.Log4Net\AWS.Logger.Log4Net.csproj" />
+    <ProjectReference Include="..\..\src\AWS.Logger.Log4net\AWS.Logger.Log4net.csproj" />
     <ProjectReference Include="..\AWS.Logger.TestUtils\AWS.Logger.TestUtils.csproj" />
   </ItemGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
+    <PackageReference Include="xunit" Version="2.2.0" />
+    <Packagereference Include="xunit.runner.visualstudio" Version="2.2.0" />
+    <PackageReference Include="log4net" Version="2.0.8" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <PackageReference Include="xunit" Version="2.2.0-beta4-build3444" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0-beta4-build1194" />
+    <PackageReference Include="log4net" Version="2.0.5" />
+  </ItemGroup>
+
 </Project>

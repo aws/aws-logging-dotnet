@@ -6,8 +6,8 @@
     <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
     <RootNamespace>AWS.Logger.Log4net</RootNamespace>
     <AssemblyName>AWS.Logger.Log4net</AssemblyName>
-	<PackageId>AWS.Logger.Log4net</PackageId>
-	    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+    <PackageId>AWS.Logger.Log4net</PackageId>
+	  <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -15,7 +15,7 @@
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-      <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\awssdk.dll.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -32,7 +32,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-  <ProjectReference Include="..\AWS.Logger.Core\AWS.Logger.Core.csproj" />
+    <ProjectReference Include="..\AWS.Logger.Core\AWS.Logger.Core.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
       <PackageReference Include="log4net" Version="2.0.8" />
