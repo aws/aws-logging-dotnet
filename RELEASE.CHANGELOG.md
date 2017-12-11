@@ -1,6 +1,8 @@
-### Release 2017-10-23 00:02 UTC
+### Release 2017-11-12 00:02 UTC
 * **AWS.Logger.SeriLog (1.0.0)**
-    * Added logging for SeriLog library.
+    * Added support for SeriLog logging library.
+* **AWS.Logger.Log4net (1.1.4)**
+    * Added support for Log4net logging library for NetStandard1.5 framework.
 
 ### Release 2017-28-09 00:02 UTC
 * **AWS.Logger.AspNetCore (1.2.4)**
