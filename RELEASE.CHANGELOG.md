@@ -1,5 +1,19 @@
 ### Release 2018-01-04 00:02 UTC
 * Modified AssemblyInfo.cs with correct version numbers for all the libraries
+* **AWS.Logger.Core (1.1.4)**
+    * Modified AssemblyInfo.cs with correct version number
+* **AWS.Logger.AspNetCore (1.2.5)**
+    * Created AssemblyInfo.cs with correct version numbers
+    * Updated nuspec file with the updated AWS.Logger.Core version
+* **AWS.Logger.Log4net (1.1.5)**
+    * Modified AssemblyInfo.cs with correct version numbers
+    * Updated nuspec file with the updated AWS.Logger.Core version
+* **AWS.Logger.NLog (1.1.4)**
+    * Modified AssemblyInfo.cs with correct version numbers
+    * Updated nuspec file with the updated AWS.Logger.Core version
+* **AWS.Logger.SeriLog (1.0.1)**
+    * Modified AssemblyInfo.cs with correct version numbers
+    * Updated nuspec file with the updated AWS.Logger.Core version  
 
 ### Release 2017-12-11 00:02 UTC
 * **AWS.Logger.SeriLog (1.0.0)**

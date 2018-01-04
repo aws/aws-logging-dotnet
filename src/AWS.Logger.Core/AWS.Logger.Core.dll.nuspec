@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>AWS.Logger.Core</id>
-    <version>1.1.3</version>
+    <version>1.1.4</version>
     <authors>Amazon Web Services</authors>
     <owners>Amazon Web Services</owners>
     <licenseUrl>http://aws.amazon.com/apache2.0/</licenseUrl>
@@ -10,7 +10,7 @@
     <iconUrl>http://media.amazonwebservices.com/aws_singlebox_01.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This is the core logging package used by the Adapter packages like AWS.Logger.Log4net to push logging messages into Amazon CloudWatch Logs.</description>
-    <copyright>Copyright 2016</copyright>
+    <copyright>Copyright 2016-2018</copyright>
     <tags>AWS Cloudwatch Logger</tags>
       <dependencies>
 
