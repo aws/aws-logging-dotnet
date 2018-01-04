@@ -1,3 +1,6 @@
+### Release 2018-01-04 00:02 UTC
+* Modified AssemblyInfo.cs with correct version numbers for all the libraries
+
 ### Release 2017-12-11 00:02 UTC
 * **AWS.Logger.SeriLog (1.0.0)**
     * Added support for SeriLog logging library.
