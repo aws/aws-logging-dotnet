@@ -4,9 +4,9 @@ using System.Runtime.InteropServices;
 
 
 [assembly: AssemblyCompany("Amazon Web Services")]
-[assembly: AssemblyTitle("AWS.Logger.Core")]
-[assembly: AssemblyProduct("AWS.Logger.Core")]
-[assembly: AssemblyDescription("AWS Core logging library used to send logging messages to Amazon CloudWatch Logs")]
+[assembly: AssemblyTitle("AWS.Logger.AspNetCore")]
+[assembly: AssemblyProduct("AWS.Logger.AspNetCore")]
+[assembly: AssemblyDescription("An AWS implementation of ASP.NET Core ILogger that records logging messages to Amazon CloudWatch Logs.")]
 [assembly: AssemblyCopyright("Copyright 2016-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.")]
 
 
@@ -16,7 +16,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("d99fe4cd-0566-43f0-a339-b6fd7e603d10")]
+[assembly: Guid("ec54d8db-9ecc-4026-9d00-bdde02af650a")]
 
-[assembly: AssemblyVersion("1.0.0")]
-[assembly: AssemblyFileVersion("1.1.3")]
+[assembly: AssemblyVersion("1.2.0")]
+[assembly: AssemblyFileVersion("1.2.4")]

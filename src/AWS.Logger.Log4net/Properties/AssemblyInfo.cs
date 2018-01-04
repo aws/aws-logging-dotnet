@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("AWS.Logger.Log4net")]
 [assembly: AssemblyProduct("AWS.Logger.Log4net")]
 [assembly: AssemblyDescription("An AWS Log4net appender that records logging messages to Amazon CloudWatch Logs.")]
-[assembly: AssemblyCopyright("Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.")]
+[assembly: AssemblyCopyright("Copyright 2016-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.")]
 
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -20,4 +20,5 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("78312e9b-bc7c-4af8-9153-dd72bbf4fd36")]
 
-[assembly: AssemblyFileVersion("1.0.1")]
+[assembly: AssemblyVersion("1.0.0")]
+[assembly: AssemblyFileVersion("1.1.4")]

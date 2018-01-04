@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyCompany("Amazon Web Services")]
-[assembly: AssemblyTitle("NLog.AWS.Logger")]
-[assembly: AssemblyProduct("NLog.AWS.Logger")]
-[assembly: AssemblyDescription("An AWS NLog target that records logging messages to Amazon CloudWatch Logs.")]
+[assembly: AssemblyTitle("AWS.Logger.SeriLog")]
+[assembly: AssemblyProduct("AWS.Logger.SeriLog")]
+[assembly: AssemblyDescription("A AWS SeriLog sink that records logging messages to Amazon CloudWatch Logs.")]
 [assembly: AssemblyCopyright("Copyright 2016-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("284abc3b-da69-4038-a025-0212a6df65a3")]
+[assembly: Guid("180041e5-49b9-4e81-b2ad-d67eb440325c")]
 
 // Version information for an assembly consists of the following four values:
 //
