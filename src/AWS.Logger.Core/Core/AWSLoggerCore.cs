@@ -171,46 +171,53 @@ namespace AWS.Logger.Core
         /// </summary>
         private async Task Monitor(CancellationToken token)
         {
-            if (_currentStreamName == null)
+            try
             {
-                await LogEventTransmissionSetup(token).ConfigureAwait(false);
-            }
-            while (true)
-            {
-                try
+                if (_currentStreamName == null)
                 {
-                    while (_pendingMessageQueue.TryDequeue(out var inputLogEvent))
+                    await LogEventTransmissionSetup(token).ConfigureAwait(false);
+                }
+                while (true)
+                {
+                    try
                     {
-                        // See if new message will cause the current batch to violote the size constraint.
-                        // If so send the current batch now before adding more to the batch of messages to send.
-                        if (_repo.IsSizeConstraintViolated(inputLogEvent.Message))
+                        while (_pendingMessageQueue.TryDequeue(out var inputLogEvent))
+                        {
+                            // See if new message will cause the current batch to violote the size constraint.
+                            // If so send the current batch now before adding more to the batch of messages to send.
+                            if (_repo.IsSizeConstraintViolated(inputLogEvent.Message))
+                            {
+                                await SendMessages(token).ConfigureAwait(false);
+                            }
+                            _repo.AddMessage(inputLogEvent);
+                        }
+                        if (_isTerminated)
+                        {
+                            // If the logger is being terminated and all the messages have been sent, exit out of loop.
+                            // If there are messages keep pushing the remaining messages before the process dies.
+                            if (_repo._request.LogEvents.Count == 0)
+                            {
+                                break;
+                            }
+                        }
+                        // Check if we have enough data to warrant making the webcall
+                        if (_repo.ShouldSendRequest(_config.MaxQueuedMessages))
                         {
                             await SendMessages(token).ConfigureAwait(false);
                         }
-                        _repo.AddMessage(inputLogEvent);
+                        await Task.Delay(Convert.ToInt32(_config.MonitorSleepTime.TotalMilliseconds), token);
                     }
-                    if (_isTerminated)
+                    catch (Exception ex) when (!(ex is OperationCanceledException))
                     {
-                        // If the logger is being terminated and all the messages have been sent, exit out of loop.
-                        // If there are messages keep pushing the remaining messages before the process dies.
-                        if (_repo._request.LogEvents.Count == 0)
-                        {
-                            break;
-                        }
+                        // We don't want to kill the main monitor loop. We will simply log the error, then continue.
+                        // If it is an OperationCancelledException, die
+                        LogLibraryError(ex, _config.LibraryLogFileName);
                     }
-                    // Check if we have enough data to warrant making the webcall
-                    if (_repo.ShouldSendRequest(_config.MaxQueuedMessages))
-                    {
-                        await SendMessages(token).ConfigureAwait(false);
-                    }
-                    await Task.Delay(Convert.ToInt32(_config.MonitorSleepTime.TotalMilliseconds), token);
                 }
-                catch (Exception ex) when (!(ex is OperationCanceledException))
-                {
-                    // We don't want to kill the main monitor loop. We will simply log the error, then continue.
-                    // If it is an OperationCancelledException, die
-                    LogLibraryError(ex, _config.LibraryLogFileName);
-                }
+            }
+            catch (OperationCanceledException)
+            {
+                //Just exit the method
             }
         }
 
