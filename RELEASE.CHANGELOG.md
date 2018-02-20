@@ -1,3 +1,10 @@
+### Release 2018-02-19 R1
+* **AWS.Logger.Core (1.1.6)**
+* Fixes bug with logger background dying after an arbitrary amount of time. An exception would be thrown and since the catch was outside the main loop, the thread would exit.
+* Simplified error handling from main loop
+* Simplified main loop method by removing redundant checks
+* Cancellation is not an error, and will no longer be logged as such. We were, but not consistently.
+
 ### Release 2018-01-04 00:02 UTC
 * Modified AssemblyInfo.cs with correct version numbers for all the libraries
 * **AWS.Logger.Core (1.1.4)**
@@ -48,7 +55,7 @@
     * Updated dependency to latest AWS.Logger.Core
 * **AWS.Logger.NLog (1.1.2)**
     * Updated dependency to latest AWS.Logger.Core
-	
+
 ### Release 2017-06-22 21:30 UTC
 * **AWS.Logger.AspNetCore (1.2.0)**
     * Pull request [#14](https://github.com/aws/aws-logging-dotnet/pull/14), adding support for custom formatters. Thanks to [Peter Deme](https://github.com/peterdeme).
@@ -88,6 +95,3 @@
     * Initial Release
 * **AWS.Logger.NLog (1.0.0)**
     * Initial Release
-
-
-
