@@ -1,3 +1,7 @@
+### Release 2018-02-23
+* **AWS.Logger.NLog (1.1.6)**
+    * Changed dependency for NetStandard 1.5 from NLog 5 to Nlog 4.5
+
 ### Release 2018-02-22
 * **AWS.Logger.Core (1.1.7)**
     * Created AssemblyInfo.cs with correct version numbers
@@ -15,7 +19,7 @@
     * Updated nuspec file with the updated AWS.Logger.Core version  
 
 
-### Release 2018-02-19 R1
+### Release 2018-02-19
 * **AWS.Logger.Core (1.1.6)**
 * Fixes bug with logger background dying after an arbitrary amount of time. An exception would be thrown and since the catch was outside the main loop, the thread would exit.
 * Simplified error handling from main loop

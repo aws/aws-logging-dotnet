@@ -49,7 +49,7 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
     <PackageReference Include="System.Threading.Thread" Version="4.0.0" />
     <PackageReference Include="System.Reflection" Version="4.1.0" />
-    <PackageReference Include="NLog" Version="5.0.0-beta07" />
+    <PackageReference Include="NLog" Version="4.5.0-rc05" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
