@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using System.Runtime.Loader;
 #endif
 using System.Reflection;
+using Amazon.Runtime.CredentialManagement;
 
 namespace AWS.Logger.Core
 {
@@ -90,11 +91,11 @@ namespace AWS.Logger.Core
             {
                 return config.Credentials;
             }
-            if (!string.IsNullOrEmpty(config.Profile) && StoredProfileAWSCredentials.IsProfileKnown(config.Profile, config.ProfilesLocation))
+            if (!string.IsNullOrEmpty(config.Profile) && new CredentialProfileStoreChain(config.ProfilesLocation)
+                .TryGetAWSCredentials(config.Profile, out var credentials))
             {
-                return new StoredProfileAWSCredentials(config.Profile, config.ProfilesLocation);
+                return credentials;
             }
-
             return FallbackCredentialsFactory.GetCredentials();
         }
 

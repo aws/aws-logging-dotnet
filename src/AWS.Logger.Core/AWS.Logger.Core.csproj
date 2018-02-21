@@ -19,7 +19,7 @@
     <SignAssembly>True</SignAssembly>
     <DelaySign>False</DelaySign>
     <AssemblyOriginatorKeyFile>..\..\awssdk.dll.snk</AssemblyOriginatorKeyFile>
-    <Version>1.1.6</Version>
+    <Version>1.1.7</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)|$(Platform)'=='netstandard1.5|AnyCPU'">
@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.3.2" />
+    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.3.4" />
     <PackageReference Include="System.Collections.Concurrent" Version="4.0.12" />
     <PackageReference Include="System.Threading.Tasks" Version="4.0.11" />
     <PackageReference Include="System.Threading.ThreadPool" Version="4.0.10" />

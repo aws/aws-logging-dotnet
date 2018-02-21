@@ -1,3 +1,20 @@
+### Release 2018-02-22
+* **AWS.Logger.Core (1.1.7)**
+    * Created AssemblyInfo.cs with correct version numbers
+* **AWS.Logger.AspNetCore (1.2.6)**
+    * Created AssemblyInfo.cs with correct version numbers
+    * Updated nuspec file with the updated AWS.Logger.Core version
+* **AWS.Logger.Log4net (1.1.6)**
+    * Modified AssemblyInfo.cs with correct version numbers
+    * Updated nuspec file with the updated AWS.Logger.Core version
+* **AWS.Logger.NLog (1.1.5)**
+    * Modified AssemblyInfo.cs with correct version numbers
+    * Updated nuspec file with the updated AWS.Logger.Core version
+* **AWS.Logger.SeriLog (1.0.2)**
+    * Modified AssemblyInfo.cs with correct version numbers
+    * Updated nuspec file with the updated AWS.Logger.Core version  
+
+
 ### Release 2018-02-19 R1
 * **AWS.Logger.Core (1.1.6)**
 * Fixes bug with logger background dying after an arbitrary amount of time. An exception would be thrown and since the catch was outside the main loop, the thread would exit.

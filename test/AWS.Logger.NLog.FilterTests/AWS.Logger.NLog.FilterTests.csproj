@@ -28,9 +28,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.1.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0-beta5-build1225" />
-    <PackageReference Include="xunit" Version="2.2.0-beta5-build3474" />
+    <PackageReference Include="xunit" Version="2.2.0" />
     <PackageReference Include="xunit.abstractions" Version="2.0.1" />
   </ItemGroup>
 
@@ -38,12 +39,9 @@
     <PackageReference Include="System.Threading.Thread" Version="4.0.0" />
     <PackageReference Include="System.Reflection" Version="4.1.0" />
     <PackageReference Include="NLog" Version="5.0.0-beta07" />
-    <PackageReference Include="AWSSDK.Core" Version="3.3.14.2" />
-
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <PackageReference Include="AWSSDK.Core" Version="3.3.7" />
     <PackageReference Include="NLog" Version="4.4.9" />
   </ItemGroup>
 

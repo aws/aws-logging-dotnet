@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>AWS.Logger.Core</id>
-    <version>1.1.6</version>
+    <version>1.1.7</version>
     <authors>Amazon Web Services</authors>
     <owners>Amazon Web Services</owners>
     <licenseUrl>http://aws.amazon.com/apache2.0/</licenseUrl>
@@ -13,28 +13,24 @@
     <copyright>Copyright 2016-2018</copyright>
     <tags>AWS Cloudwatch Logger</tags>
       <dependencies>
-
-      <group targetFramework="netstandard1.5">
-        <dependency id="AWSSDK.CloudWatchLogs" version="[3.3.2, 3.4)" />
-        <dependency id="System.Collections.Concurrent" version="4.0.12" />
-        <dependency id="System.Globalization" version="4.0.11" />
-        <dependency id="System.Runtime.Loader" version="4.0.0" />
-        <dependency id="System.Threading.Tasks"  version="4.0.11"/>
-        <dependency id="System.Threading.ThreadPool" version= "4.0.10"/>
-        <dependency id="System.Threading.Timer" version= "4.0.1"/>
-      </group>
-
+        <group targetFramework="netstandard1.5">
+          <dependency id="AWSSDK.CloudWatchLogs" version="3.3.4" />
+          <dependency id="System.Collections.Concurrent" version="4.0.12" />
+          <dependency id="System.Globalization" version="4.0.11" />
+          <dependency id="System.Runtime.Loader" version="4.0.0" />
+          <dependency id="System.Threading.Tasks"  version="4.0.11"/>
+          <dependency id="System.Threading.ThreadPool" version= "4.0.10"/>
+          <dependency id="System.Threading.Timer" version= "4.0.1"/>
+        </group>
         <group targetFramework="net452">
-          <dependency id="AWSSDK.CloudWatchLogs" version="[3.3.2, 3.4)" />
-      </group>
-    </dependencies>
+          <dependency id="AWSSDK.CloudWatchLogs" version="3.3.4" />
+        </group>
+      </dependencies>
   </metadata>
   <files>
   <file src="bin\Release\netstandard1.5\AWS.Logger.Core.dll" target="lib\netstandard1.5" />
   <file src="bin\Release\netstandard1.5\AWS.Logger.Core.pdb" target="lib\netstandard1.5" />
-
   <file src="bin\Release\net45\AWS.Logger.Core.dll" target="lib\net45" />
   <file src="bin\Release\net45\AWS.Logger.Core.pdb" target="lib\net45" />
-
 </files>
 </package>

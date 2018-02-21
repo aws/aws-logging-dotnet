@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>AWS.Logger.NLog</id>
-    <version>1.1.4</version>
+    <version>1.1.5</version>
     <authors>Amazon Web Services</authors>
     <owners>Amazon Web Services</owners>
     <licenseUrl>http://aws.amazon.com/apache2.0/</licenseUrl>
@@ -14,13 +14,12 @@
     <tags>AWS Cloudwatch Logger NLog</tags>
     <dependencies>
       <group targetFramework="net452">
+        <dependency id="AWS.Logger.Core" version="1.1.7" />
         <dependency id="NLog" version="4.4.9" />
       </group>
-
-      <group>
-        <dependency id="AWS.Logger.Core" version="1.1.4" />
+      <group targetFramework="netstandard1.5">
+        <dependency id="AWS.Logger.Core" version="1.1.7" />
       </group>
-
     </dependencies>
   </metadata>
   <files>
