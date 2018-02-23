@@ -20,7 +20,6 @@ namespace AWS.Logger.Core
     public class AWSLoggerCore : IAWSLoggerCore
     {
         #region Private Members
-        private Object addMessagesLock = new Object();
         const string EMPTY_MESSAGE = "\t";
         private ConcurrentQueue<InputLogEvent> _pendingMessageQueue = new ConcurrentQueue<InputLogEvent>();
         private string _currentStreamName = null;
