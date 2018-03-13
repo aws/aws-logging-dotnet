@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>AWS.Logger.AspNetCore</id>
-    <version>1.2.6</version>
+    <version>1.2.7</version>
     <authors>Amazon Web Services</authors>
     <owners>Amazon Web Services</owners>
     <licenseUrl>http://aws.amazon.com/apache2.0/</licenseUrl>
@@ -14,7 +14,7 @@
     <tags>AWS Cloudwatch Logger</tags>
     <dependencies>
       <group targetFramework="netstandard1.5">
-        <dependency id="AWS.Logger.Core" version="1.1.7" />
+        <dependency id="AWS.Logger.Core" version="1.1.8" />
         <dependency id="Microsoft.Extensions.Logging.Abstractions" version="1.0.0" />
         <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="1.0.0" />
       </group>

@@ -230,6 +230,8 @@ namespace AWS.Logger.Core
         {
             try
             {
+                //Make sure the log events are in the right order.
+                _repo._request.LogEvents.Sort((ev1, ev2) => ev1.Timestamp.CompareTo(ev2.Timestamp));
                 var response = await _client.PutLogEventsAsync(_repo._request, token).ConfigureAwait(false);
                 _repo.Reset(response.NextSequenceToken);
                 requestCount = 5;
