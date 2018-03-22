@@ -1,6 +1,7 @@
 ﻿using AWS.Logger.TestUtils;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using Serilog.Formatting.Compact;
 using System;
 using System.Threading;
 using Xunit;
@@ -22,10 +23,10 @@ namespace AWS.Logger.SeriLog.Tests
             var configuration = new ConfigurationBuilder()
             .AddJsonFile(configurationFile)
             .Build();
-
+             
             Log.Logger = new LoggerConfiguration().
                 ReadFrom.Configuration(configuration).
-                 WriteTo.AWSSeriLog(configuration).CreateLogger();
+                 WriteTo.AWSSeriLog(new CompactJsonFormatter(), configuration).CreateLogger();
         }
         #region Test Cases  
 

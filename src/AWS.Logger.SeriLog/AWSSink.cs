@@ -3,11 +3,13 @@ using Serilog;
 
 using Serilog.Core;
 using Serilog.Events;
+using Serilog.Formatting;
 using Microsoft.Extensions.Configuration;
 using Amazon.Runtime;
 using AWS.Logger.Core;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace AWS.Logger.SeriLog
 {
@@ -17,7 +19,7 @@ namespace AWS.Logger.SeriLog
     public class AWSSink: ILogEventSink
     {
         AWSLoggerCore _core = null;
-        IFormatProvider _iformatDriver;
+        ITextFormatter _textFormatter;
 
         /// <summary>
         /// Default constructor
@@ -30,10 +32,10 @@ namespace AWS.Logger.SeriLog
         /// </summary>
         /// <param name="loggerConfiguration"></param>
         /// <param name="iFormatProvider"></param>
-        public AWSSink(AWSLoggerConfig loggerConfiguration,IFormatProvider iFormatProvider = null)
+        public AWSSink(AWSLoggerConfig loggerConfiguration, ITextFormatter textFormatter)
         {
             _core = new AWSLoggerCore(loggerConfiguration, "SeriLogger");
-            _iformatDriver = iFormatProvider;
+            _textFormatter = textFormatter;
         }
 
         /// <summary>
@@ -43,13 +45,24 @@ namespace AWS.Logger.SeriLog
         public void Emit(LogEvent logEvent)
         {
             StringBuilder formattedMessage = new StringBuilder();
-            var message = logEvent.RenderMessage(_iformatDriver);
+            var message = RenderLogEvent(logEvent);
             formattedMessage.AppendLine(message);
+
             if (logEvent.Exception != null)
             {
                 formattedMessage.AppendLine(logEvent.Exception.ToString());
             }
             _core.AddMessage(formattedMessage.ToString());
+        }
+
+        private string RenderLogEvent(LogEvent logEvent)
+        {
+            using (var writer = new StringWriter())
+            {
+                _textFormatter.Format(logEvent, writer);
+                writer.Flush();
+                return writer.ToString();
+            }
         }
 
         private class DisposableScope : IDisposable
