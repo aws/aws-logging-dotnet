@@ -29,8 +29,9 @@ namespace AWS.Logger.SeriLog
         /// <returns></returns>
         public static LoggerConfiguration AWSSeriLog(
                   this LoggerSinkConfiguration loggerConfiguration,
-                  ITextFormatter textFormatter,
-                  IConfiguration configuration)
+                  IConfiguration configuration, 
+                  IFormatProvider iFormatProvider = null,
+                  ITextFormatter textFormatter = null )
         {
             AWSLoggerConfig config = new AWSLoggerConfig();
 
@@ -63,8 +64,10 @@ namespace AWS.Logger.SeriLog
             {
                 config.LibraryLogFileName = configuration[LIBRARY_LOG_FILE_NAME];
             }
-            return AWSSeriLog(loggerConfiguration, textFormatter, config);
+            return AWSSeriLog(loggerConfiguration, config, iFormatProvider, textFormatter);
         }
+
+
         /// <summary>
         /// AWSSeriLogger target that is called when the customer
         /// explicitly creates a configuration of type AWSLoggerConfig 
@@ -75,11 +78,11 @@ namespace AWS.Logger.SeriLog
         /// <returns></returns>
         public static LoggerConfiguration AWSSeriLog(
                   this LoggerSinkConfiguration loggerConfiguration,
-                   ITextFormatter textFormatter,
-                  AWSLoggerConfig configuration = null)
+                   AWSLoggerConfig configuration = null,
+                   IFormatProvider iFormatProvider = null, 
+                   ITextFormatter textFormatter = null)
         {
-            if (textFormatter == null) throw new ArgumentNullException(nameof(textFormatter));
-            return loggerConfiguration.Sink(new AWSSink(configuration, textFormatter));
+            return loggerConfiguration.Sink(new AWSSink(configuration, iFormatProvider, textFormatter));
         }
     }
 }

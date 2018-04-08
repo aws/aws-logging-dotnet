@@ -26,7 +26,7 @@ namespace AWS.Logger.SeriLog.Tests
              
             Log.Logger = new LoggerConfiguration().
                 ReadFrom.Configuration(configuration).
-                 WriteTo.AWSSeriLog(new CompactJsonFormatter(), configuration).CreateLogger();
+                 WriteTo.AWSSeriLog( configuration).CreateLogger();
         }
         #region Test Cases  
 

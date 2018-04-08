@@ -19,6 +19,7 @@ namespace AWS.Logger.SeriLog
     public class AWSSink: ILogEventSink
     {
         AWSLoggerCore _core = null;
+        IFormatProvider _iformatDriver;
         ITextFormatter _textFormatter;
 
         /// <summary>
@@ -32,9 +33,10 @@ namespace AWS.Logger.SeriLog
         /// </summary>
         /// <param name="loggerConfiguration"></param>
         /// <param name="iFormatProvider"></param>
-        public AWSSink(AWSLoggerConfig loggerConfiguration, ITextFormatter textFormatter)
+        public AWSSink(AWSLoggerConfig loggerConfiguration, IFormatProvider iFormatProvider = null, ITextFormatter textFormatter = null)
         {
             _core = new AWSLoggerCore(loggerConfiguration, "SeriLogger");
+            _iformatDriver = iFormatProvider;
             _textFormatter = textFormatter;
         }
 
@@ -56,13 +58,17 @@ namespace AWS.Logger.SeriLog
         }
 
         private string RenderLogEvent(LogEvent logEvent)
-        {
-            using (var writer = new StringWriter())
+        { 
+            if (_iformatDriver == null && _textFormatter != null)
             {
-                _textFormatter.Format(logEvent, writer);
-                writer.Flush();
-                return writer.ToString();
+                using (var writer = new StringWriter())
+                {
+                    _textFormatter.Format(logEvent, writer);
+                    writer.Flush();
+                    return writer.ToString();
+                }
             }
+            return logEvent.RenderMessage(_iformatDriver);
         }
 
         private class DisposableScope : IDisposable
