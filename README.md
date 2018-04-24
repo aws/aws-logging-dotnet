@@ -29,7 +29,7 @@ is **NLog.config**. Here is an example config file that configures the AWS Regio
     <target name="aws" type="AWSTarget" logGroup="NLog.ConfigExample" region="us-east-1"/>
   </targets>
   <rules>
-    <logger name="*" minlevel="Info" writeTo="logfile,aws" />
+    <logger name="*" minlevel="Info" writeTo="aws" />
   </rules>
 </nlog>
 ```
