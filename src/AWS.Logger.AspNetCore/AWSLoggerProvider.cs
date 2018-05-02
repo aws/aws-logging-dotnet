@@ -11,10 +11,10 @@ namespace AWS.Logger.AspNetCore
     /// </summary>
     public class AWSLoggerProvider : ILoggerProvider
     {       
-        private IAWSLoggerCore _core;
+        private readonly IAWSLoggerCore _core;
+        private readonly AWSLoggerConfigSection _configSection;
+        private readonly Func<LogLevel, object, Exception, string> _customFormatter;
         private Func<string, LogLevel, bool> _filter;
-        private AWSLoggerConfigSection _configSection;
-        private Func<LogLevel, object, Exception, string> _customFormatter;
 
         /// <summary>
         /// Creates the logging provider with the configuration information to connect to AWS and how the messages should be sent.

@@ -87,5 +87,13 @@ namespace AWS.Logger
         /// </para>
         /// </summary>
         string LibraryLogFileName { get; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IAWSLoggerConfig.IncludeScopes"/> property. This determines if scopes - if they exist - are included in a log message.
+        /// <para>
+        /// The default is false.
+        /// </para>
+        /// </summary>
+        bool IncludeScopes { get; set; }
     }
 }
