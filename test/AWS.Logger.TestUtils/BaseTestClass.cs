@@ -176,5 +176,7 @@ namespace AWS.Logger.TestUtils
 
             _testFixture.LogGroupNameList.Add(logGroupName);
         }
+
+
     }
 }

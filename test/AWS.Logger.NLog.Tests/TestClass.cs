@@ -52,6 +52,41 @@ namespace AWS.Logger.NLogger.Tests
             MultiThreadBufferFullTest("AWSNLogGroupMultiThreadBufferFullTest");
         }
 
+        [Fact]
+        public void MessageHasToBeBrokenUp()
+        {
+            string logGroupName = "AWSNLogGroup";
+
+            CreateLoggerFromConfiguration("Regular.config");
+            Logger = LogManager.GetLogger("loggerRegular");
+
+            // This will get broken up into 3 CloudWatch Log messages
+            Logger.Debug(new string('a', 600000)); 
+            Logger.Debug(LASTMESSAGE);
+
+            GetLogEventsResponse getLogEventsResponse = new GetLogEventsResponse();
+            if (NotifyLoggingCompleted(logGroupName, "LASTMESSAGE"))
+            {
+                DescribeLogStreamsResponse describeLogstreamsResponse =
+                Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
+                {
+                    Descending = true,
+                    LogGroupName = logGroupName,
+                    OrderBy = "LastEventTime"
+                }).Result;
+
+                // Wait for the large messages to propagate
+                Thread.Sleep(5000);
+                getLogEventsResponse = Client.GetLogEventsAsync(new GetLogEventsRequest
+                {
+                    LogGroupName = logGroupName,
+                    LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
+                }).Result;
+            }
+
+            Assert.Equal(4, getLogEventsResponse.Events.Count());
+        }
+
         public override void LogMessages(int count)
         {
             for (int i = 0; i < count-1; i++)

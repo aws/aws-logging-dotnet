@@ -15,6 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\AWS.Logger.Core\AWS.Logger.Core.csproj" />
     <ProjectReference Include="..\AWS.Logger.TestUtils\AWS.Logger.TestUtils.csproj" />
   </ItemGroup>
 
