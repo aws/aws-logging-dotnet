@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using Serilog.Formatting;
 using Serilog.Configuration;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,9 @@ namespace AWS.Logger.SeriLog
         /// <returns></returns>
         public static LoggerConfiguration AWSSeriLog(
                   this LoggerSinkConfiguration loggerConfiguration,
-                  IConfiguration configuration)
+                  IConfiguration configuration, 
+                  IFormatProvider iFormatProvider = null,
+                  ITextFormatter textFormatter = null )
         {
             AWSLoggerConfig config = new AWSLoggerConfig();
 
@@ -61,8 +64,10 @@ namespace AWS.Logger.SeriLog
             {
                 config.LibraryLogFileName = configuration[LIBRARY_LOG_FILE_NAME];
             }
-            return AWSSeriLog(loggerConfiguration, config);
+            return AWSSeriLog(loggerConfiguration, config, iFormatProvider, textFormatter);
         }
+
+
         /// <summary>
         /// AWSSeriLogger target that is called when the customer
         /// explicitly creates a configuration of type AWSLoggerConfig 
@@ -73,9 +78,11 @@ namespace AWS.Logger.SeriLog
         /// <returns></returns>
         public static LoggerConfiguration AWSSeriLog(
                   this LoggerSinkConfiguration loggerConfiguration,
-                  AWSLoggerConfig configuration = null)
+                   AWSLoggerConfig configuration = null,
+                   IFormatProvider iFormatProvider = null, 
+                   ITextFormatter textFormatter = null)
         {
-            return loggerConfiguration.Sink(new AWSSink(configuration));
+            return loggerConfiguration.Sink(new AWSSink(configuration, iFormatProvider, textFormatter));
         }
     }
 }
