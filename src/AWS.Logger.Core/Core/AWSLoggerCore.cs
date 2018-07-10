@@ -2,6 +2,7 @@ using System;
 using Amazon.CloudWatchLogs;
 using Amazon.CloudWatchLogs.Model;
 using Amazon.Runtime;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
@@ -19,6 +20,8 @@ namespace AWS.Logger.Core
 {
     public class AWSLoggerCore : IAWSLoggerCore
     {
+        const int MAX_MESSAGE_SIZE_IN_BYTES = 256000;
+
         #region Private Members
         const string EMPTY_MESSAGE = "\t";
         private ConcurrentQueue<InputLogEvent> _pendingMessageQueue = new ConcurrentQueue<InputLogEvent>();
@@ -115,32 +118,52 @@ namespace AWS.Logger.Core
         /// the logger
         /// </summary>
         /// <param name="message"></param>
-        public void AddMessage(string message)
+        public void AddMessage(string rawMessage)
         {
-            if (string.IsNullOrEmpty(message))
+            Action<string> processor = (message) =>
             {
-                message = EMPTY_MESSAGE;
-            }
-            if (_pendingMessageQueue.Count > _config.MaxQueuedMessages)
-            {
-                if ((_maxBufferTimeStamp == DateTime.MinValue) || (DateTime.Now > _maxBufferTimeStamp.Add(TimeSpan.FromMinutes(MAX_BUFFER_TIMEDIFF))))
+                if (_pendingMessageQueue.Count > _config.MaxQueuedMessages)
                 {
-                    _maxBufferTimeStamp = DateTime.Now;
-                    message = "The AWS Logger in-memory buffer has reached maximum capacity";
+                    if ((_maxBufferTimeStamp == DateTime.MinValue) || (DateTime.Now > _maxBufferTimeStamp.Add(TimeSpan.FromMinutes(MAX_BUFFER_TIMEDIFF))))
+                    {
+                        _maxBufferTimeStamp = DateTime.Now;
+                        message = "The AWS Logger in-memory buffer has reached maximum capacity";
+                        _pendingMessageQueue.Enqueue(new InputLogEvent
+                        {
+                            Timestamp = DateTime.Now,
+                            Message = message,
+                        });
+                    }
+                }
+                else
+                {
                     _pendingMessageQueue.Enqueue(new InputLogEvent
                     {
                         Timestamp = DateTime.Now,
                         Message = message,
                     });
                 }
+            };
+
+            if (string.IsNullOrEmpty(rawMessage))
+            {
+                rawMessage = EMPTY_MESSAGE;
+            }
+
+            // Only do the extra work of breaking up the message if the max unicode bytes exceeds the possible size. This is not
+            // an exact measurement since the string is UTF8 but it gives us a chance to skip the extra computation for 
+            // typically small messages.
+            if (Encoding.Unicode.GetMaxByteCount(rawMessage.Length) < MAX_MESSAGE_SIZE_IN_BYTES)
+            {
+                processor(rawMessage);
             }
             else
             {
-                _pendingMessageQueue.Enqueue(new InputLogEvent
+                var messageParts = BreakupMessage(rawMessage);
+                foreach(var message in messageParts)
                 {
-                    Timestamp = DateTime.Now,
-                    Message = message,
-                });
+                    processor(message);
+                }
             }
         }
 
@@ -185,7 +208,7 @@ namespace AWS.Logger.Core
                         {
                             // See if new message will cause the current batch to violote the size constraint.
                             // If so send the current batch now before adding more to the batch of messages to send.
-                            if (_repo.IsSizeConstraintViolated(inputLogEvent.Message))
+                            if (_repo.CurrentBatchMessageCount > 0 && _repo.IsSizeConstraintViolated(inputLogEvent.Message))
                             {
                                 await SendMessages(token).ConfigureAwait(false);
                             }
@@ -286,6 +309,42 @@ namespace AWS.Logger.Core
         }
 
         /// <summary>
+        /// Break up the message into max parts of 256K.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static IList<string> BreakupMessage(string message)
+        {
+            var parts = new List<string>();
+
+            var singleCharArray = new char[1];
+            var encoding = Encoding.UTF8;
+            int byteCount = 0;
+            var sb = new StringBuilder(MAX_MESSAGE_SIZE_IN_BYTES);
+            foreach (var c in message)
+            {
+                singleCharArray[0] = c;
+                byteCount += encoding.GetByteCount(singleCharArray);
+                sb.Append(c);
+
+                // This could go a couple bytes
+                if (byteCount > MAX_MESSAGE_SIZE_IN_BYTES)
+                {
+                    parts.Add(sb.ToString());
+                    sb.Clear();
+                    byteCount = 0;
+                }
+            }
+
+            if (sb.Length > 0)
+            {
+                parts.Add(sb.ToString());
+            }
+
+            return parts;
+        }
+
+        /// <summary>
         /// Class to handle PutLogEvent request and associated parameters. 
         /// Also has the requisite checks to determine when the object is ready for Transmission.
         /// </summary>
@@ -322,6 +381,11 @@ namespace AWS.Logger.Core
 
             public LogEventBatch()
             {
+            }
+
+            public int CurrentBatchMessageCount
+            {
+                get { return this._request.LogEvents.Count; }
             }
 
             public bool IsSizeConstraintViolated(string message)
