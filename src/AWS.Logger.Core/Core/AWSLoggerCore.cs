@@ -353,7 +353,7 @@ namespace AWS.Logger.Core
             public TimeSpan TimeIntervalBetweenPushes { get; private set; }
             public int MaxBatchSize { get; private set; }
 
-            public bool ShouldSendRequest(int maxQueuedMessages)
+            public bool ShouldSendRequest(int maxQueuedEvents)
             {
                 if (_request.LogEvents.Count == 0)
                     return false;
@@ -361,7 +361,7 @@ namespace AWS.Logger.Core
                 if (_nextPushTime < DateTime.Now)
                     return true;
 
-                if (maxQueuedMessages <= _request.LogEvents.Count)
+                if (maxQueuedEvents <= _request.LogEvents.Count)
                     return true;
 
                 return false;

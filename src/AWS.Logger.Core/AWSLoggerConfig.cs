@@ -17,6 +17,7 @@ namespace AWS.Logger
     /// </summary>
     public class AWSLoggerConfig : IAWSLoggerConfig
     {
+        private int batchSizeInBytes = 102400;
         #region Public Properties
 
         /// <summary>
@@ -74,7 +75,21 @@ namespace AWS.Logger
         /// The default is 100 Kilobytes.
         /// </para>
         /// </summary>
-        public int BatchSizeInBytes { get; set; } = 102400;
+        public int BatchSizeInBytes
+        {
+            get
+            {
+                return batchSizeInBytes;
+            }
+            set
+            {
+                if (value > Math.Pow(1024, 2))
+                {
+                    throw new ArgumentException("The events batch size cannot exeed 1MB. https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/cloudwatch_limits_cwl.html");
+                }
+                batchSizeInBytes = value;
+            }
+        }
 
         /// <summary>
         /// Gets and sets the MaxQueuedMessages property. This specifies the maximum number of log messages that could be stored in-memory. MaxQueuedMessages 
