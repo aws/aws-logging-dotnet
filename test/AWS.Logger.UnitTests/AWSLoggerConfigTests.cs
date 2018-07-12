@@ -8,18 +8,20 @@ namespace AWS.Logger.UnitTests
 {
     public class AWSLoggerConfigTests
     {
+        AWSLoggerConfig config;
+        public AWSLoggerConfigTests()
+        {
+            config = new AWSLoggerConfig();
+        }
         [Fact]
         public void TestDefaultBatchSizeInBytes()
         {
-            AWSLoggerConfig config = new AWSLoggerConfig();
             Assert.Equal(102400, config.BatchSizeInBytes);
         }
 
         [Fact]
         public void SetInvalidValueOnBatchSizeInBytes()
         {
-            AWSLoggerConfig config = new AWSLoggerConfig();
-
             var exception = Record.Exception(() => config.BatchSizeInBytes = (int)Math.Pow(1024, 2) + 1);
             Assert.NotNull(exception);
 
@@ -29,8 +31,6 @@ namespace AWS.Logger.UnitTests
         [Fact]
         public void SetValidValueOnBatchSizeInBytes()
         {
-            AWSLoggerConfig config = new AWSLoggerConfig();
-
             var exception = Record.Exception(() => config.BatchSizeInBytes = (int)Math.Pow(1024, 2) - 1);
             Assert.Null(exception);
         }
