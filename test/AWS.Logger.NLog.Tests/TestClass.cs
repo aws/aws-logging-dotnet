@@ -55,10 +55,10 @@ namespace AWS.Logger.NLogger.Tests
         [Fact]
         public void MessageHasToBeBrokenUp()
         {
-            string logGroupName = "AWSNLogGroup";
+            string logGroupName = "AWSNLogGroupEventSizeExceededTest";
 
-            CreateLoggerFromConfiguration("Regular.config");
-            Logger = LogManager.GetLogger("loggerRegular");
+            CreateLoggerFromConfiguration("AWSNLogGroupEventSizeExceededTest.config");
+            Logger = LogManager.GetLogger("loggerRegularEventSizeExceeded");
 
             // This will get broken up into 3 CloudWatch Log messages
             Logger.Debug(new string('a', 600000)); 
@@ -83,7 +83,7 @@ namespace AWS.Logger.NLogger.Tests
                     LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
                 }).Result;
             }
-
+            _testFixture.LogGroupNameList.Add(logGroupName);
             Assert.Equal(4, getLogEventsResponse.Events.Count());
         }
 
