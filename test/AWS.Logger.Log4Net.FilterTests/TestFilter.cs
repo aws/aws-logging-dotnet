@@ -49,9 +49,9 @@ namespace AWS.Logger.Log4Net.FilterTests
             logger.Fatal("fatal");
 
             Assert.Equal(3, awsAppender._core.ReceivedMessages.Count);
-            Assert.True(awsAppender._core.ReceivedMessages.ElementAt(0).Contains("warning"));
-            Assert.True(awsAppender._core.ReceivedMessages.ElementAt(1).Contains("error"));
-            Assert.True(awsAppender._core.ReceivedMessages.ElementAt(2).Contains("fatal"));
+            Assert.Contains("warning", awsAppender._core.ReceivedMessages.ElementAt(0));
+            Assert.Contains("error", awsAppender._core.ReceivedMessages.ElementAt(1));
+            Assert.Contains("fatal", awsAppender._core.ReceivedMessages.ElementAt(2));
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace AWS.Logger.Log4Net.FilterTests
             logger.Warn("warning");
 
             Assert.Equal(2, awsAppender._core.ReceivedMessages.Count);
-            Assert.True(awsAppender._core.ReceivedMessages.ElementAt(1).Contains("warning"));
+            Assert.Contains("warning", awsAppender._core.ReceivedMessages.ElementAt(1));
             string val;
             while (!awsAppender._core.ReceivedMessages.IsEmpty)
             {
@@ -98,7 +98,7 @@ namespace AWS.Logger.Log4Net.FilterTests
             logger.Debug("trace");
             logger.Warn("warning");
 
-            Assert.Equal(0, awsAppender._core.ReceivedMessages.Count);
+            Assert.Empty(awsAppender._core.ReceivedMessages);
         }
     }
 }

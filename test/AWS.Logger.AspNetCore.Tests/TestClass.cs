@@ -97,7 +97,7 @@ namespace AWS.Logger.AspNetCore.Tests
             var tasks = new List<Task>();
             var logMessageCount = 10;
             LogMessages(logMessageCount);
-            Assert.True(coreLogger.ReceivedMessages.Contains("Error message\r\nSystem.Exception: Exception message.\r\n"));
+            Assert.Contains("Error message\r\nSystem.Exception: Exception message.\r\n", coreLogger.ReceivedMessages);
         }
         /// <summary>
         /// Basic test case that creates multiple threads and each thread mocks log messages
@@ -133,7 +133,7 @@ namespace AWS.Logger.AspNetCore.Tests
         public void MultiThreadTest()
         {
             LoggingSetup("multiThreadTest.json",null);
-            MultiThreadTest(ConfigSection.Config.LogGroup);
+            MultiThreadTestGroup(ConfigSection.Config.LogGroup);
         }
 
         /// <summary>
@@ -147,14 +147,14 @@ namespace AWS.Logger.AspNetCore.Tests
         public void MultiThreadBufferFullTest()
         {
             LoggingSetup("multiThreadBufferFullTest.json",null);
-            MultiThreadBufferFullTest(ConfigSection.Config.LogGroup);
+            MultiThreadBufferFullTestGroup(ConfigSection.Config.LogGroup);
         }
 
         /// <summary>
         /// This method posts debug messages onto CloudWatchLogs.
         /// </summary>
         /// <param name="count">The number of messages that would be posted onto CloudWatchLogs</param>
-        public override void LogMessages(int count)
+        protected override void LogMessages(int count)
         {
             Logger.LogError(0, new Exception("Exception message."), "Error message");
             for (int i = 0; i < count-2; i++)

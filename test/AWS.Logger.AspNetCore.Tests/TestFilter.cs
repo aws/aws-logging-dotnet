@@ -54,9 +54,9 @@ namespace AWS.Logger.AspNetCore.Tests
             logger.LogCritical("critical");
 
             Assert.Equal(3, coreLogger.ReceivedMessages.Count);
-            Assert.True(coreLogger.ReceivedMessages.Contains("warning\r\n"));
-            Assert.True(coreLogger.ReceivedMessages.Contains("error\r\n"));
-            Assert.True(coreLogger.ReceivedMessages.Contains("critical\r\n"));
+            Assert.Contains("warning\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains("error\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains("critical\r\n", coreLogger.ReceivedMessages);
         }
 
         [Fact]
@@ -74,8 +74,8 @@ namespace AWS.Logger.AspNetCore.Tests
             logger.LogTrace("trace");
             logger.LogWarning("warning");
 
-            Assert.Equal(1, coreLogger.ReceivedMessages.Count);
-            Assert.True(coreLogger.ReceivedMessages.Contains("warning\r\n"));
+            Assert.Single(coreLogger.ReceivedMessages);
+            Assert.Contains("warning\r\n", coreLogger.ReceivedMessages);
             string val;
             while (!coreLogger.ReceivedMessages.IsEmpty)
             {
@@ -87,7 +87,7 @@ namespace AWS.Logger.AspNetCore.Tests
             logger.LogTrace("trace");
             logger.LogWarning("warning");
 
-            Assert.Equal(0, coreLogger.ReceivedMessages.Count);
+            Assert.Empty(coreLogger.ReceivedMessages);
         }
         [Fact]
         public void ValidAppsettingsFilter()
@@ -112,10 +112,9 @@ namespace AWS.Logger.AspNetCore.Tests
             logger.LogCritical("critical");
 
             Assert.Equal(5, coreLogger.ReceivedMessages.Count);
-            Assert.True(coreLogger.ReceivedMessages.Contains("warning\r\n"));
-            Assert.True(coreLogger.ReceivedMessages.Contains("error\r\n"));
-            Assert.True(coreLogger.ReceivedMessages.Contains("critical\r\n"));
-
+            Assert.Contains("warning\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains("error\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains("critical\r\n", coreLogger.ReceivedMessages);
         }
 
         [Fact]
@@ -140,10 +139,7 @@ namespace AWS.Logger.AspNetCore.Tests
             logger.LogError("error");
             logger.LogCritical("critical");
 
-            Assert.Equal(0, coreLogger.ReceivedMessages.Count);
-            Assert.False(coreLogger.ReceivedMessages.Contains("warning\r\n"));
-            Assert.False(coreLogger.ReceivedMessages.Contains("error\r\n"));
-            Assert.False(coreLogger.ReceivedMessages.Contains("critical\r\n"));
+            Assert.Empty(coreLogger.ReceivedMessages);
 
             categoryName = "AWS.Log";
             logger = new AWSLogger(
@@ -159,9 +155,9 @@ namespace AWS.Logger.AspNetCore.Tests
             logger.LogCritical("critical");
 
             Assert.Equal(5, coreLogger.ReceivedMessages.Count);
-            Assert.True(coreLogger.ReceivedMessages.Contains("warning\r\n"));
-            Assert.True(coreLogger.ReceivedMessages.Contains("error\r\n"));
-            Assert.True(coreLogger.ReceivedMessages.Contains("critical\r\n"));
+            Assert.Contains("warning\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains("error\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains("critical\r\n", coreLogger.ReceivedMessages);
         }
 
         [Fact]
@@ -187,10 +183,9 @@ namespace AWS.Logger.AspNetCore.Tests
             logger.LogCritical("critical");
 
             Assert.Equal(5, coreLogger.ReceivedMessages.Count);
-            Assert.True(coreLogger.ReceivedMessages.Contains("warning\r\n"));
-            Assert.True(coreLogger.ReceivedMessages.Contains("error\r\n"));
-            Assert.True(coreLogger.ReceivedMessages.Contains("critical\r\n"));
-
+            Assert.Contains("warning\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains("error\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains("critical\r\n", coreLogger.ReceivedMessages);
         }
 
         [Fact]
@@ -216,9 +211,9 @@ namespace AWS.Logger.AspNetCore.Tests
             logger.LogCritical("critical");
 
             Assert.Equal(6, coreLogger.ReceivedMessages.Count);
-            Assert.True(coreLogger.ReceivedMessages.Contains("warning\r\n"));
-            Assert.True(coreLogger.ReceivedMessages.Contains("error\r\n"));
-            Assert.True(coreLogger.ReceivedMessages.Contains("critical\r\n"));
+            Assert.Contains("warning\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains("error\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains("critical\r\n", coreLogger.ReceivedMessages);
 
         }
     }
