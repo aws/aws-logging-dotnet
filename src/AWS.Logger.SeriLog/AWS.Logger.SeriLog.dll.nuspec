@@ -14,7 +14,7 @@
     <tags>AWS Cloudwatch Logger SeriLog</tags>
     <dependencies>
     <group>
-      <dependency id="AWS.Logger.Core" version="1.1.8" />
+      <dependency id="AWS.Logger.Core" version="1.2.0" />
       <dependency id="Serilog" version="2.5.0" />
     </group>
     </dependencies>

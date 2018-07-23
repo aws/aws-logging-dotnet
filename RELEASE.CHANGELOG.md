@@ -1,3 +1,17 @@
+### Release 2018-07-23
+* **AWS.Logger.Core (1.2.0)**
+    * Break up large logging messages into sizes that CloudWatch Logs will accept. This change was done to handle the CloudwatchLogs restriction on the event size(256 KB as per https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/cloudwatch_limits_cwl.html). This is addressing the following GitHub issue: https://github.com/aws/aws-logging-dotnet/issues/40
+    * Added validation to uphold CloudwatchLogs restriction on the batch size(1 MB as per https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/cloudwatch_limits_cwl.html).
+* **AWS.Logger.AspNetCore (1.3.0)**
+    * Updated nuspec file with the updated AWS.Logger.Core version
+* **AWS.Logger.Log4net (1.2.0)**
+    * Updated nuspec file with the updated AWS.Logger.Core version
+* **AWS.Logger.NLog (1.2.0)**
+    * Updated nuspec file with the updated AWS.Logger.Core version
+* **AWS.Logger.SeriLog (1.1.0)**
+    * Updated nuspec file with the updated AWS.Logger.Core version
+    * Merged in PR https://github.com/aws/aws-logging-dotnet/pull/41 for adding ITextFormatter to format log messages
+
 ### Release 2018-02-23
 * **AWS.Logger.NLog (1.1.6)**
     * Changed dependency for NetStandard 1.5 from NLog 5 to Nlog 4.5
