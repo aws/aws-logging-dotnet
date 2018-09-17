@@ -1,22 +1,17 @@
 ﻿using System;
+using System.IO;
+using AWS.Logger.Core;
 using Serilog;
-
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
-using Microsoft.Extensions.Configuration;
-using Amazon.Runtime;
-using AWS.Logger.Core;
-using System.Linq;
-using System.Text;
-using System.IO;
 
 namespace AWS.Logger.SeriLog
 {
     /// <summary>
     /// A Serilog sink that can be used with the Serilogger logging library to send messages to AWS.
     /// </summary>
-    public class AWSSink: ILogEventSink
+    public class AWSSink: ILogEventSink, IDisposable
     {
         AWSLoggerCore _core = null;
         IFormatProvider _iformatDriver;
@@ -46,15 +41,16 @@ namespace AWS.Logger.SeriLog
         /// <param name="logEvent"></param>
         public void Emit(LogEvent logEvent)
         {
-            StringBuilder formattedMessage = new StringBuilder();
             var message = RenderLogEvent(logEvent);
-            formattedMessage.AppendLine(message);
-
             if (logEvent.Exception != null)
             {
-                formattedMessage.AppendLine(logEvent.Exception.ToString());
+                message = string.Concat(message, Environment.NewLine, logEvent.Exception.ToString(), Environment.NewLine);
             }
-            _core.AddMessage(formattedMessage.ToString());
+            else
+            {
+                message = string.Concat(message, Environment.NewLine);
+            }
+            _core.AddMessage(message);
         }
 
         private string RenderLogEvent(LogEvent logEvent)
@@ -71,11 +67,32 @@ namespace AWS.Logger.SeriLog
             return logEvent.RenderMessage(_iformatDriver);
         }
 
-        private class DisposableScope : IDisposable
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
         {
-            public void Dispose()
+            if (!disposedValue)
             {
+                if (disposing)
+                {
+                    try
+                    {
+                        _core.Close();
+                    }
+                    catch (Exception)
+                    {
+                        // .. and as ugly as THIS is, .Dispose() methods shall not throw exceptions
+                    }
+                }
+
+                disposedValue = true;
             }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
         }
     }
 }
