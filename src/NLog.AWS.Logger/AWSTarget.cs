@@ -1,8 +1,9 @@
 ﻿using System;
 
-using NLog.Targets;
-using NLog.Config;
 using NLog;
+using NLog.Targets;
+using NLog.Common;
+using NLog.Config;
 
 using AWS.Logger;
 using AWS.Logger.Core;
@@ -182,6 +183,19 @@ namespace NLog.AWS.Logger
         {
             var message = this.Layout.Render(logEvent);
             _core.AddMessage(message);
+        }
+
+        protected override void FlushAsync(AsyncContinuation asyncContinuation)
+        {
+            try
+            {
+                _core.Flush();
+                asyncContinuation(null);
+            }
+            catch (Exception ex)
+            {
+                asyncContinuation(ex);
+            }
         }
     }
 }

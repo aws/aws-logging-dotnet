@@ -1,19 +1,19 @@
 using System;
-using Amazon.CloudWatchLogs;
-using Amazon.CloudWatchLogs.Model;
-using Amazon.Runtime;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text;
-using System.Linq;
 using System.Collections.Concurrent;
 using System.IO;
-using System.Text.RegularExpressions;
+using System.Linq;
+using System.Reflection;
 #if CORECLR
 using System.Runtime.Loader;
 #endif
-using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using Amazon.CloudWatchLogs;
+using Amazon.CloudWatchLogs.Model;
+using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
 
 namespace AWS.Logger.Core
@@ -28,15 +28,16 @@ namespace AWS.Logger.Core
         private string _currentStreamName = null;
         private LogEventBatch _repo = new LogEventBatch();
         private CancellationTokenSource _cancelStartSource;
+        private SemaphoreSlim _flushEventCounter;
         private AWSLoggerConfig _config;
         private IAmazonCloudWatchLogs _client;
-        private bool _isTerminated = false;
         private DateTime _maxBufferTimeStamp = new DateTime();
         private string _logType;
         private static int requestCount = 5;
         const double MAX_BUFFER_TIMEDIFF = 5;
         private readonly static Regex invalid_sequence_token_regex = new
             Regex(@"The given sequenceToken is invalid. The next expected sequenceToken is: (\d+)");
+
         #endregion
         public AWSLoggerCore(AWSLoggerConfig config, string logType)
         {
@@ -72,9 +73,7 @@ namespace AWS.Logger.Core
         {
             this.Close();
         }
-
-#elif NET452
-
+#else
         private void RegisterShutdownHook()
         {
             AppDomain.CurrentDomain.DomainUnload += ProcessExit;
@@ -103,15 +102,57 @@ namespace AWS.Logger.Core
 
         public void Close()
         {
-            _isTerminated = true;
+            Flush();
             _cancelStartSource.Cancel();
-            _config.ShutDown();
-            Task.Run(async () =>
-            {
-                await Monitor(CancellationToken.None);
-            }).Wait();
         }
 
+        public void Flush()
+        {
+            if (_cancelStartSource.IsCancellationRequested)
+                return;
+
+            if (!_pendingMessageQueue.IsEmpty || !_repo.IsEmpty)
+            {
+                bool lockTaken = false;
+                try
+                {
+                    // Ensure only one thread executes the flush operation
+                    System.Threading.Monitor.TryEnter(_flushEventCounter, ref lockTaken);
+                    if (lockTaken)
+                    {
+                        _flushEventCounter.Release();   // Signal Monitor-Task to start premature flush
+
+                        bool flushStarted = false;
+                        for (int i = 0; i < 150; ++i)
+                        {
+                            Task.Delay(100).Wait();     // Waiting for Monitor-Task to complete flush
+                            if (_flushEventCounter.CurrentCount == 0)
+                            {
+                                if (!flushStarted)
+                                {
+                                    flushStarted = true;// Monitor-Task have now started premature-flush
+                                    _flushEventCounter.Release();
+                                }
+                                else
+                                {
+                                    break;              // Monitor-Task have now completed premature-flush
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Someone else is waiting for flush, lets join
+                        System.Threading.Monitor.TryEnter(_flushEventCounter, TimeSpan.FromSeconds(15), ref lockTaken);
+                    }
+                }
+                finally
+                { 
+                    if (lockTaken)
+                        System.Threading.Monitor.Exit(_flushEventCounter);
+                }
+            }
+        }
 
         /// <summary>
         /// A Concurrent Queue is used to store the messages from 
@@ -124,9 +165,9 @@ namespace AWS.Logger.Core
             {
                 if (_pendingMessageQueue.Count > _config.MaxQueuedMessages)
                 {
-                    if ((_maxBufferTimeStamp == DateTime.MinValue) || (DateTime.Now > _maxBufferTimeStamp.Add(TimeSpan.FromMinutes(MAX_BUFFER_TIMEDIFF))))
+                    if ((_maxBufferTimeStamp == DateTime.MinValue) || (DateTime.UtcNow > _maxBufferTimeStamp.Add(TimeSpan.FromMinutes(MAX_BUFFER_TIMEDIFF))))
                     {
-                        _maxBufferTimeStamp = DateTime.Now;
+                        _maxBufferTimeStamp = DateTime.UtcNow;
                         message = "The AWS Logger in-memory buffer has reached maximum capacity";
                         _pendingMessageQueue.Enqueue(new InputLogEvent
                         {
@@ -174,6 +215,7 @@ namespace AWS.Logger.Core
                 _cancelStartSource.Dispose();
             }
         }
+
         /// <summary>
         /// Kicks off the Poller Thread to keep tabs on the PutLogEvent request and the
         /// Concurrent Queue
@@ -181,6 +223,7 @@ namespace AWS.Logger.Core
         /// <param name="PatrolSleepTime"></param>
         public void StartMonitor()
         {
+            _flushEventCounter = new SemaphoreSlim(0, 1);
             _cancelStartSource = new CancellationTokenSource();
             Task.Run(async () =>
             {
@@ -194,12 +237,15 @@ namespace AWS.Logger.Core
         /// </summary>
         private async Task Monitor(CancellationToken token)
         {
+            bool executeFlush = false;
+
             try
             {
                 if (_currentStreamName == null)
                 {
                     await LogEventTransmissionSetup(token).ConfigureAwait(false);
                 }
+
                 while (true)
                 {
                     try
@@ -212,23 +258,17 @@ namespace AWS.Logger.Core
                             {
                                 await SendMessages(token).ConfigureAwait(false);
                             }
+
                             _repo.AddMessage(inputLogEvent);
                         }
-                        if (_isTerminated)
-                        {
-                            // If the logger is being terminated and all the messages have been sent, exit out of loop.
-                            // If there are messages keep pushing the remaining messages before the process dies.
-                            if (_repo._request.LogEvents.Count == 0)
-                            {
-                                break;
-                            }
-                        }
-                        // Check if we have enough data to warrant making the webcall
-                        if (_repo.ShouldSendRequest(_config.MaxQueuedMessages))
+
+                        if (_repo.ShouldSendRequest(_config.MaxQueuedMessages) || (executeFlush && !_repo.IsEmpty))
                         {
                             await SendMessages(token).ConfigureAwait(false);
+                            executeFlush = false;
                         }
-                        await Task.Delay(Convert.ToInt32(_config.MonitorSleepTime.TotalMilliseconds), token);
+
+                        executeFlush = await _flushEventCounter.WaitAsync(Convert.ToInt32(_config.MonitorSleepTime.TotalMilliseconds), token);
                     }
                     catch (Exception ex) when (!(ex is OperationCanceledException))
                     {
@@ -358,7 +398,7 @@ namespace AWS.Logger.Core
                 if (_request.LogEvents.Count == 0)
                     return false;
 
-                if (_nextPushTime < DateTime.Now)
+                if (_nextPushTime < DateTime.UtcNow)
                     return true;
 
                 if (maxQueuedEvents <= _request.LogEvents.Count)
@@ -388,6 +428,8 @@ namespace AWS.Logger.Core
                 get { return this._request.LogEvents.Count; }
             }
 
+            public bool IsEmpty => _request.LogEvents.Count == 0;
+
             public bool IsSizeConstraintViolated(string message)
             {
                 Encoding unicode = Encoding.Unicode;
@@ -410,7 +452,7 @@ namespace AWS.Logger.Core
                 _request.LogEvents.Clear();
                 _totalMessageSize = 0;
                 _request.SequenceToken = SeqToken;
-                _nextPushTime = DateTime.Now.Add(TimeIntervalBetweenPushes);
+                _nextPushTime = DateTime.UtcNow.Add(TimeIntervalBetweenPushes);
             }
         }
 

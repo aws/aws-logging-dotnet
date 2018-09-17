@@ -126,12 +126,6 @@ namespace AWS.Logger
             LogGroup = logGroup;
         }
 
-        internal void ShutDown()
-        {
-            MonitorSleepTime = TimeSpan.FromMilliseconds(0);
-            BatchPushInterval = TimeSpan.FromSeconds(0);
-        }
-
         /// <summary>
         /// Gets and sets the LogStreamNameSuffix property. The LogStreamName consists of a DateTimeStamp as the prefix and a user defined suffix value that can 
         /// be set using the LogStreamNameSuffix property defined here.
