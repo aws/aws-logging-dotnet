@@ -39,6 +39,6 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <PackageReference Include="log4net" Version="2.0.5" />
+    <PackageReference Include="log4net" Version="2.0.8" />
   </ItemGroup>
 </Project>
