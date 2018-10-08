@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AspNetCore", "AspNetCore", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Log4net", "Log4net", "{D28DFB15-FA6F-42EE-890C-E6300A187CCA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWS.Logger.Log4net", "src\AWS.Logger.Log4net\AWS.Logger.Log4net.csproj", "{78312E9B-BC7C-4AF8-9153-DD72BBF4FD36}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWS.Logger.Log4net", "src\AWS.Logger.Log4net\AWS.Logger.Log4net.csproj", "{78312E9B-BC7C-4AF8-9153-DD72BBF4FD36}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NLog.AWS.Logger", "src\NLog.AWS.Logger\NLog.AWS.Logger.csproj", "{5BBF70EA-A239-4A42-B1E6-83ADCC01153B}"
 EndProject
@@ -39,11 +39,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgrammaticConfigurationEx
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWS.Logger.NLog.Tests", "test\AWS.Logger.NLog.Tests\AWS.Logger.NLog.Tests.csproj", "{F7986868-9D7E-4DF6-A57E-E79E38AD166D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWS.Logger.Log4Net.Tests", "test\AWS.Logger.Log4Net.Tests\AWS.Logger.Log4Net.Tests.csproj", "{C63B828F-D01D-4CA3-922D-5E283DD1CCF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWS.Logger.Log4Net.Tests", "test\AWS.Logger.Log4Net.Tests\AWS.Logger.Log4Net.Tests.csproj", "{C63B828F-D01D-4CA3-922D-5E283DD1CCF1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWS.Logger.NLog.FilterTests", "test\AWS.Logger.NLog.FilterTests\AWS.Logger.NLog.FilterTests.csproj", "{48377844-B524-46AC-B465-246A1552FE64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWS.Logger.Log4Net.FilterTests", "test\AWS.Logger.Log4Net.FilterTests\AWS.Logger.Log4Net.FilterTests.csproj", "{1A4E2BC7-CFE5-4532-9CFD-4DC1EFA0AD82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWS.Logger.Log4Net.FilterTests", "test\AWS.Logger.Log4Net.FilterTests\AWS.Logger.Log4Net.FilterTests.csproj", "{1A4E2BC7-CFE5-4532-9CFD-4DC1EFA0AD82}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWS.Logger.TestUtils", "test\AWS.Logger.TestUtils\AWS.Logger.TestUtils.csproj", "{ADFF6031-0F8E-4EED-8E28-F29F0900BC11}"
 EndProject
@@ -58,6 +58,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWS.Logger.SeriLog.Tests", "test\AWS.Logger.SeriLog.Tests\AWS.Logger.SeriLog.Tests.csproj", "{D18AD3E0-9465-4393-AEDB-F2E75DEE839C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWS.Logger.SeriLog", "src\AWS.Logger.SeriLog\AWS.Logger.SeriLog.csproj", "{916D3A6A-3713-48FB-8978-1440CD02F782}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicAWSCredentialsConfigurationExample", "samples\Log4net\BasicAWSCredentialsConfigurationExample\BasicAWSCredentialsConfigurationExample.csproj", "{7249C7F3-A0EF-4940-9931-3096C87E009E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -141,6 +143,10 @@ Global
 		{916D3A6A-3713-48FB-8978-1440CD02F782}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{916D3A6A-3713-48FB-8978-1440CD02F782}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{916D3A6A-3713-48FB-8978-1440CD02F782}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7249C7F3-A0EF-4940-9931-3096C87E009E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7249C7F3-A0EF-4940-9931-3096C87E009E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7249C7F3-A0EF-4940-9931-3096C87E009E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7249C7F3-A0EF-4940-9931-3096C87E009E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -168,6 +174,7 @@ Global
 		{14E1469E-4799-486D-ABD9-873283BF31EE} = {5646565D-E0F8-4EB3-AE6A-6C288B831C7A}
 		{D18AD3E0-9465-4393-AEDB-F2E75DEE839C} = {5646565D-E0F8-4EB3-AE6A-6C288B831C7A}
 		{916D3A6A-3713-48FB-8978-1440CD02F782} = {E3018A04-6209-4500-B8F2-706514407F90}
+		{7249C7F3-A0EF-4940-9931-3096C87E009E} = {D28DFB15-FA6F-42EE-890C-E6300A187CCA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {46F50BDA-08A5-4A81-9CA9-F0B732C341A7}
