@@ -1,5 +1,5 @@
 ﻿#Introduction
-This project shows you how to configure AWS CloudWatchLog with AWS basic credentials.
+This project shows you how to configure AWS CloudWatch Logs with basic AWS credentials.
 
 It is useful for a project that is not hosted on an AWS environment, e.g. 
 other dedicated servers, on-premise server.
@@ -12,5 +12,5 @@ other dedicated servers, on-premise server.
 - Select the Debug tab and then add your AWS API key and secret key to Command line arguments text box as 
   the following pattern: `YouAwsApiKey YourAwsSecretKey`
 - Run a project with debugging by pressing `F5`
-- Log in to your AWS console, go to Cloud watch log. You should see a new log message in
+- Log in to your AWS console, go to CloudWatch Logs. You should see a new log message in
 `Log4net.BasicAWSCredentialsConfigurationExample` group.
