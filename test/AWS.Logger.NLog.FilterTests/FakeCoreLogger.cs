@@ -13,8 +13,9 @@ namespace AWS.Logger.NLogger.FilterTests
     {
         ConcurrentQueue<string> _pendingMessages = new ConcurrentQueue<string>();
         public ConcurrentQueue<string> ReceivedMessages { get; private set; } = new ConcurrentQueue<string>();
-
-        private SemaphoreSlim _flushEventCounter;
+        private SemaphoreSlim _flushTriggerEvent;
+        private ManualResetEventSlim _flushCompletedEvent;
+        private CancellationTokenSource _closeTokenSource;
         TimeSpan _asyncDelay;
 
         public FakeCoreLogger(TimeSpan asyncDelay = default(TimeSpan))
@@ -30,75 +31,52 @@ namespace AWS.Logger.NLogger.FilterTests
             }
             else
             {
-                if (_flushEventCounter == null)
+                if (_flushTriggerEvent == null)
                 {
-                    _flushEventCounter = new SemaphoreSlim(0, 1);
-                }
-
-                bool wasEmpty = _pendingMessages.IsEmpty;
-                _pendingMessages.Enqueue(message);
-                if (wasEmpty)
-                {
+                    _flushTriggerEvent = new SemaphoreSlim(0, 1);
+                    _flushCompletedEvent = new ManualResetEventSlim(false);
+                    _closeTokenSource = new CancellationTokenSource();
                     Task.Run(async () =>
                     {
                         bool flushNow = false;
                         do
                         {
-                            flushNow = await _flushEventCounter.WaitAsync(_asyncDelay);
                             while (_pendingMessages.TryDequeue(out var msg))
                             {
-                                await Task.Delay(10);
+                                await Task.Delay(50);
                                 ReceivedMessages.Enqueue(msg);
                             }
-                        } while (flushNow);
-                    });
+                            if (flushNow)
+                                _flushCompletedEvent.Set();
+                            flushNow = await _flushTriggerEvent.WaitAsync(_asyncDelay);
+                        } while (!_closeTokenSource.IsCancellationRequested);
+                    }, _closeTokenSource.Token);
                 }
+
+                _pendingMessages.Enqueue(message);
             }
         }
 
         public void Flush()
         {
-            if (_flushEventCounter != null)
+            if (_flushTriggerEvent != null)
             {
                 bool lockTaken = false;
                 try
                 {
                     // Ensure only one thread executes the flush operation
-                    System.Threading.Monitor.TryEnter(_flushEventCounter, ref lockTaken);
+                    System.Threading.Monitor.TryEnter(_flushTriggerEvent, ref lockTaken);
                     if (lockTaken)
                     {
-                        _flushEventCounter.Release();   // Premature release the Monitor-Task
-
-                        bool flushStarted = false;
-                        for (int i = 0; i < 15; ++i)
-                        {
-                            Task.Delay(100).Wait();
-                            if (_flushEventCounter.CurrentCount == 0)
-                            {
-                                if (!flushStarted)
-                                {
-                                    // Monitor-Task has been released
-                                    flushStarted = true;
-                                    _flushEventCounter.Release();
-                                }
-                                else
-                                {
-                                    // Monitor-Task has completed flush, and awaiting again
-                                    break;
-                                }
-                            }
-                        }
+                        _flushCompletedEvent.Reset();
+                        _flushTriggerEvent.Release();   // Signal Monitor-Task to start premature flush
                     }
-                    else
-                    {
-                        // Someone else is waiting for flush, lets join
-                        System.Threading.Monitor.TryEnter(_flushEventCounter, TimeSpan.FromSeconds(1.5), ref lockTaken);
-                    }
+                    _flushCompletedEvent.Wait(TimeSpan.FromSeconds(15));
                 }
                 finally
                 {
                     if (lockTaken)
-                        System.Threading.Monitor.Exit(_flushEventCounter);
+                        System.Threading.Monitor.Exit(_flushTriggerEvent);
                 }
             }
         }
@@ -106,11 +84,12 @@ namespace AWS.Logger.NLogger.FilterTests
         public void Close()
         {
             Flush();
+            _closeTokenSource.Cancel();
         }
 
         public void StartMonitor()
         {
-            _flushEventCounter = new SemaphoreSlim(0, 1);
+            _flushTriggerEvent = new SemaphoreSlim(0, 1);
         }
     }
 }

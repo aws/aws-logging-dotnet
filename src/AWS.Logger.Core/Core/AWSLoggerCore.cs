@@ -28,7 +28,8 @@ namespace AWS.Logger.Core
         private string _currentStreamName = null;
         private LogEventBatch _repo = new LogEventBatch();
         private CancellationTokenSource _cancelStartSource;
-        private SemaphoreSlim _flushEventCounter;
+        private SemaphoreSlim _flushTriggerEvent;
+        private ManualResetEventSlim _flushCompletedEvent;
         private AWSLoggerConfig _config;
         private IAmazonCloudWatchLogs _client;
         private DateTime _maxBufferTimeStamp = new DateTime();
@@ -117,39 +118,20 @@ namespace AWS.Logger.Core
                 try
                 {
                     // Ensure only one thread executes the flush operation
-                    System.Threading.Monitor.TryEnter(_flushEventCounter, ref lockTaken);
+                    System.Threading.Monitor.TryEnter(_flushTriggerEvent, ref lockTaken);
                     if (lockTaken)
                     {
-                        _flushEventCounter.Release();   // Signal Monitor-Task to start premature flush
+                        _flushCompletedEvent.Reset();
+                        _flushTriggerEvent.Release();   // Signal Monitor-Task to start premature flush
+                    }
 
-                        bool flushStarted = false;
-                        for (int i = 0; i < 150; ++i)
-                        {
-                            Task.Delay(100).Wait();     // Waiting for Monitor-Task to complete flush
-                            if (_flushEventCounter.CurrentCount == 0)
-                            {
-                                if (!flushStarted)
-                                {
-                                    flushStarted = true;// Monitor-Task have now started premature-flush
-                                    _flushEventCounter.Release();
-                                }
-                                else
-                                {
-                                    break;              // Monitor-Task have now completed premature-flush
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // Someone else is waiting for flush, lets join
-                        System.Threading.Monitor.TryEnter(_flushEventCounter, TimeSpan.FromSeconds(15), ref lockTaken);
-                    }
+                    // Waiting for Monitor-Task to complete flush
+                    _flushCompletedEvent.Wait(TimeSpan.FromSeconds(15));
                 }
                 finally
-                { 
+                {
                     if (lockTaken)
-                        System.Threading.Monitor.Exit(_flushEventCounter);
+                        System.Threading.Monitor.Exit(_flushTriggerEvent);
                 }
             }
         }
@@ -223,7 +205,8 @@ namespace AWS.Logger.Core
         /// <param name="PatrolSleepTime"></param>
         public void StartMonitor()
         {
-            _flushEventCounter = new SemaphoreSlim(0, 1);
+            _flushTriggerEvent = new SemaphoreSlim(0, 1);
+            _flushCompletedEvent = new ManualResetEventSlim(false);
             _cancelStartSource = new CancellationTokenSource();
             Task.Run(async () =>
             {
@@ -246,7 +229,7 @@ namespace AWS.Logger.Core
                     await LogEventTransmissionSetup(token).ConfigureAwait(false);
                 }
 
-                while (true)
+                while (!_cancelStartSource.IsCancellationRequested)
                 {
                     try
                     {
@@ -265,10 +248,12 @@ namespace AWS.Logger.Core
                         if (_repo.ShouldSendRequest(_config.MaxQueuedMessages) || (executeFlush && !_repo.IsEmpty))
                         {
                             await SendMessages(token).ConfigureAwait(false);
-                            executeFlush = false;
                         }
 
-                        executeFlush = await _flushEventCounter.WaitAsync(Convert.ToInt32(_config.MonitorSleepTime.TotalMilliseconds), token);
+                        if (executeFlush)
+                            _flushCompletedEvent.Set();
+
+                        executeFlush = await _flushTriggerEvent.WaitAsync(Convert.ToInt32(_config.MonitorSleepTime.TotalMilliseconds), token);
                     }
                     catch (Exception ex) when (!(ex is OperationCanceledException))
                     {
