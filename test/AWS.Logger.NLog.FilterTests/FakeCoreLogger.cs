@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -38,6 +36,8 @@ namespace AWS.Logger.NLogger.FilterTests
                     _closeTokenSource = new CancellationTokenSource();
                     Task.Run(async () =>
                     {
+                        await Task.Delay(100).ConfigureAwait(false);    // Simulate slow connection
+
                         bool flushNow = false;
                         do
                         {
@@ -89,7 +89,6 @@ namespace AWS.Logger.NLogger.FilterTests
 
         public void StartMonitor()
         {
-            _flushTriggerEvent = new SemaphoreSlim(0, 1);
         }
     }
 }
