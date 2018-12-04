@@ -21,12 +21,14 @@ namespace AWS.Logger.TestUtils
         public const string CUSTOMSTREAMSUFFIX = "Custom";
         public TestFixture _testFixture;
         public AmazonCloudWatchLogsClient Client;
+
         public BaseTestClass(TestFixture testFixture)
         {
             _testFixture = testFixture;
             Client = new AmazonCloudWatchLogsClient(Amazon.RegionEndpoint.USWest2);
         }
-        public bool NotifyLoggingCompleted(string logGroupName, string filterPattern)
+
+        protected bool NotifyLoggingCompleted(string logGroupName, string filterPattern)
         {
             Stopwatch timer = new Stopwatch();
             timer.Start();
@@ -40,7 +42,8 @@ namespace AWS.Logger.TestUtils
             }
             return FilterPatternExists(logGroupName, filterPattern);
         }
-        public bool FilterPatternExists(string logGroupName, string filterPattern)
+
+        protected bool FilterPatternExists(string logGroupName, string filterPattern)
         {
             DescribeLogStreamsResponse describeLogstreamsResponse;
             try
@@ -77,9 +80,9 @@ namespace AWS.Logger.TestUtils
             }
         }
 
-        public abstract void LogMessages(int count);
+        protected abstract void LogMessages(int count);
 
-        public void SimpleLoggingTest(string logGroupName)
+        protected void SimpleLoggingTest(string logGroupName)
         {
             LogMessages(SIMPLELOGTEST_COUNT);
             GetLogEventsResponse getLogEventsResponse = new GetLogEventsResponse();
@@ -109,7 +112,7 @@ namespace AWS.Logger.TestUtils
             _testFixture.LogGroupNameList.Add(logGroupName);
         }
 
-        public void MultiThreadTest(string logGroupName)
+        protected void MultiThreadTestGroup(string logGroupName)
         {
             var tasks = new List<Task>();
             var streamNames = new List<string>();
@@ -160,7 +163,7 @@ namespace AWS.Logger.TestUtils
             _testFixture.LogGroupNameList.Add(logGroupName);
         }
 
-        public void MultiThreadBufferFullTest(string logGroupName)
+        protected void MultiThreadBufferFullTestGroup(string logGroupName)
         {
             var tasks = new List<Task>();
             var streamNames = new List<string>();

@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Amazon;
 using Amazon.CloudWatchLogs;
 using Amazon.CloudWatchLogs.Model;
-using Xunit;
-using System.Text.RegularExpressions;
 using AWS.Logger.TestUtils;
+using Xunit;
 
 namespace AWS.Logger.UnitTest
 {
     public class UnitTest:IClassFixture<TestFixture>
     {
-        
         AmazonCloudWatchLogsClient client;
         TestFixture _testFixure;
 
@@ -21,6 +19,7 @@ namespace AWS.Logger.UnitTest
         {
             _testFixure = testFixture;
         }
+
         [Fact]
         public async Task RegexTest()
         {

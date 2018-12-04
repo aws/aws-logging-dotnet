@@ -25,8 +25,8 @@ namespace AWS.Logger.AspNetCore.Tests
                 logger.LogInformation("log");
             }
 
-            Assert.Equal(1, coreLogger.ReceivedMessages.Count);
-            Assert.True(coreLogger.ReceivedMessages.Contains("log\r\n"));
+            Assert.Single(coreLogger.ReceivedMessages);
+            Assert.Contains("log\r\n", coreLogger.ReceivedMessages);
         }
     }
 }

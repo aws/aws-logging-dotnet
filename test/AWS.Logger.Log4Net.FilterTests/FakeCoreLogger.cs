@@ -17,6 +17,10 @@ namespace AWS.Logger.Log4Net.FilterTests
             ReceivedMessages.Enqueue(message);
         }
 
+        public void Flush()
+        {
+        }
+
         public void Close()
         {
         }

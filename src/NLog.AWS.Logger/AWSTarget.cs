@@ -1,8 +1,9 @@
 ﻿using System;
 
-using NLog.Targets;
-using NLog.Config;
 using NLog;
+using NLog.Targets;
+using NLog.Common;
+using NLog.Config;
 
 using AWS.Logger;
 using AWS.Logger.Core;
@@ -176,12 +177,31 @@ namespace NLog.AWS.Logger
 				LibraryLogFileName = LibraryLogFileName
             };
             _core = new AWSLoggerCore(config, "NLog");
+            _core.LogLibraryAlert += AwsLogLibraryAlert;
+        }
+
+        private void AwsLogLibraryAlert(object sender, AWSLoggerCore.LogLibraryEventArgs e)
+        {
+            InternalLogger.Error(e.Exception, "AWSTarget(Name={0}) - CloudWatch Network Error - ServiceUrl={1}", Name, e.ServiceUrl);
         }
 
         protected override void Write(LogEventInfo logEvent)
         {
             var message = this.Layout.Render(logEvent);
             _core.AddMessage(message);
+        }
+
+        protected override void FlushAsync(AsyncContinuation asyncContinuation)
+        {
+            try
+            {
+                _core.Flush();
+                asyncContinuation(null);
+            }
+            catch (Exception ex)
+            {
+                asyncContinuation(ex);
+            }
         }
     }
 }

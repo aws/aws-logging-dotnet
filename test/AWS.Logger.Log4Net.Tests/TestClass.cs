@@ -1,19 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Xunit;
+﻿using System;
+using System.Reflection;
+using System.Threading;
+using AWS.Logger.TestUtils;
 using log4net;
 using log4net.Config;
-using System.Threading;
-using Amazon.CloudWatchLogs;
-using Amazon.CloudWatchLogs.Model;
-using log4net.Repository.Hierarchy;
-using log4net.Layout;
-using log4net.Core;
-using System.Threading.Tasks;
-using System;
-using System.Reflection;
-using log4net.Repository;
-using AWS.Logger.TestUtils;
+using Xunit;
 
 namespace AWS.Logger.Log4Net.Tests
 {
@@ -21,7 +12,7 @@ namespace AWS.Logger.Log4Net.Tests
     {
         public ILog Logger;
 
-        public void GetLog4NetLogger(string fileName, string logName)
+        private void GetLog4NetLogger(string fileName, string logName)
         {
             // Create logger
             var repositoryAssembly = typeof(Log4NetTestClass).GetTypeInfo().Assembly;
@@ -29,6 +20,7 @@ namespace AWS.Logger.Log4Net.Tests
             XmlConfigurator.Configure(loggerRepository, new System.IO.FileInfo(fileName));
             Logger = LogManager.GetLogger(repositoryAssembly, logName);
         }
+
         public Log4NetTestClass(TestFixture testFixture) : base(testFixture)
         {
         }
@@ -45,17 +37,17 @@ namespace AWS.Logger.Log4Net.Tests
         public void MultiThreadTest()
         {
             GetLog4NetLogger("MultiThreadTest.config", "MultiThreadTest");
-            MultiThreadTest("AWSLog4NetGroupLog4NetMultiThreadTest");
+            MultiThreadTestGroup("AWSLog4NetGroupLog4NetMultiThreadTest");
         }
 
         [Fact]
         public void MultiThreadBufferFullTest()
         {
             GetLog4NetLogger("MultiThreadBufferFullTest.config", "MultiThreadBufferFullTest");
-            MultiThreadBufferFullTest("AWSLog4NetGroupMultiThreadBufferFullTest");
+            MultiThreadBufferFullTestGroup("AWSLog4NetGroupMultiThreadBufferFullTest");
         }
 
-        public override void LogMessages(int count)
+        protected override void LogMessages(int count)
         {
             for (int i = 0; i < count-1; i++)
             {

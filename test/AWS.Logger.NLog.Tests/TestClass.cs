@@ -1,15 +1,10 @@
-﻿using NLog;
-using System;
-using System.IO;
-using System.Linq;
+﻿using System;
 using System.Threading;
-using Xunit;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Amazon.CloudWatchLogs;
 using Amazon.CloudWatchLogs.Model;
-using NLog.Config;
 using AWS.Logger.TestUtils;
+using NLog;
+using NLog.Config;
+using Xunit;
 
 namespace AWS.Logger.NLogger.Tests
 {
@@ -23,6 +18,7 @@ namespace AWS.Logger.NLogger.Tests
         {
             LogManager.Configuration = new XmlLoggingConfiguration(configFileName);
         }
+
         public NLogTestClass(TestFixture testFixture) : base(testFixture)
         {
         }
@@ -41,7 +37,7 @@ namespace AWS.Logger.NLogger.Tests
         {
             CreateLoggerFromConfiguration("AWSNLogGroupMultiThreadTest.config");
             Logger = LogManager.GetLogger("loggerMultiThread");
-            MultiThreadTest("AWSNLogGroupMultiThreadTest");
+            MultiThreadTestGroup("AWSNLogGroupMultiThreadTest");
         }
 
         [Fact]
@@ -49,7 +45,7 @@ namespace AWS.Logger.NLogger.Tests
         {
             CreateLoggerFromConfiguration("AWSNLogGroupMultiThreadBufferFullTest.config");
             Logger = LogManager.GetLogger("loggerMultiThreadBufferFull");
-            MultiThreadBufferFullTest("AWSNLogGroupMultiThreadBufferFullTest");
+            MultiThreadBufferFullTestGroup("AWSNLogGroupMultiThreadBufferFullTest");
         }
 
         [Fact]
@@ -84,10 +80,10 @@ namespace AWS.Logger.NLogger.Tests
                 }).Result;
             }
             _testFixture.LogGroupNameList.Add(logGroupName);
-            Assert.Equal(4, getLogEventsResponse.Events.Count());
+            Assert.Equal(4, getLogEventsResponse.Events.Count);
         }
 
-        public override void LogMessages(int count)
+        protected override void LogMessages(int count)
         {
             for (int i = 0; i < count-1; i++)
             {

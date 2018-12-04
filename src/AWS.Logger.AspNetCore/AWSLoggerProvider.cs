@@ -85,6 +85,7 @@ namespace AWS.Logger.AspNetCore
         /// </summary>
         public void Dispose()
         {
+            _core.Close();
         }
 
         /// <summary>

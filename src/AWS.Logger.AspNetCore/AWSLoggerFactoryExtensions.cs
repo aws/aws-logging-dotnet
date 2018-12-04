@@ -2,10 +2,6 @@
 using AWS.Logger.AspNetCore;
 using Microsoft.Extensions.Configuration;
 using System;
-#if CORECLR
-using System.Runtime.Loader;
-#endif
-using System.Reflection;
 
 namespace Microsoft.Extensions.Logging
 {

@@ -1,11 +1,10 @@
-﻿using AWS.Logger.TestUtils;
+﻿using System;
+using System.Threading;
+using AWS.Logger.SeriLog;
+using AWS.Logger.TestUtils;
 using Microsoft.Extensions.Configuration;
 using Serilog;
-using Serilog.Formatting.Compact;
-using System;
-using System.Threading;
 using Xunit;
-using AWS.Logger.SeriLog;
 
 namespace AWS.Logger.SeriLog.Tests
 {
@@ -41,21 +40,21 @@ namespace AWS.Logger.SeriLog.Tests
         public void MultiThreadTest()
         {
             CreateLoggerFromConfiguration("AWSSeriLogGroupMultiThreadTest.json");
-            MultiThreadTest("AWSSeriLogGroupMultiThreadTest");
+            MultiThreadTestGroup("AWSSeriLogGroupMultiThreadTest");
         }
 
         [Fact]
         public void MultiThreadBufferFullTest()
         {
             CreateLoggerFromConfiguration("AWSSeriLogGroupMultiThreadBufferFullTest.json");
-            MultiThreadBufferFullTest("AWSSeriLogGroupMultiThreadBufferFullTest");
+            MultiThreadBufferFullTestGroup("AWSSeriLogGroupMultiThreadBufferFullTest");
         }
 
         /// <summary>
         /// This method posts debug messages onto CloudWatchLogs.
         /// </summary>
         /// <param name="count">The number of messages that would be posted onto CloudWatchLogs</param>
-        public override void LogMessages(int count)
+        protected override void LogMessages(int count)
         {
             for (int i = 0; i < count - 1; i++)
             {

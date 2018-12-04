@@ -64,20 +64,21 @@ namespace AWS.Logger.AspNetCore
         /// <param name="formatter"></param>
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            StringBuilder formattedMessage = null;
             if (!IsEnabled(logLevel))
             {
                 return;
             }
-            var message = _customFormatter != null ? _customFormatter(logLevel, state, exception) : formatter(state, exception);
-            formattedMessage = new StringBuilder();
-            formattedMessage.AppendLine(message);
-            if (exception != null && _customFormatter==null)
-            {
-                formattedMessage.AppendLine(exception.ToString());
-            }
-            _core.AddMessage(formattedMessage.ToString());
 
+            var message = _customFormatter != null ? _customFormatter(logLevel, state, exception) : formatter(state, exception);
+            if (exception != null && _customFormatter == null)
+            {
+                message = string.Concat(message, Environment.NewLine, exception.ToString(), Environment.NewLine);
+            }
+            else
+            {
+                message = string.Concat(message, Environment.NewLine);
+            }
+            _core.AddMessage(message);
         }
 
         private class DisposableScope : IDisposable

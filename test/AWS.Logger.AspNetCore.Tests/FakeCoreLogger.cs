@@ -22,6 +22,10 @@ namespace AWS.Logger.AspNetCore.Tests
             ReceivedMessages.Enqueue(message);
         }
 
+        public void Flush()
+        {
+        }
+
         public void Close()
         {
         }
