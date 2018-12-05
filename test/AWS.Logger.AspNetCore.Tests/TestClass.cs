@@ -41,7 +41,7 @@ namespace AWS.Logger.AspNetCore.Tests
         /// <param name="configSectionInfoBlockName">The Json object name that contains the AWS Logging configuration information
         /// . The Default value is "AWS.Logging".</param>
         /// <param name="sourceFilePath">The source file path specifies the path for the configuration file.</param>
-        public void LoggingSetup(string configFileName, string configSectionInfoBlockName,
+        private void LoggingSetup(string configFileName, string configSectionInfoBlockName,
             [System.Runtime.CompilerServices.CallerFilePath]string sourceFilePath = "")
         {
             var configurationBuilder = new ConfigurationBuilder()

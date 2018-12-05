@@ -23,7 +23,7 @@ namespace AWS.Logger.AspNetCore.Tests
                 logger.LogInformation("log");
             }
 
-            Assert.Equal(1, coreLogger.ReceivedMessages.Count);
+            Assert.Single(coreLogger.ReceivedMessages);
             Assert.True(coreLogger.ReceivedMessages.Contains("log\r\n"), "Messages don't contain actual log message.");
         }
 
@@ -39,7 +39,7 @@ namespace AWS.Logger.AspNetCore.Tests
 
             logger.LogInformation("log");
 
-            Assert.Equal(1, coreLogger.ReceivedMessages.Count);
+            Assert.Single(coreLogger.ReceivedMessages);
             var msg = coreLogger.ReceivedMessages.SingleOrDefault(m => m.Contains("log\r\n"));
             Assert.True(msg != null, "Messages don't contain actual log message.");
             Assert.False(msg.Contains("=>"), "Fragment of scopes exists (\"=>\").");
@@ -61,7 +61,7 @@ namespace AWS.Logger.AspNetCore.Tests
                 logger.LogInformation("log");
             }
 
-            Assert.Equal(1, coreLogger.ReceivedMessages.Count);
+            Assert.Single(coreLogger.ReceivedMessages);
             var msg = coreLogger.ReceivedMessages.SingleOrDefault(m => m.Contains("log\r\n"));
             Assert.True(msg != null, "Messages don't contain actual log message.");
             // Same message should contain the scope
@@ -86,7 +86,7 @@ namespace AWS.Logger.AspNetCore.Tests
                 }
             }
 
-            Assert.Equal(1, coreLogger.ReceivedMessages.Count);
+            Assert.Single(coreLogger.ReceivedMessages);
             var msg = coreLogger.ReceivedMessages.SingleOrDefault(m => m.Contains("log\r\n"));
             Assert.True(msg != null, "Messages don't contain actual log message.");
             // Same message should contain the scope

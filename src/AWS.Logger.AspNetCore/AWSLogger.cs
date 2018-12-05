@@ -82,29 +82,24 @@ namespace AWS.Logger.AspNetCore
                 // If neither a message nor an exception are provided, don't log anything (there's nothing to log, after all).
                 return;
 
-            // Build actual message
-            var formattedMessage = new StringBuilder();
-
-            if (IncludeScopes)
-                AddScopeInformation(formattedMessage);
-
-            formattedMessage.AppendLine(message);
+            var scope = IncludeScopes ? AddScopeInformation() : string.Empty;
             if (exception != null && _customFormatter==null)
             {
-                message = string.Concat(message, Environment.NewLine, exception.ToString(), Environment.NewLine);
+                message = string.Concat(scope, message, Environment.NewLine, exception.ToString(), Environment.NewLine);
             }
             else
             {
-                message = string.Concat(message, Environment.NewLine);
+                message = string.Concat(scope, message, Environment.NewLine);
             }
             _core.AddMessage(message);
         }
 
-        private static void AddScopeInformation(StringBuilder sb)
+        private static string AddScopeInformation()
         {
             var deepestScope = AWSLogScope.Current;
             var current = deepestScope;
 
+            var sb = new StringBuilder();
             while (current != null)
             {
                 var scopeLog = $"=> {current}";
@@ -117,6 +112,8 @@ namespace AWS.Logger.AspNetCore
 
             if (deepestScope != null)
                 sb.Append(": ");
+
+            return sb.ToString();
         }
     }
 }
