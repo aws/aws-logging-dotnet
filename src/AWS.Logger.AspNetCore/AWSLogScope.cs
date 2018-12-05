@@ -5,7 +5,7 @@
     using System.Threading;
 
     [DebuggerDisplay("{" + nameof(CategoryName) + " == null ? \"\" : \"[" + nameof(CategoryName) + "] \",nq}{" + nameof(ToString) + ",nq}")]
-    public class AWSLogScope
+    internal class AWSLogScope
     {
         private static readonly AsyncLocal<AWSLogScope> Instance = new AsyncLocal<AWSLogScope>();
 
@@ -40,9 +40,15 @@
 
         private class DisposableScope : IDisposable
         {
+            bool _isDisposed = false;
+
             public void Dispose()
             {
-                Current = Current.Parent;
+                if(!_isDisposed)
+                {
+                    Current = Current.Parent;
+                    this._isDisposed = true;
+                }
             }
         }
     }
