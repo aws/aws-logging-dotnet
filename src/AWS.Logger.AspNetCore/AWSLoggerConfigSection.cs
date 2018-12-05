@@ -32,6 +32,14 @@ namespace Microsoft.Extensions.Configuration
 
         public IConfiguration LogLevels { get; set; } = null;
 
+        /// <summary>
+        /// Gets the <see cref="IAWSLoggerConfig.IncludeScopes"/> property. This determines if scopes - if they exist - are included in a log message.
+        /// <para>
+        /// The default is false.
+        /// </para>
+        /// </summary>
+        public bool IncludeScopes { get; set; } = false;
+
         internal const string LOG_GROUP = "LogGroup";
         internal const string REGION = "Region";
         internal const string PROFILE = "Profile";
@@ -41,6 +49,7 @@ namespace Microsoft.Extensions.Configuration
         internal const string MAX_QUEUED_MESSAGES = "MaxQueuedMessages";
         internal const string LOG_STREAM_NAME_SUFFIX = "LogStreamNameSuffix";
         internal const string LIBRARY_LOG_FILE_NAME = "LibraryLogFileName";
+        internal const string INCLUDE_SCOPES_NAME = "IncludeScopes";
 
         public AWSLoggerConfigSection(IConfiguration loggerConfigSection)
         {
@@ -72,6 +81,10 @@ namespace Microsoft.Extensions.Configuration
             if (loggerConfigSection[LIBRARY_LOG_FILE_NAME] != null)
             {
                 Config.LibraryLogFileName = loggerConfigSection[LIBRARY_LOG_FILE_NAME];
+            }
+            if (loggerConfigSection[INCLUDE_SCOPES_NAME] != null)
+            {
+                this.IncludeScopes = Boolean.Parse(loggerConfigSection[INCLUDE_SCOPES_NAME]);
             }
             var logLevels = loggerConfigSection.GetSection(LOG_LEVEL);
             if (logLevels != null && logLevels.GetChildren().Count() > 0)

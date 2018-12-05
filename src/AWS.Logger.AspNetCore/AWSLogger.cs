@@ -15,6 +15,8 @@ namespace AWS.Logger.AspNetCore
         private readonly Func<string, LogLevel, bool> _filter;
         private readonly Func<LogLevel, object, Exception, string> _customFormatter;
 
+        public bool IncludeScopes { get; set; }
+
         /// <summary>
         /// Construct an instance of AWSLogger
         /// </summary>
@@ -30,15 +32,12 @@ namespace AWS.Logger.AspNetCore
             _customFormatter = customFormatter;
         }
 
-        /// <summary>
-        /// Currently scopes are not supported and a dummy instance of IDisposable is returned but not used.
-        /// </summary>
-        /// <typeparam name="TState"></typeparam>
-        /// <param name="state"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public IDisposable BeginScope<TState>(TState state)
         {
-            return new DisposableScope();
+            if (state == null)
+                throw new ArgumentNullException(nameof(state));
+            return AWSLogScope.Push(_categoryName, state);
         }
 
         /// <summary>
@@ -65,12 +64,32 @@ namespace AWS.Logger.AspNetCore
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             if (!IsEnabled(logLevel))
-            {
                 return;
+
+            string message;
+            if (_customFormatter == null)
+            {
+                if (formatter == null)
+                    throw new ArgumentNullException(nameof(formatter));
+                message = formatter(state, exception);
+            }
+            else
+            {
+                message = _customFormatter(logLevel, state, exception);
             }
 
-            var message = _customFormatter != null ? _customFormatter(logLevel, state, exception) : formatter(state, exception);
-            if (exception != null && _customFormatter == null)
+            if (string.IsNullOrEmpty(message) && exception == null)
+                // If neither a message nor an exception are provided, don't log anything (there's nothing to log, after all).
+                return;
+
+            // Build actual message
+            var formattedMessage = new StringBuilder();
+
+            if (IncludeScopes)
+                AddScopeInformation(formattedMessage);
+
+            formattedMessage.AppendLine(message);
+            if (exception != null && _customFormatter==null)
             {
                 message = string.Concat(message, Environment.NewLine, exception.ToString(), Environment.NewLine);
             }
@@ -81,12 +100,23 @@ namespace AWS.Logger.AspNetCore
             _core.AddMessage(message);
         }
 
-        private class DisposableScope : IDisposable
+        private static void AddScopeInformation(StringBuilder sb)
         {
-            public void Dispose()
-            {
+            var deepestScope = AWSLogScope.Current;
+            var current = deepestScope;
 
+            while (current != null)
+            {
+                var scopeLog = $"=> {current}";
+                sb.Insert(0, scopeLog);
+
+                current = current.Parent;
+                if (current != null)
+                    sb.Insert(0, " ");
             }
+
+            if (deepestScope != null)
+                sb.Append(": ");
         }
     }
 }
