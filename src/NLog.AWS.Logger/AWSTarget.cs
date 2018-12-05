@@ -155,18 +155,6 @@ namespace NLog.AWS.Logger
             set => _config.LibraryLogFileName = value;
         }
 
-        /// <summary>
-        /// Gets the <see cref="IAWSLoggerConfig.IncludeScopes"/> property. This determines if scopes - if they exist - are included in a log message.
-        /// <para>
-        /// The default is false.
-        /// </para>
-        /// </summary>
-        public bool IncludeScopes
-        {
-            get => _config.IncludeScopes;
-            set => _config.IncludeScopes = value;
-        }
-
         protected override void InitializeTarget()
         {
             if (_core != null)
@@ -185,8 +173,7 @@ namespace NLog.AWS.Logger
                 BatchSizeInBytes = BatchSizeInBytes,
                 MaxQueuedMessages = MaxQueuedMessages,
 				LogStreamNameSuffix = LogStreamNameSuffix,
-				LibraryLogFileName = LibraryLogFileName,
-                IncludeScopes = IncludeScopes
+				LibraryLogFileName = LibraryLogFileName
             };
             _core = new AWSLoggerCore(config, "NLog");
         }

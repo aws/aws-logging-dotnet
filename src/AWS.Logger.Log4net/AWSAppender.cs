@@ -153,18 +153,6 @@ namespace AWS.Logger.Log4net
         }
 
         /// <summary>
-        /// Gets the <see cref="IAWSLoggerConfig.IncludeScopes"/> property. This determines if scopes - if they exist - are included in a log message.
-        /// <para>
-        /// The default is false.
-        /// </para>
-        /// </summary>
-        public bool IncludeScopes
-        {
-            get => _config.IncludeScopes;
-            set => _config.IncludeScopes = value;
-        }
-
-        /// <summary>
         /// Initialize the appender based on the options set.
         /// </summary>
         public override void ActivateOptions()
@@ -185,8 +173,7 @@ namespace AWS.Logger.Log4net
                 BatchSizeInBytes = BatchSizeInBytes,
                 MaxQueuedMessages = MaxQueuedMessages,
 				LogStreamNameSuffix = LogStreamNameSuffix,
-				LibraryLogFileName = LibraryLogFileName,
-                IncludeScopes = IncludeScopes
+				LibraryLogFileName = LibraryLogFileName
             };
             _core = new AWSLoggerCore(config, "Log4net");
         }

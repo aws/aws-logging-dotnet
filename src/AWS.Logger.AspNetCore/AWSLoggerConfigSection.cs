@@ -32,6 +32,14 @@ namespace Microsoft.Extensions.Configuration
 
         public IConfiguration LogLevels { get; set; } = null;
 
+        /// <summary>
+        /// Gets the <see cref="IAWSLoggerConfig.IncludeScopes"/> property. This determines if scopes - if they exist - are included in a log message.
+        /// <para>
+        /// The default is false.
+        /// </para>
+        /// </summary>
+        public bool IncludeScopes { get; set; } = false;
+
         internal const string LOG_GROUP = "LogGroup";
         internal const string REGION = "Region";
         internal const string PROFILE = "Profile";
@@ -76,7 +84,7 @@ namespace Microsoft.Extensions.Configuration
             }
             if (loggerConfigSection[INCLUDE_SCOPES_NAME] != null)
             {
-                Config.IncludeScopes = Boolean.Parse(loggerConfigSection[INCLUDE_SCOPES_NAME]);
+                this.IncludeScopes = Boolean.Parse(loggerConfigSection[INCLUDE_SCOPES_NAME]);
             }
             var logLevels = loggerConfigSection.GetSection(LOG_LEVEL);
             if (logLevels != null && logLevels.GetChildren().Count() > 0)

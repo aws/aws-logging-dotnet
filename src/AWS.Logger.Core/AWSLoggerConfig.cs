@@ -127,14 +127,6 @@ namespace AWS.Logger
         /// </summary>
         public string LibraryLogFileName { get; set; } = "aws-logger-errors.txt";
 
-        /// <summary>
-        /// Gets the <see cref="IAWSLoggerConfig.IncludeScopes"/> property. This determines if scopes - if they exist - are included in a log message.
-        /// <para>
-        /// The default is false.
-        /// </para>
-        /// </summary>
-        public bool IncludeScopes { get; set; } = false;
-
         #endregion
 
         /// <summary>
