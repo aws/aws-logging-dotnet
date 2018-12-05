@@ -149,12 +149,13 @@ namespace AWS.Logger.Core
                         _flushCompletedEvent.Reset();
                         if (_flushTriggerEvent.CurrentCount == 0)
                         {
-                            var serviceUrl = GetServiceUrl();
-                            LogLibraryServiceError(new TimeoutException($"Flush Pending - ServiceURL={serviceUrl}, StreamName={_currentStreamName}, PendingMessages={_pendingMessageQueue.Count}, CurrentBatch={_repo.CurrentBatchMessageCount}"), serviceUrl);
+                            _flushTriggerEvent.Release();   // Signal Monitor-Task to start premature flush
                         }
                         else
                         {
-                            _flushTriggerEvent.Release();   // Signal Monitor-Task to start premature flush
+                            // Means that the Background Task is busy, and not yet claimed the previous release (Maybe busy with credentials)
+                            var serviceUrl = GetServiceUrl();
+                            LogLibraryServiceError(new TimeoutException($"Flush Pending - ServiceURL={serviceUrl}, StreamName={_currentStreamName}, PendingMessages={_pendingMessageQueue.Count}, CurrentBatch={_repo.CurrentBatchMessageCount}"), serviceUrl);
                         }
                     }
 
