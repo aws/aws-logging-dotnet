@@ -30,8 +30,8 @@ namespace AWS.Logger.Log4net
         /// </summary>
         public string LogGroup
         {
-            get { return _config.LogGroup; }
-            set { _config.LogGroup = value; }
+            get => _config.LogGroup;
+            set => _config.LogGroup = value;
         }
 
         /// <summary>
@@ -42,8 +42,8 @@ namespace AWS.Logger.Log4net
         /// </summary>
         public string Profile
         {
-            get { return _config.Profile; }
-            set { _config.Profile = value; }
+            get => _config.Profile;
+            set => _config.Profile = value;
         }
 
 
@@ -56,8 +56,8 @@ namespace AWS.Logger.Log4net
         /// </summary>
         public string ProfilesLocation
         {
-            get { return _config.ProfilesLocation; }
-            set { _config.ProfilesLocation = value; }
+            get => _config.ProfilesLocation;
+            set => _config.ProfilesLocation = value;
         }
 
 
@@ -69,8 +69,8 @@ namespace AWS.Logger.Log4net
         /// </summary>
         public AWSCredentials Credentials
         {
-            get { return _config.Credentials; }
-            set { _config.Credentials = value; }
+            get => _config.Credentials;
+            set => _config.Credentials = value;
         }
 
 
@@ -81,8 +81,8 @@ namespace AWS.Logger.Log4net
         /// </summary>
         public string Region
         {
-            get { return _config.Region; }
-            set { _config.Region = value; }
+            get => _config.Region;
+            set => _config.Region = value;
         }
 
 
@@ -95,8 +95,8 @@ namespace AWS.Logger.Log4net
         /// </summary>
         public TimeSpan BatchPushInterval
         {
-            get { return _config.BatchPushInterval; }
-            set { _config.BatchPushInterval = value; }
+            get => _config.BatchPushInterval;
+            set => _config.BatchPushInterval = value;
         }
 
 
@@ -109,8 +109,8 @@ namespace AWS.Logger.Log4net
         /// </summary>
         public int BatchSizeInBytes
         {
-            get { return _config.BatchSizeInBytes; }
-            set { _config.BatchSizeInBytes = value; }
+            get => _config.BatchSizeInBytes;
+            set => _config.BatchSizeInBytes = value;
         }
 
 
@@ -123,8 +123,8 @@ namespace AWS.Logger.Log4net
         /// </summary>
         public int MaxQueuedMessages
         {
-            get { return _config.MaxQueuedMessages; }
-            set { _config.MaxQueuedMessages = value; }
+            get => _config.MaxQueuedMessages;
+            set => _config.MaxQueuedMessages = value;
         }
 
         /// <summary>
@@ -136,8 +136,8 @@ namespace AWS.Logger.Log4net
         /// </summary>
         public string LogStreamNameSuffix
         {
-            get { return _config.LogStreamNameSuffix; }
-            set { _config.LogStreamNameSuffix = value; }
+            get => _config.LogStreamNameSuffix;
+            set => _config.LogStreamNameSuffix = value;
         }
 
         /// <summary>
@@ -148,8 +148,20 @@ namespace AWS.Logger.Log4net
         /// </summary>
         public string LibraryLogFileName
         {
-            get { return _config.LibraryLogFileName; }
-            set { _config.LibraryLogFileName = value; }
+            get => _config.LibraryLogFileName;
+            set => _config.LibraryLogFileName = value;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IAWSLoggerConfig.IncludeScopes"/> property. This determines if scopes - if they exist - are included in a log message.
+        /// <para>
+        /// The default is false.
+        /// </para>
+        /// </summary>
+        public bool IncludeScopes
+        {
+            get => _config.IncludeScopes;
+            set => _config.IncludeScopes = value;
         }
 
         /// <summary>
@@ -173,7 +185,8 @@ namespace AWS.Logger.Log4net
                 BatchSizeInBytes = BatchSizeInBytes,
                 MaxQueuedMessages = MaxQueuedMessages,
 				LogStreamNameSuffix = LogStreamNameSuffix,
-				LibraryLogFileName = LibraryLogFileName
+				LibraryLogFileName = LibraryLogFileName,
+                IncludeScopes = IncludeScopes
             };
             _core = new AWSLoggerCore(config, "Log4net");
         }
