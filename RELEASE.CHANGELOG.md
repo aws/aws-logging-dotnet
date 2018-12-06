@@ -1,18 +1,18 @@
 ### Release 2018-12-06
-* **AWS.Logger.Core (1.3.0)**
+* **AWS.Logger.Core (1.3.1)**
     * Merged PR https://github.com/aws/aws-logging-dotnet/pull/53 adding the ability to flush the queued messages. 
 Also improving shutdown behavior. Thanks [Rolf Kristensen](https://github.com/snakefoot)
-* **AWS.Logger.AspNetCore (1.4.0)**
+* **AWS.Logger.AspNetCore (1.4.1)**
     * Merged PR https://github.com/aws/aws-logging-dotnet/pull/46 adding support for scopes. Thanks [Stefan Over](https://github.com/Herdo)
-    * Bumped dependency of AWS.Logger.Core to 1.3.0
-* **AWS.Logger.Log4net (1.3.0)**
+    * Bumped dependency of AWS.Logger.Core to 1.3.1
+* **AWS.Logger.Log4net (1.3.1)**
     * Merged PR https://github.com/aws/aws-logging-dotnet/pull/59 updating to version 2.0.8 of Log4net. Thanks [Aaron Amm](https://github.com/aaronamm)
     * Merged PR https://github.com/aws/aws-logging-dotnet/pull/59 with new Log4net sample. Thanks [Aaron Amm](https://github.com/aaronamm)
-    * Bumped dependency of AWS.Logger.Core to 1.3.0
-* **AWS.Logger.NLog (1.3.0)**
-    * Bumped dependency of AWS.Logger.Core to 1.2.0
-* **AWS.Logger.SeriLog (1.3.0)**
-    * Bumped dependency of AWS.Logger.Core to 1.2.0
+    * Bumped dependency of AWS.Logger.Core to 1.3.1
+* **AWS.Logger.NLog (1.3.1)**
+    * Bumped dependency of AWS.Logger.Core to 1.3.1
+* **AWS.Logger.SeriLog (1.2.1)**
+    * Bumped dependency of AWS.Logger.Core to 1.3.1
 
 
 ### Release 2018-07-23
