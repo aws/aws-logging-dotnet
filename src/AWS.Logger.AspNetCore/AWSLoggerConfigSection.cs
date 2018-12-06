@@ -4,13 +4,21 @@ using System.Linq;
 
 namespace Microsoft.Extensions.Configuration
 {
+    /// <summary>
+    /// Extensions methods for IConfiguration to lookup AWS logger configuration
+    /// </summary>
     public static class ConfigurationSectionExtensions
     {
         //Default configuration block on the appsettings.json
         //Customer's information will be fetched from this block unless otherwise set.
         const string DEFAULT_BLOCK = "AWS.Logging";
 
-
+        /// <summary>
+        /// Loads the AWS Logger Configuration from the ConfigSection
+        /// </summary>
+        /// <param name="configSection">ConfigSection</param>
+        /// <param name="configSectionInfoBlockName">ConfigSection SubPath to load from</param>
+        /// <returns></returns>
         public static AWSLoggerConfigSection GetAWSLoggingConfigSection(this IConfiguration configSection, string configSectionInfoBlockName = DEFAULT_BLOCK)
         {
             var loggerConfigSection = configSection.GetSection(configSectionInfoBlockName);
@@ -28,12 +36,18 @@ namespace Microsoft.Extensions.Configuration
     /// </summary>
     public class AWSLoggerConfigSection
     {
+        /// <summary>
+        /// Configuration options for logging messages to AWS
+        /// </summary>
         public AWSLoggerConfig Config { get; set; } = new AWSLoggerConfig();
 
+        /// <summary>
+        /// Custom LogLevel Filters for <see cref="AWS.Logger.AspNetCore.AWSLoggerProvider"/>
+        /// </summary>
         public IConfiguration LogLevels { get; set; } = null;
 
         /// <summary>
-        /// Gets the <see cref="IAWSLoggerConfig.IncludeScopes"/> property. This determines if scopes - if they exist - are included in a log message.
+        /// Gets the <see cref="AWS.Logger.AspNetCore.AWSLogger.IncludeScopes"/> property. This determines if scopes - if they exist - are included in a log message.
         /// <para>
         /// The default is false.
         /// </para>
@@ -51,6 +65,10 @@ namespace Microsoft.Extensions.Configuration
         internal const string LIBRARY_LOG_FILE_NAME = "LibraryLogFileName";
         internal const string INCLUDE_SCOPES_NAME = "IncludeScopes";
 
+        /// <summary>
+        /// Construct an instance of AWSLoggerConfigSection
+        /// </summary>
+        /// <param name="loggerConfigSection">ConfigSection to parse</param>
         public AWSLoggerConfigSection(IConfiguration loggerConfigSection)
         {
             Config.LogGroup = loggerConfigSection[LOG_GROUP];
@@ -87,7 +105,7 @@ namespace Microsoft.Extensions.Configuration
                 this.IncludeScopes = Boolean.Parse(loggerConfigSection[INCLUDE_SCOPES_NAME]);
             }
             var logLevels = loggerConfigSection.GetSection(LOG_LEVEL);
-            if (logLevels != null && logLevels.GetChildren().Count() > 0)
+            if (logLevels?.GetChildren().Any() == true)
             {
                 this.LogLevels = logLevels;
             }

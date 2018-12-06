@@ -15,6 +15,9 @@ namespace AWS.Logger.AspNetCore
         private readonly Func<string, LogLevel, bool> _filter;
         private readonly Func<LogLevel, object, Exception, string> _customFormatter;
 
+        /// <summary>
+        /// Prefix log messages with scopes created with ILogger.BeginScope
+        /// </summary>
         public bool IncludeScopes { get; set; }
 
         /// <summary>

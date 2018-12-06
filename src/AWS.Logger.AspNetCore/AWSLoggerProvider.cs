@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using AWS.Logger.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using AWS.Logger.Core;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace AWS.Logger.AspNetCore
 {
@@ -50,7 +50,12 @@ namespace AWS.Logger.AspNetCore
             _customFormatter = formatter;
         }
 
-        public AWSLoggerProvider(AWSLoggerConfigSection configSection, Func<LogLevel, object, Exception, string> formatter = null) 
+        /// <summary>
+        /// Creates the logging provider with the configuration section information to connect to AWS and how the messages should be sent. Also contains the LogLevel details
+        /// </summary>
+        /// <param name="configSection">Contains configuration on how to connect to AWS and how the log messages should be sent. Also contains the LogeLevel details based upon which the filter values would be set</param>
+        /// <param name="formatter">A custom formatter which accepts a LogLevel, a state, and an exception and returns the formatted log message.</param>
+        public AWSLoggerProvider(AWSLoggerConfigSection configSection, Func<LogLevel, object, Exception, string> formatter) 
             : this(configSection)
         {
             _customFormatter = formatter;

@@ -2,8 +2,6 @@
 <Project DefaultTargets="FullBuild" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" >
     <PropertyGroup>
       <SolutionFile></SolutionFile>
-      <NugetExecutable>C:\PathToNuget\nuget.exe</NugetExecutable>
-      <NuspecFile></NuspecFile>
     </PropertyGroup>
 
     <!-- <Target Name="FullBuild" DependsOnTargets="Compile;Nuget;Test45;Test" /> -->
@@ -14,16 +12,15 @@
     </Target>
 
     <Target Name = "Nuget" DependsOnTargets="Compile;Test">
-    <!-- You could use the MSBuild Copy task here to move the compiled code into
+      <!-- You could use the MSBuild Copy task here to move the compiled code into
            a structure that fits your desired package format -->
-    <Exec Command="if exist Deployment rmdir /S/Q Deployment"/>
-    <Exec Command="mkdir Deployment"/>
-		<Exec Command=".\.nuget\Nuget.exe pack .\src\AWS.Logger.Core\AWS.Logger.Core.dll.nuspec -OutputDirectory .\Deployment"/>
-		<Exec Command=".\.nuget\Nuget.exe pack .\src\AWS.Logger.AspNetCore\AWS.Logger.AspNetCore.dll.nuspec -OutputDirectory .\Deployment"/>
-		<Exec Command=".\.nuget\Nuget.exe pack .\src\AWS.Logger.Log4net\AWS.Logger.Log4net.dll.nuspec -OutputDirectory .\Deployment"/>
-    		<Exec Command=".\.nuget\NuGet.exe pack .\src\NLog.AWS.Logger\NLog.AWS.Logger.dll.nuspec -OutputDirectory .\Deployment"/>
-		<Exec Command=".\.nuget\NuGet.exe pack .\src\AWS.Logger.SeriLog\AWS.Logger.SeriLog.dll.nuspec -OutputDirectory .\Deployment"/>
-
+      <Exec Command="if exist Deployment rmdir /S/Q Deployment"/>
+      <Exec Command="mkdir Deployment"/>
+      <Exec Command="dotnet msbuild /t:pack .\src\AWS.Logger.Core       /p:Configuration=Release /p:PackageOutputPath=..\..\Deployment" ContinueOnError="WarnAndContinue"/>
+      <Exec Command="dotnet msbuild /t:pack .\src\AWS.Logger.AspNetCore /p:Configuration=Release /p:PackageOutputPath=..\..\Deployment" ContinueOnError="WarnAndContinue"/>
+      <Exec Command="dotnet msbuild /t:pack .\src\AWS.Logger.Log4net    /p:Configuration=Release /p:PackageOutputPath=..\..\Deployment" ContinueOnError="WarnAndContinue"/>
+      <Exec Command="dotnet msbuild /t:pack .\src\NLog.AWS.Logger       /p:Configuration=Release /p:PackageOutputPath=..\..\Deployment" ContinueOnError="WarnAndContinue"/>
+      <Exec Command="dotnet msbuild /t:pack .\src\AWS.Logger.SeriLog    /p:Configuration=Release /p:PackageOutputPath=..\..\Deployment" ContinueOnError="WarnAndContinue"/>
     </Target>
 
     <Target Name = "Test" DependsOnTargets="Compile">

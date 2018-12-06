@@ -23,11 +23,10 @@ namespace AWS.Logger.SeriLog
         public AWSSink()
         {
         }
+
         /// <summary>
         /// Constructor called by AWSLoggerSeriLoggerExtension
         /// </summary>
-        /// <param name="loggerConfiguration"></param>
-        /// <param name="iFormatProvider"></param>
         public AWSSink(AWSLoggerConfig loggerConfiguration, IFormatProvider iFormatProvider = null, ITextFormatter textFormatter = null)
         {
             _core = new AWSLoggerCore(loggerConfiguration, "SeriLogger");
@@ -69,6 +68,9 @@ namespace AWS.Logger.SeriLog
 
         private bool disposedValue = false; // To detect redundant calls
 
+        /// <summary>
+        /// Disposable Pattern
+        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -89,6 +91,7 @@ namespace AWS.Logger.SeriLog
             }
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.

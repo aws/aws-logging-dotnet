@@ -3,6 +3,9 @@ using Amazon.Runtime;
 
 namespace AWS.Logger
 {
+    /// <summary>
+    /// Configuration options for logging messages to AWS CloudWatch Logs
+    /// </summary>
     public interface IAWSLoggerConfig
     {
         /// <summary>

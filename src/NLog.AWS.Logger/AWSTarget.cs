@@ -156,6 +156,7 @@ namespace NLog.AWS.Logger
             set { _config.LibraryLogFileName = value; }
         }
 
+        /// <inheritdoc/>
         protected override void InitializeTarget()
         {
             if (_core != null)
@@ -185,12 +186,14 @@ namespace NLog.AWS.Logger
             InternalLogger.Error(e.Exception, "AWSTarget(Name={0}) - CloudWatch Network Error - ServiceUrl={1}", Name, e.ServiceUrl);
         }
 
+        /// <inheritdoc/>
         protected override void Write(LogEventInfo logEvent)
         {
             var message = this.Layout.Render(logEvent);
             _core.AddMessage(message);
         }
 
+        /// <inheritdoc/>
         protected override void FlushAsync(AsyncContinuation asyncContinuation)
         {
             try

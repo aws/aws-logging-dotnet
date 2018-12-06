@@ -1,21 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFrameworks>netstandard1.5;netstandard2.0;net45</TargetFrameworks>
+
     <Description>AWS Core logging library used to send logging messages to Amazon CloudWatch Logs</Description>
-    <AssemblyTitle>AWS.Logger.Core</AssemblyTitle>
     <Authors>Amazon Web Services</Authors>
-    <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
-    <AssemblyName>AWS.Logger.Core</AssemblyName>
-    <PackageId>AWS.Logger.Core</PackageId>
-    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+    <Company>Amazon Web Services</Company>
+    <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
+    <Copyright>Copyright 2016-$(CurrentYear) Amazon.com, Inc. or its affiliates. All Rights Reserved.</Copyright>
+    <PackageTags>AWS;Cloudwatch;Logger</PackageTags>
+    <PackageIconUrl>https://media.amazonwebservices.com/aws_singlebox_01.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/aws/aws-logging-dotnet</PackageProjectUrl>
+    <PackageLicenseUrl>https://aws.amazon.com/apache-2-0/</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/aws/aws-logging-dotnet.git</RepositoryUrl>
+
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.5' ">1.6.0</NetStandardImplicitPackageVersion>
     <SignAssembly>True</SignAssembly>
     <DelaySign>False</DelaySign>
     <AssemblyOriginatorKeyFile>..\..\awssdk.dll.snk</AssemblyOriginatorKeyFile>
@@ -24,10 +28,6 @@
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
     <DefineConstants>CORECLR</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <DefineConstants>NET452</DefineConstants>
   </PropertyGroup>
   
   <ItemGroup>

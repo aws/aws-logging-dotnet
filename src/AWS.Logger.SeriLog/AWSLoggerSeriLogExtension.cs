@@ -1,13 +1,14 @@
-﻿using Serilog;
+﻿using System;
+using Serilog;
 using Serilog.Formatting;
 using Serilog.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.Extensions.Configuration;
 
 namespace AWS.Logger.SeriLog
 {
+    /// <summary>
+    /// Extensions methods for <see cref="LoggerSinkConfiguration"/> to register <see cref="AWSSink"/>
+    /// </summary>
     public static class AWSLoggerSeriLogExtension
     {
         internal const string LOG_GROUP = "Serilog:LogGroup";
@@ -24,9 +25,6 @@ namespace AWS.Logger.SeriLog
         /// Serilog.Settings.Configuration to set the SeriLogger configuration
         /// using a Json input.
         /// </summary>
-        /// <param name="loggerConfiguration"></param>
-        /// <param name="configuration"></param>
-        /// <returns></returns>
         public static LoggerConfiguration AWSSeriLog(
                   this LoggerSinkConfiguration loggerConfiguration,
                   IConfiguration configuration, 
@@ -67,15 +65,11 @@ namespace AWS.Logger.SeriLog
             return AWSSeriLog(loggerConfiguration, config, iFormatProvider, textFormatter);
         }
 
-
         /// <summary>
         /// AWSSeriLogger target that is called when the customer
         /// explicitly creates a configuration of type AWSLoggerConfig 
         /// to set the SeriLogger configuration.
         /// </summary>
-        /// <param name="loggerConfiguration"></param>
-        /// <param name="configuration"></param>
-        /// <returns></returns>
         public static LoggerConfiguration AWSSeriLog(
                   this LoggerSinkConfiguration loggerConfiguration,
                    AWSLoggerConfig configuration = null,

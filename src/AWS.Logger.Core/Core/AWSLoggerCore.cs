@@ -18,6 +18,9 @@ using Amazon.Runtime.CredentialManagement;
 
 namespace AWS.Logger.Core
 {
+    /// <summary>
+    /// Sends LogEvent messages to CloudWatch Logs
+    /// </summary>
     public class AWSLoggerCore : IAWSLoggerCore
     {
         const int MAX_MESSAGE_SIZE_IN_BYTES = 256000;
@@ -38,7 +41,11 @@ namespace AWS.Logger.Core
         const double MAX_BUFFER_TIMEDIFF = 5;
         private readonly static Regex invalid_sequence_token_regex = new
             Regex(@"The given sequenceToken is invalid. The next expected sequenceToken is: (\d+)");
+        #endregion
 
+        /// <summary>
+        /// Alert details from CloudWatch Log Engine
+        /// </summary>
         public sealed class LogLibraryEventArgs : EventArgs
         {
             internal LogLibraryEventArgs(Exception ex)
@@ -46,13 +53,27 @@ namespace AWS.Logger.Core
                 Exception = ex;
             }
 
+            /// <summary>
+            /// Exception Details returned
+            /// </summary>
             public Exception Exception { get; }
+
+            /// <summary>
+            /// Service EndPoint Url involved
+            /// </summary>
             public string ServiceUrl { get; internal set; }
         }
 
+        /// <summary>
+        /// Event Notification on alerts from the CloudWatch Log Engine
+        /// </summary>
         public event EventHandler<LogLibraryEventArgs> LogLibraryAlert;
 
-        #endregion
+        /// <summary>
+        /// Construct an instance of AWSLoggerCore
+        /// </summary>
+        /// <param name="config">Configuration options for logging messages to AWS</param>
+        /// <param name="logType">Logging Provider Name to include in UserAgentHeader</param>
         public AWSLoggerCore(AWSLoggerConfig config, string logType)
         {
             _config = config;
@@ -115,6 +136,7 @@ namespace AWS.Logger.Core
             return FallbackCredentialsFactory.GetCredentials();
         }
 
+        /// <inheritdoc />
         public void Close()
         {
             try
@@ -132,6 +154,7 @@ namespace AWS.Logger.Core
             }
         }
 
+        /// <inheritdoc />
         public void Flush()
         {
             if (_cancelStartSource.IsCancellationRequested)
@@ -246,6 +269,9 @@ namespace AWS.Logger.Core
             }
         }
 
+        /// <summary>
+        /// Finalizer to ensure shutdown when forgetting to dispose
+        /// </summary>
         ~AWSLoggerCore()
         {
             if (_cancelStartSource != null)
@@ -258,7 +284,6 @@ namespace AWS.Logger.Core
         /// Kicks off the Poller Thread to keep tabs on the PutLogEvent request and the
         /// Concurrent Queue
         /// </summary>
-        /// <param name="PatrolSleepTime"></param>
         public void StartMonitor()
         {
             _flushTriggerEvent = new SemaphoreSlim(0, 1);
@@ -565,6 +590,9 @@ namespace AWS.Logger.Core
             }
         }
 
+        /// <summary>
+        /// Write Exception details to the file specified with the filename
+        /// </summary>
         public static void LogLibraryError(Exception ex, string LibraryLogFileName)
         {
             try

@@ -1,44 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  
   <PropertyGroup>
+    <TargetFrameworks>netstandard1.5;netstandard2.0;net45</TargetFrameworks>
+    
     <Description>An AWS Log4net appender that records logging messages to Amazon CloudWatch Logs.</Description>
-    <AssemblyTitle>AWS.Logger.Log4net</AssemblyTitle>
     <Authors>Amazon Web Services</Authors>
-    <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
-    <RootNamespace>AWS.Logger.Log4net</RootNamespace>
-    <AssemblyName>AWS.Logger.Log4net</AssemblyName>
-    <PackageId>AWS.Logger.Log4net</PackageId>
-	  <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+    <Company>Amazon Web Services</Company>
+    <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
+    <Copyright>Copyright 2016-$(CurrentYear) Amazon.com, Inc. or its affiliates. All Rights Reserved.</Copyright>
+    <PackageTags>AWS;Cloudwatch;Logger;Log4net</PackageTags>
+    <PackageIconUrl>https://media.amazonwebservices.com/aws_singlebox_01.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/aws/aws-logging-dotnet</PackageProjectUrl>
+    <PackageLicenseUrl>https://aws.amazon.com/apache-2-0/</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/aws/aws-logging-dotnet.git</RepositoryUrl>
+
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.5' ">1.6.0</NetStandardImplicitPackageVersion>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\awssdk.dll.snk</AssemblyOriginatorKeyFile>
     <Version>1.3.1</Version>
   </PropertyGroup>
-  <Choose>
-    <When Condition=" '$(AWSKeyFile)' == '' ">
-      <PropertyGroup>
-        <AssemblyOriginatorKeyFile>..\..\awssdk.dll.snk</AssemblyOriginatorKeyFile>
-      </PropertyGroup>
-    </When>
-    <Otherwise>
-      <PropertyGroup>
-        <AssemblyOriginatorKeyFile>$(AWSKeyFile)</AssemblyOriginatorKeyFile>
-      </PropertyGroup>
-    </Otherwise>
-  </Choose>
+
   <ItemGroup>
     <ProjectReference Include="..\AWS.Logger.Core\AWS.Logger.Core.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-      <PackageReference Include="log4net" Version="2.0.8" />
-  </ItemGroup>
-   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+ 
+   <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.8" />
   </ItemGroup>
   
