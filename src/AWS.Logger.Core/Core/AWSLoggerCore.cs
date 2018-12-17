@@ -128,12 +128,24 @@ namespace AWS.Logger.Core
             {
                 return config.Credentials;
             }
-            if (!string.IsNullOrEmpty(config.Profile) && new CredentialProfileStoreChain(config.ProfilesLocation)
-                .TryGetAWSCredentials(config.Profile, out var credentials))
+            if (!string.IsNullOrEmpty(config.Profile))
             {
-                return credentials;
+                var credentials = LookupCredentialsFromProfileStore(config);
+                if (credentials != null)
+                    return credentials;
             }
             return FallbackCredentialsFactory.GetCredentials();
+        }
+
+        private static AWSCredentials LookupCredentialsFromProfileStore(AWSLoggerConfig config)
+        {
+            var credentialProfileStore = string.IsNullOrEmpty(config.ProfilesLocation)
+                ? new CredentialProfileStoreChain()
+                : new CredentialProfileStoreChain(config.ProfilesLocation);
+            if (credentialProfileStore.TryGetAWSCredentials(config.Profile, out var credentials))
+                return credentials;
+            else
+                return null;
         }
 
         /// <inheritdoc />
