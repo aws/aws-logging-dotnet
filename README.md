@@ -6,6 +6,18 @@ Amazon CloudWatch Logs service to write log data to a configured
 log group. The logs can be viewed and searched using the [AWS CloudWatch Console](https://console.aws.amazon.com/cloudwatch/).
 
 For a history of releases view the [release change log](RELEASE.CHANGELOG.md)
+
+### AWS Lambda
+
+These packages batch logging messages in a queue and send messages to CloudWatch Logs using a background thread. 
+The use of the background thread means that the messages are not guaranteed to be delivered when used in AWS Lambda.
+The reason is because the background thread will be frozen once a Lambda event is processed and 
+may not ever be unfrozen if more Lambda events are not received for some time.
+
+When using Lambda it is recommended to use either the `ILambdaContext.Logger.LogLine` or the 
+[Amazon.Lambda.Logging.AspNetCore](https://github.com/aws/aws-lambda-dotnet/tree/master/Libraries/src/Amazon.Lambda.Logging.AspNetCore) package.
+
+
 ## Supported Logging Frameworks
 
 1. [NLog](#nlog)
