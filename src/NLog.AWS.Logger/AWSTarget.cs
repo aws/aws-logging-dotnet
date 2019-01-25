@@ -25,7 +25,7 @@ namespace NLog.AWS.Logger
         /// </summary>
         public AWSTarget()
         {
-            
+            this.OptimizeBufferReuse = true;
         }
 
         /// <summary>
@@ -165,20 +165,33 @@ namespace NLog.AWS.Logger
                 _core = null;
             }
 
-            var config = new AWSLoggerConfig(this.LogGroup)
+            var config = new AWSLoggerConfig(RenderSimpleLayout(LogGroup, nameof(LogGroup)))
             {
-                Region = Region,
+                Region = RenderSimpleLayout(Region, nameof(Region)),
                 Credentials = Credentials,
-                Profile = Profile,
-                ProfilesLocation = ProfilesLocation,
+                Profile = RenderSimpleLayout(Profile, nameof(Profile)),
+                ProfilesLocation = RenderSimpleLayout(ProfilesLocation, nameof(ProfilesLocation)),
                 BatchPushInterval = BatchPushInterval,
                 BatchSizeInBytes = BatchSizeInBytes,
                 MaxQueuedMessages = MaxQueuedMessages,
-				LogStreamNameSuffix = LogStreamNameSuffix,
-				LibraryLogFileName = LibraryLogFileName
+                LogStreamNameSuffix = RenderSimpleLayout(LogStreamNameSuffix, nameof(LogStreamNameSuffix)),
+                LibraryLogFileName = LibraryLogFileName
             };
             _core = new AWSLoggerCore(config, "NLog");
             _core.LogLibraryAlert += AwsLogLibraryAlert;
+        }
+
+        private string RenderSimpleLayout(string simpleLayout, string propertyName)
+        {
+            try
+            {
+                return string.IsNullOrEmpty(simpleLayout) ? string.Empty : new Layouts.SimpleLayout(simpleLayout).Render(LogEventInfo.CreateNullEvent());
+            }
+            catch (Exception ex)
+            {
+                InternalLogger.Debug(ex, "AWSTarget(Name={0}) - Could not render Layout for {1}", Name, propertyName);
+                return simpleLayout;
+            }
         }
 
         private void AwsLogLibraryAlert(object sender, AWSLoggerCore.LogLibraryEventArgs e)
@@ -189,7 +202,7 @@ namespace NLog.AWS.Logger
         /// <inheritdoc/>
         protected override void Write(LogEventInfo logEvent)
         {
-            var message = this.Layout.Render(logEvent);
+            var message = RenderLogEvent(this.Layout, logEvent);
             _core.AddMessage(message);
         }
 
