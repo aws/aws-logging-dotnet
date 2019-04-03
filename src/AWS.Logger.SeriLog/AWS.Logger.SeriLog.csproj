@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>An AWS SeriLog sink that records logging messages to Amazon CloudWatch Logs.</Description>
@@ -30,4 +30,10 @@
   <ItemGroup>
     <ProjectReference Include="..\AWS.Logger.Core\AWS.Logger.Core.csproj" />
   </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
 </Project>

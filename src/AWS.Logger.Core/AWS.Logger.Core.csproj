@@ -29,7 +29,12 @@
   <PropertyGroup Condition="'$(TargetFramework)|$(Platform)'=='net45|AnyCPU'">
     <DefineConstants>NET452</DefineConstants>
   </PropertyGroup>
-  
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="packages.config" />
   </ItemGroup>
