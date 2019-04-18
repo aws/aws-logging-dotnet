@@ -21,9 +21,6 @@
   </metadata>
   <files>
     <file src="bin\Release\netstandard1.5\NLog.AWS.Logger.dll" target="lib\netstandard1.5" />
-    <file src="bin\Release\netstandard1.5\NLog.AWS.Logger.pdb" target="lib\netstandard1.5" />
-
     <file src="bin\Release\net45\NLog.AWS.Logger.dll" target="lib\net45" />
-    <file src="bin\Release\net45\NLog.AWS.Logger.pdb" target="lib\net45" />
   </files>
 </package>
