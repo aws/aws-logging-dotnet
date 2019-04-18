@@ -22,6 +22,5 @@
   </metadata>
   <files>
     <file src="bin\Release\netstandard1.5\AWS.Logger.AspNetCore.dll" target="lib\netstandard1.5" />
-    <file src="bin\Release\netstandard1.5\AWS.Logger.AspNetCore.pdb" target="lib\netstandard1.5" />
   </files>
 </package>

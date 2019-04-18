@@ -21,9 +21,6 @@
   </metadata>
   <files>
     <file src="bin\Release\netstandard1.5\AWS.Logger.SeriLog.dll" target="lib\netstandard1.5" />
-    <file src="bin\Release\netstandard1.5\AWS.Logger.SeriLog.pdb" target="lib\netstandard1.5" />
-
     <file src="bin\Release\net45\AWS.Logger.SeriLog.dll" target="lib\net45" />
-    <file src="bin\Release\net45\AWS.Logger.SeriLog.pdb" target="lib\net45" />
   </files>
 </package>
