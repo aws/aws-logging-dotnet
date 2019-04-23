@@ -37,8 +37,4 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="1.0.0" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>none</DebugType>
-    <DebugSymbols>false</DebugSymbols>
-  </PropertyGroup>
 </Project>

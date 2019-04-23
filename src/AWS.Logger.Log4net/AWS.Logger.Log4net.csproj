@@ -32,10 +32,5 @@
    <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.8" />
   </ItemGroup>
-  
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>none</DebugType>
-    <DebugSymbols>false</DebugSymbols>
-  </PropertyGroup>
 
 </Project>
