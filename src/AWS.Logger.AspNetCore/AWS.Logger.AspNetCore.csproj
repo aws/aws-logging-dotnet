@@ -25,11 +25,6 @@
     <Version>1.4.1</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>none</DebugType>
-    <DebugSymbols>false</DebugSymbols>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\AWS.Logger.Core\AWS.Logger.Core.csproj" />
   </ItemGroup>

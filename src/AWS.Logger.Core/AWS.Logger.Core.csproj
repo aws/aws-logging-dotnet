@@ -30,11 +30,6 @@
     <DefineConstants>CORECLR</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>none</DebugType>
-    <DebugSymbols>false</DebugSymbols>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.3.4" />
   </ItemGroup>
