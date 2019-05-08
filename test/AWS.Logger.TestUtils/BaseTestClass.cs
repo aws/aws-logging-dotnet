@@ -19,6 +19,7 @@ namespace AWS.Logger.TestUtils
         public const int THREAD_COUNT = 2;
         public const string LASTMESSAGE = "LASTMESSAGE";
         public const string CUSTOMSTREAMSUFFIX = "Custom";
+        public const string CUSTOMSTREAMPREFIX = "CustomPrefix";
         public TestFixture _testFixture;
         public AmazonCloudWatchLogsClient Client;
 
@@ -105,12 +106,15 @@ namespace AWS.Logger.TestUtils
 
                 var customStreamSuffix = describeLogstreamsResponse.LogStreams[0].LogStreamName.Split('-').Last().Trim();
                 Assert.Equal(CUSTOMSTREAMSUFFIX, customStreamSuffix);
+                var customStreamPrefix = describeLogstreamsResponse.LogStreams[0].LogStreamName.Split('-').First().Trim();
+                Assert.Equal(CUSTOMSTREAMPREFIX, customStreamPrefix);
             }
             Assert.Equal(SIMPLELOGTEST_COUNT, getLogEventsResponse.Events.Count());
 
 
             _testFixture.LogGroupNameList.Add(logGroupName);
         }
+        
 
         protected void MultiThreadTestGroup(string logGroupName)
         {

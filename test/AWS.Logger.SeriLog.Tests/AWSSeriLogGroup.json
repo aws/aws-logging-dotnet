@@ -5,6 +5,7 @@
     "LogGroup": "AWSSeriLogGroup",
     "Region": "us-west-2",
     "LogStreamNameSuffix": "Custom",
+    "LogStreamNamePrefix": "CustomPrefix",
     "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ]
   }
 }

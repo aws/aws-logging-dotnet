@@ -18,6 +18,7 @@ namespace AWS.Logger.SeriLog
         internal const string BATCH_PUSH_SIZE_IN_BYTES = "Serilog:BatchPushSizeInBytes";
         internal const string MAX_QUEUED_MESSAGES = "Serilog:MaxQueuedMessages";
         internal const string LOG_STREAM_NAME_SUFFIX = "Serilog:LogStreamNameSuffix";
+        internal const string LOG_STREAM_NAME_PREFIX = "Serilog:LogStreamNamePrefix";
         internal const string LIBRARY_LOG_FILE_NAME = "Serilog:LibraryLogFileName";
 
         /// <summary>
@@ -57,6 +58,10 @@ namespace AWS.Logger.SeriLog
             if (configuration[LOG_STREAM_NAME_SUFFIX] != null)
             {
                 config.LogStreamNameSuffix = configuration[LOG_STREAM_NAME_SUFFIX];
+            }
+            if (configuration[LOG_STREAM_NAME_PREFIX] != null)
+            {
+                config.LogStreamNamePrefix = configuration[LOG_STREAM_NAME_PREFIX];
             }
             if (configuration[LIBRARY_LOG_FILE_NAME] != null)
             {
