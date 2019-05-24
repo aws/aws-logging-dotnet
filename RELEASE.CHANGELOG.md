@@ -1,3 +1,7 @@
+### Release 2019-05-15
+* **AWS.Logger.NLog (1.3.2)**
+    * Merged PR https://github.com/aws/aws-logging-dotnet/pull/71 NLog AWSTarget apply Layout logic to config-properties. Thanks [Rolf Kristensen](https://github.com/snakefoot)
+
 ### Release 2018-12-06
 * **AWS.Logger.Core (1.3.1)**
     * Merged PR https://github.com/aws/aws-logging-dotnet/pull/53 adding the ability to flush the queued messages. 
