@@ -132,8 +132,8 @@ namespace NLog.AWS.Logger
         }
 
         /// <summary>
-        /// Gets and sets the LogStreamNameSuffix property. The LogStreamName consists of a DateTimeStamp as the prefix and a user defined suffix value that can 
-        /// be set using the LogStreamNameSuffix property defined here.
+        /// Gets and sets the LogStreamNameSuffix property. The LogStreamName consists of an optional user-defined prefix segment, then a DateTimeStamp as the
+        /// system-defined prefix segment, and a user defined suffix value that can be set using the LogStreamNameSuffix property defined here.
         /// <para>
         /// The default is going to a Guid.
         /// </para>
@@ -142,6 +142,19 @@ namespace NLog.AWS.Logger
         {
             get { return _config.LogStreamNameSuffix; }
             set { _config.LogStreamNameSuffix = value; }
+        }
+
+        /// <summary>
+        /// Gets and sets the LogStreamNamePrefix property. The LogStreamName consists of an optional user-defined prefix segment (defined here), then a
+        /// DateTimeStamp as the system-defined prefix segment, and a user defined suffix value that can be set using the LogStreamNameSuffix property.
+        /// <para>
+        /// The default will use an empty string for this user-defined portion, meaning the log stream name will start with the system-defined portion of the prefix (yyyy/MM/dd ... )
+        /// </para>
+        /// </summary>
+        public string LogStreamNamePrefix
+        {
+            get { return _config.LogStreamNamePrefix; }
+            set { _config.LogStreamNamePrefix = value; }
         }
 
         /// <summary>
@@ -175,6 +188,7 @@ namespace NLog.AWS.Logger
                 BatchSizeInBytes = BatchSizeInBytes,
                 MaxQueuedMessages = MaxQueuedMessages,
                 LogStreamNameSuffix = RenderSimpleLayout(LogStreamNameSuffix, nameof(LogStreamNameSuffix)),
+                LogStreamNamePrefix = RenderSimpleLayout(LogStreamNamePrefix, nameof(LogStreamNamePrefix)),
                 LibraryLogFileName = LibraryLogFileName
             };
             _core = new AWSLoggerCore(config, "NLog");

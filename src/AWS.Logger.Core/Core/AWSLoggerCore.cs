@@ -444,7 +444,7 @@ namespace AWS.Logger.Core
                 }
             }
 
-            var currentStreamName = DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss") + " - " + _config.LogStreamNameSuffix;
+            var currentStreamName = GenerateStreamName();
 
             var streamResponse = await _client.CreateLogStreamAsync(new CreateLogStreamRequest
             {
@@ -459,6 +459,22 @@ namespace AWS.Logger.Core
             _repo = new LogEventBatch(_config.LogGroup, currentStreamName, Convert.ToInt32(_config.BatchPushInterval.TotalSeconds), _config.BatchSizeInBytes);
 
             return currentStreamName;
+        }
+
+        /// <summary>
+        /// generate a logstream name
+        /// </summary>
+        /// <returns>logstream name that ALWAYS includes a unique date-based segment</returns>
+        private string GenerateStreamName()
+        {
+            var suffix = _config.LogStreamNameSuffix;
+            var prefix = _config.LogStreamNamePrefix ?? string.Empty;
+            if (!string.IsNullOrEmpty(prefix))
+            {
+                prefix += " - ";  //if there WAS a user-specified prefix, let's use it, followed by a separator
+            }
+
+            return prefix + DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss") + " - " + suffix;
         }
 
         private static bool IsSuccessStatusCode(AmazonWebServiceResponse serviceResponse)

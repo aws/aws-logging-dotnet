@@ -62,6 +62,7 @@ namespace Microsoft.Extensions.Configuration
         internal const string LOG_LEVEL = "LogLevel";
         internal const string MAX_QUEUED_MESSAGES = "MaxQueuedMessages";
         internal const string LOG_STREAM_NAME_SUFFIX = "LogStreamNameSuffix";
+        internal const string LOG_STREAM_NAME_PREFIX = "LogStreamNamePrefix";
         internal const string LIBRARY_LOG_FILE_NAME = "LibraryLogFileName";
         internal const string INCLUDE_SCOPES_NAME = "IncludeScopes";
 
@@ -95,6 +96,10 @@ namespace Microsoft.Extensions.Configuration
             if (loggerConfigSection[LOG_STREAM_NAME_SUFFIX] != null)
             {
                 Config.LogStreamNameSuffix = loggerConfigSection[LOG_STREAM_NAME_SUFFIX];
+            }
+            if (loggerConfigSection[LOG_STREAM_NAME_PREFIX] != null)
+            {
+                Config.LogStreamNamePrefix = loggerConfigSection[LOG_STREAM_NAME_PREFIX];
             }
             if (loggerConfigSection[LIBRARY_LOG_FILE_NAME] != null)
             {

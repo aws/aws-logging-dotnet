@@ -129,12 +129,22 @@ namespace AWS.Logger
         /// <summary>
         /// Gets and sets the LogStreamNameSuffix property. The LogStreamName consists of a DateTimeStamp as the prefix and a user defined suffix value that can 
         /// be set using the LogStreamNameSuffix property defined here.
-        /// The LogstreamName then follows the pattern '[DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss")]-[LogstreamNameSuffix]'
+        /// The LogstreamName then follows the pattern '[LogStreamNamePrefix]-[DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss")]-[LogStreamNameSuffix]'
         /// <para>
         /// The default is going to a Guid.
         /// </para>
         /// </summary>
         public string LogStreamNameSuffix { get; set; } = Guid.NewGuid().ToString();
+
+        /// <summary>
+        /// Gets and sets the LogStreamNamePrefix property. The LogStreamName consists of an optional user-defined LogStreamNamePrefix (that can be set here)
+        /// followed by a DateTimeStamp as the prefix, and a user defined suffix value
+        /// The LogstreamName then follows the pattern '[LogStreamNamePrefix]-[DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss")]-[LogStreamNameSuffix]'
+        /// <para>
+        /// The default is an empty string.
+        /// </para>
+        /// </summary>
+        public string LogStreamNamePrefix { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets and sets the LibraryLogFileName property. This is the name of the file into which errors from the AWS.Logger.Core library will be wriiten into.
