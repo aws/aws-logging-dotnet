@@ -63,14 +63,14 @@ namespace AWS.Logger.AspNetCore.Tests
             }
 
             var loggingFactoryService = this.ServiceCollection.FirstOrDefault(x => x.ServiceType is ILoggerFactory);
-            this.Provider = this.ServiceCollection.AddLogging()
+            this.Provider = this.ServiceCollection.AddLogging(logging => logging.SetMinimumLevel(LogLevel.Debug))
                                     .BuildServiceProvider();
 
             if (loggingFactoryService == null)
             {
                 var loggingFactory = this.Provider.GetService<ILoggerFactory>();
-                loggingFactory.AddAWSProvider(ConfigSection);
-                Logger = loggingFactory.CreateLogger<ILoggerTestClass>();
+                loggingFactory.AddAWSProvider(ConfigSection);                
+                Logger = loggingFactory.CreateLogger<ILoggerTestClass>();                
             }
         }
 
@@ -94,7 +94,6 @@ namespace AWS.Logger.AspNetCore.Tests
             Logger = new AWSLogger(
                 categoryName,
                 coreLogger, null);
-            var tasks = new List<Task>();
             var logMessageCount = 10;
             LogMessages(logMessageCount);
             Assert.Contains("Error message\r\nSystem.Exception: Exception message.\r\n", coreLogger.ReceivedMessages);
