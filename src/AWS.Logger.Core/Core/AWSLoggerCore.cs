@@ -444,7 +444,7 @@ namespace AWS.Logger.Core
                 }
             }
 
-            var currentStreamName = GenerateStreamName();
+            var currentStreamName = GenerateStreamName(_config);
 
             var streamResponse = await _client.CreateLogStreamAsync(new CreateLogStreamRequest
             {
@@ -465,12 +465,12 @@ namespace AWS.Logger.Core
         /// Generate a logstream name
         /// </summary>
         /// <returns>logstream name that ALWAYS includes a unique date-based segment</returns>
-        private string GenerateStreamName()
+        public static string GenerateStreamName(IAWSLoggerConfig config)
         {
             var streamName = new StringBuilder();
 
             
-            var prefix = _config.LogStreamNamePrefix;
+            var prefix = config.LogStreamNamePrefix;
             if (!string.IsNullOrEmpty(prefix))
             {
                 streamName.Append(prefix);
@@ -479,7 +479,7 @@ namespace AWS.Logger.Core
 
             streamName.Append(DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss"));
 
-            var suffix = _config.LogStreamNameSuffix;
+            var suffix = config.LogStreamNameSuffix;
             if (!string.IsNullOrEmpty(suffix))
             {
                 streamName.Append(" - ");
