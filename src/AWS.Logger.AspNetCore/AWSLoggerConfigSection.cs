@@ -9,9 +9,14 @@ namespace Microsoft.Extensions.Configuration
     /// </summary>
     public static class ConfigurationSectionExtensions
     {
-        //Default configuration block on the appsettings.json
-        //Customer's information will be fetched from this block unless otherwise set.
-        const string DEFAULT_BLOCK = "AWS.Logging";
+        // Default configuration block on the appsettings.json
+        // Customer's information will be fetched from this block unless otherwise set.
+        const string DEFAULT_BLOCK = "Logging";
+
+        // This library was originally written before logging standarized, or it at least we didn't realize it was standarized, on the "Logging" section in the config.
+        // The library now uses "Logging" as the default section to look for config but to maintain backwards compatibility the package will fallback
+        // AWS.Logging if a log group is not configured in the "Logging" config block".
+        const string LEGACY_DEFAULT_BLOCK = "AWS.Logging";
 
         /// <summary>
         /// Loads the AWS Logger Configuration from the ConfigSection
@@ -27,6 +32,18 @@ namespace Microsoft.Extensions.Configuration
             {
                 configObj = new AWSLoggerConfigSection(loggerConfigSection);
             }
+            // If the code was relying on the default config block and no log group was found then
+            // check the legacy default block.
+            else if(string.Equals(configSectionInfoBlockName, DEFAULT_BLOCK, StringComparison.InvariantCulture))
+            {
+                loggerConfigSection = configSection.GetSection(LEGACY_DEFAULT_BLOCK);
+                if (loggerConfigSection[AWSLoggerConfigSection.LOG_GROUP] != null)
+                {
+                    configObj = new AWSLoggerConfigSection(loggerConfigSection);
+                }
+            }
+
+
             return configObj;
         }
     }
