@@ -2,6 +2,8 @@ using AWS.Logger;
 using System;
 using System.Linq;
 
+// Placed in the Microsoft namespaces so that the extension methods are visible whenever the owning namespace
+// is declared.
 namespace Microsoft.Extensions.Configuration
 {
     /// <summary>

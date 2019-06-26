@@ -16,7 +16,7 @@ namespace AWS.Logger.AspNetCore
         private readonly Func<string, LogLevel, bool> _filter;
         private readonly Func<LogLevel, object, Exception, string> _customFormatter;
 
-        private bool _includeScopes = Constants.IncludeScopesDefault;
+        private bool _includeScopes;
         /// <summary>
         /// Prefix log messages with scopes created with ILogger.BeginScope
         /// </summary>
@@ -76,6 +76,9 @@ namespace AWS.Logger.AspNetCore
             _core = core;
             _filter = filter;
             _customFormatter = customFormatter;
+
+            // This is done in the constructor to ensure the logic in the setter is run during initialization.
+            this.IncludeScopes = Constants.IncludeScopesDefault;
         }
 
         /// <inheritdoc />
@@ -119,72 +122,85 @@ namespace AWS.Logger.AspNetCore
                 if (formatter == null)
                     throw new ArgumentNullException(nameof(formatter));
 
+                var messageText = formatter(state, exception);
+                // If neither a message nor an exception are provided, don't log anything (there's nothing to log, after all).
+                if (string.IsNullOrEmpty(messageText) && exception == null)
+                    return;
+
                 // Format of the logged text, optional components are in {}
-                //  {[LogLevel] }{ => Scopes : }{Category: }{EventId: }MessageText {Exception}{\n}
-                var components = new List<string>(4);
+                //  {[LogLevel] }{ Scopes: => }{Category: }{EventId: }MessageText {Exception}{\n}
+                var messageBuilder = new StringBuilder();
+                Action<string> addToBuilder = token =>
+                {
+                    if (string.IsNullOrEmpty(token))
+                        return;
+
+                    if (messageBuilder.Length > 0)
+                        messageBuilder.Append(" ");
+                    messageBuilder.Append(token);
+                };
+
                 if (IncludeLogLevel)
                 {
-                    components.Add($"[{logLevel}]");
+                    addToBuilder($"[{logLevel}]");
                 }
 
-                GetScopeInformation(components);
+                GetScopeInformation(messageBuilder);
 
                 if (IncludeCategory)
                 {
-                    components.Add($"{_categoryName}:");
+                    addToBuilder($"{_categoryName}:");
                 }
                 if (IncludeEventId)
                 {
-                    components.Add($"[{eventId}]:");
+                    addToBuilder($"[{eventId}]:");
                 }
 
-                string text;
-                if (_customFormatter == null)
-                {
-                    text = formatter(state, exception);
-                }
-                else
-                {
-                    text = _customFormatter(logLevel, state, exception);
-                }
-
-                components.Add(text);
+                addToBuilder(messageText);
 
                 if (IncludeException)
                 {
-                    components.Add($"{exception}");
+                    addToBuilder($"{exception}");
                 }
                 if (IncludeNewline)
                 {
-                    components.Add(Environment.NewLine);
+                    messageBuilder.Append(Environment.NewLine);
                 }
 
-                message = string.Join(" ", components);
+                message = messageBuilder.ToString();
             }
             else
             {
                 message = _customFormatter(logLevel, state, exception);
+
+                // If neither a message nor an exception are provided, don't log anything (there's nothing to log, after all).
+                if (string.IsNullOrEmpty(message) && exception == null)
+                    return;
             }
 
             _core.AddMessage(message);
         }
 
-        private void GetScopeInformation(List<string> logMessageComponents)
+        private void GetScopeInformation(StringBuilder messageBuilder)
         {
             var scopeProvider = ScopeProvider;
 
             if (IncludeScopes && scopeProvider != null)
             {
-                var initialCount = logMessageComponents.Count;
+                var initialLength = messageBuilder.Length;
 
-                scopeProvider.ForEachScope((scope, list) =>
+                scopeProvider.ForEachScope((scope, builder) =>
                 {
-                    list.Add(scope.ToString());
-                }, (logMessageComponents));
+                    if(messageBuilder.Length > 0)
+                    {
+                        messageBuilder.Append(" ");
+                    }
+                    messageBuilder.Append(scope.ToString());
+                }, (messageBuilder));
 
-                if (logMessageComponents.Count > initialCount)
+                if (messageBuilder.Length > initialLength)
                 {
-                    logMessageComponents.Add("=>");
+                    messageBuilder.Append(" =>");
                 }
             }
         }

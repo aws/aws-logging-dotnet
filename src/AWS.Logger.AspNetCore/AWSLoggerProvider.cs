@@ -96,12 +96,12 @@ namespace AWS.Logger.AspNetCore
             return _loggers.GetOrAdd(name, loggerName => new AWSLogger(categoryName, _core, _filter, _customFormatter)
             {
                 ScopeProvider = _scopeProvider,
-                IncludeScopes = _configSection != null ? _configSection.IncludeScopes : Constants.IncludeScopesDefault,
-                IncludeLogLevel = _configSection != null ? _configSection.IncludeLogLevel : Constants.IncludeLogLevelDefault,
-                IncludeCategory = _configSection != null ? _configSection.IncludeCategory : Constants.IncludeCategoryDefault,
-                IncludeEventId = _configSection != null ? _configSection.IncludeEventId : Constants.IncludeEventIdDefault,
-                IncludeNewline = _configSection != null ? _configSection.IncludeNewline : Constants.IncludeNewlineDefault,
-                IncludeException = _configSection != null ? _configSection.IncludeCategory : Constants.IncludeExceptionDefault
+                IncludeScopes = _configSection?.IncludeScopes ?? Constants.IncludeScopesDefault,
+                IncludeLogLevel = _configSection?.IncludeLogLevel ?? Constants.IncludeLogLevelDefault,
+                IncludeCategory = _configSection?.IncludeCategory ?? Constants.IncludeCategoryDefault,
+                IncludeEventId = _configSection?.IncludeEventId ?? Constants.IncludeEventIdDefault,
+                IncludeNewline = _configSection?.IncludeNewline ?? Constants.IncludeNewlineDefault,
+                IncludeException = _configSection?.IncludeException ?? Constants.IncludeExceptionDefault
             });
         }
 

@@ -69,8 +69,8 @@ namespace AWS.Logger.AspNetCore.Tests
             if (loggingFactoryService == null)
             {
                 var loggingFactory = this.Provider.GetService<ILoggerFactory>();
-                loggingFactory.AddAWSProvider(ConfigSection);                
-                Logger = loggingFactory.CreateLogger<ILoggerTestClass>();                
+                loggingFactory.AddAWSProvider(ConfigSection);
+                Logger = loggingFactory.CreateLogger<ILoggerTestClass>();
             }
         }
 
@@ -96,7 +96,7 @@ namespace AWS.Logger.AspNetCore.Tests
                 coreLogger, null);
             var logMessageCount = 10;
             LogMessages(logMessageCount);
-            Assert.Contains("[Error] testlogging: Error message System.Exception: Exception message. \r\n", coreLogger.ReceivedMessages);
+            Assert.Contains("[Error] testlogging: Error message System.Exception: Exception message.\r\n", coreLogger.ReceivedMessages);
         }
         /// <summary>
         /// Basic test case that creates multiple threads and each thread mocks log messages
