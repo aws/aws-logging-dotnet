@@ -17,7 +17,7 @@ namespace AWS.Logger.AspNetCore
         private readonly IAWSLoggerCore _core;
         private readonly AWSLoggerConfigSection _configSection;
         private readonly Func<LogLevel, object, Exception, string> _customFormatter;
-        private Func<string, LogLevel, bool> _filter;
+        private Func<string, LogLevel, bool> _customFilter;
 
         // Constants
         private const string DEFAULT_CATEGORY_NAME = "Default";
@@ -53,7 +53,7 @@ namespace AWS.Logger.AspNetCore
         {
             _scopeProvider = NullExternalScopeProvider.Instance;
             _core = new AWSLoggerCore(config, "ILogger");
-            _filter = filter;
+            _customFilter = filter;
             _customFormatter = formatter;
         }
 
@@ -88,12 +88,13 @@ namespace AWS.Logger.AspNetCore
         {
             var name = string.IsNullOrEmpty(categoryName) ? DEFAULT_CATEGORY_NAME : categoryName;
 
-            if (_configSection != null && _filter == null)
+            var filter = _customFilter;
+            if (_configSection != null && filter == null)
             {
-                _filter = CreateConfigSectionFilter(_configSection.LogLevels, name);
+                filter = CreateConfigSectionFilter(_configSection.LogLevels, name);
             }
 
-            return _loggers.GetOrAdd(name, loggerName => new AWSLogger(categoryName, _core, _filter, _customFormatter)
+            return _loggers.GetOrAdd(name, loggerName => new AWSLogger(categoryName, _core, filter, _customFormatter)
             {
                 ScopeProvider = _scopeProvider,
                 IncludeScopes = _configSection?.IncludeScopes ?? Constants.IncludeScopesDefault,
