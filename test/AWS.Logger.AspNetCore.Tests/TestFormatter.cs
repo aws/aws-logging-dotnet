@@ -26,7 +26,7 @@ namespace AWS.Logger.AspNetCore.Tests
 
             string expectedMessage = customFormatter(logLevel, message, null);
 
-            Assert.Equal(expectedMessage, coreLogger.ReceivedMessages.First().Replace("\r\n", string.Empty));
+            Assert.Equal(expectedMessage, coreLogger.ReceivedMessages.First().Replace(Environment.NewLine, string.Empty));
         }
     }
 }

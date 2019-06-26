@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using AWS.Logger.Core;
 using Microsoft.Extensions.Configuration;
@@ -9,12 +10,17 @@ namespace AWS.Logger.AspNetCore
     /// <summary>
     /// Implementation of the ILoggerProvider which is used to create instances of ILogger.
     /// </summary>
-    public class AWSLoggerProvider : ILoggerProvider
-    {       
+    public class AWSLoggerProvider : ILoggerProvider, ISupportExternalScope
+    {
+        private readonly ConcurrentDictionary<string, AWSLogger> _loggers = new ConcurrentDictionary<string, AWSLogger>();
+        private IExternalScopeProvider _scopeProvider;
         private readonly IAWSLoggerCore _core;
         private readonly AWSLoggerConfigSection _configSection;
         private readonly Func<LogLevel, object, Exception, string> _customFormatter;
         private Func<string, LogLevel, bool> _filter;
+
+        // Constants
+        private const string DEFAULT_CATEGORY_NAME = "Default";
 
         /// <summary>
         /// Creates the logging provider with the configuration information to connect to AWS and how the messages should be sent.
@@ -45,6 +51,7 @@ namespace AWS.Logger.AspNetCore
         /// <param name="formatter">A custom formatter which accepts a LogLevel, a state, and an exception and returns the formatted log message.</param>
         public AWSLoggerProvider(AWSLoggerConfig config, Func<string, LogLevel, bool> filter, Func<LogLevel, object, Exception, string> formatter = null)
         {
+            _scopeProvider = NullExternalScopeProvider.Instance;
             _core = new AWSLoggerCore(config, "ILogger");
             _filter = filter;
             _customFormatter = formatter;
@@ -67,6 +74,7 @@ namespace AWS.Logger.AspNetCore
         /// <param name="configSection">Contains configuration on how to connect to AWS and how the log messages should be sent. Also contains the LogeLevel details based upon which the filter values would be set</param>
         public AWSLoggerProvider(AWSLoggerConfigSection configSection)
         {
+            _scopeProvider = configSection.IncludeScopes ? new LoggerExternalScopeProvider() : NullExternalScopeProvider.Instance;
             _configSection = configSection;
             _core = new AWSLoggerCore(_configSection.Config, "ILogger");
         }        
@@ -78,11 +86,23 @@ namespace AWS.Logger.AspNetCore
         /// <returns></returns>
         public ILogger CreateLogger(string categoryName)
         {
-            if (_configSection != null)
+            var name = string.IsNullOrEmpty(categoryName) ? DEFAULT_CATEGORY_NAME : categoryName;
+
+            if (_configSection != null && _filter == null)
             {
-                _filter = CreateConfigSectionFilter(_configSection.LogLevels, categoryName);
+                _filter = CreateConfigSectionFilter(_configSection.LogLevels, name);
             }
-            return new AWSLogger(categoryName, _core, _filter, _customFormatter);
+
+            return _loggers.GetOrAdd(name, loggerName => new AWSLogger(categoryName, _core, _filter, _customFormatter)
+            {
+                ScopeProvider = _scopeProvider,
+                IncludeScopes = _configSection?.IncludeScopes ?? Constants.IncludeScopesDefault,
+                IncludeLogLevel = _configSection?.IncludeLogLevel ?? Constants.IncludeLogLevelDefault,
+                IncludeCategory = _configSection?.IncludeCategory ?? Constants.IncludeCategoryDefault,
+                IncludeEventId = _configSection?.IncludeEventId ?? Constants.IncludeEventIdDefault,
+                IncludeNewline = _configSection?.IncludeNewline ?? Constants.IncludeNewlineDefault,
+                IncludeException = _configSection?.IncludeException ?? Constants.IncludeExceptionDefault
+            });
         }
 
         /// <summary>
@@ -174,6 +194,17 @@ namespace AWS.Logger.AspNetCore
             {
                 var message = $"Configuration value '{value}' for category '{name}' is not supported.";
                 throw new InvalidOperationException(message);
+            }
+        }
+
+        /// <inheritdoc />
+        public void SetScopeProvider(IExternalScopeProvider scopeProvider)
+        {
+            _scopeProvider = scopeProvider;
+
+            foreach (var logger in _loggers)
+            {
+                logger.Value.ScopeProvider = _scopeProvider;
             }
         }
     }

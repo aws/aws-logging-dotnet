@@ -2,6 +2,8 @@ using AWS.Logger;
 using System;
 using System.Linq;
 
+// Placed in the Microsoft namespaces so that the extension methods are visible whenever the owning namespace
+// is declared.
 namespace Microsoft.Extensions.Configuration
 {
     /// <summary>
@@ -9,9 +11,14 @@ namespace Microsoft.Extensions.Configuration
     /// </summary>
     public static class ConfigurationSectionExtensions
     {
-        //Default configuration block on the appsettings.json
-        //Customer's information will be fetched from this block unless otherwise set.
-        const string DEFAULT_BLOCK = "AWS.Logging";
+        // Default configuration block on the appsettings.json
+        // Customer's information will be fetched from this block unless otherwise set.
+        private const string DEFAULT_BLOCK = "Logging";
+
+        // This library was originally written before logging standarized, or it at least we didn't realize it was standarized, on the "Logging" section in the config.
+        // The library now uses "Logging" as the default section to look for config but to maintain backwards compatibility the package will fallback
+        // AWS.Logging if a log group is not configured in the "Logging" config block".
+        private const string LEGACY_DEFAULT_BLOCK = "AWS.Logging";
 
         /// <summary>
         /// Loads the AWS Logger Configuration from the ConfigSection
@@ -27,6 +34,18 @@ namespace Microsoft.Extensions.Configuration
             {
                 configObj = new AWSLoggerConfigSection(loggerConfigSection);
             }
+            // If the code was relying on the default config block and no log group was found then
+            // check the legacy default block.
+            else if(string.Equals(configSectionInfoBlockName, DEFAULT_BLOCK, StringComparison.InvariantCulture))
+            {
+                loggerConfigSection = configSection.GetSection(LEGACY_DEFAULT_BLOCK);
+                if (loggerConfigSection[AWSLoggerConfigSection.LOG_GROUP] != null)
+                {
+                    configObj = new AWSLoggerConfigSection(loggerConfigSection);
+                }
+            }
+
+
             return configObj;
         }
     }
@@ -46,17 +65,59 @@ namespace Microsoft.Extensions.Configuration
         /// </summary>
         public IConfiguration LogLevels { get; set; } = null;
 
+
         /// <summary>
         /// Gets the <see cref="AWS.Logger.AspNetCore.AWSLogger.IncludeScopes"/> property. This determines if scopes - if they exist - are included in a log message.
         /// <para>
         /// The default is false.
         /// </para>
         /// </summary>
-        public bool IncludeScopes { get; set; } = false;
+        public bool IncludeScopes { get; set; } = AWS.Logger.AspNetCore.Constants.IncludeScopesDefault;
+
+        /// <summary>
+        /// Gets the <see cref="AWS.Logger.AspNetCore.AWSLogger.IncludeLogLevel"/> property. This determines if log level is included in a log message.
+        /// <para>
+        /// The default is true.
+        /// </para>
+        /// </summary>
+        public bool IncludeLogLevel { get; set; } = AWS.Logger.AspNetCore.Constants.IncludeLogLevelDefault;
+
+        /// <summary>
+        /// Gets the <see cref="AWS.Logger.AspNetCore.AWSLogger.IncludeCategory"/> property. This determines if category is included in a log message.
+        /// <para>
+        /// The default is true.
+        /// </para>
+        /// </summary>
+        public bool IncludeCategory { get; set; } = AWS.Logger.AspNetCore.Constants.IncludeCategoryDefault;
+
+        /// <summary>
+        /// Gets the <see cref="AWS.Logger.AspNetCore.AWSLogger.IncludeEventId"/> property. This determines if event id is included in a log message.
+        /// <para>
+        /// The default is false.
+        /// </para>
+        /// </summary>
+        public bool IncludeEventId { get; set; } = AWS.Logger.AspNetCore.Constants.IncludeEventIdDefault;
+
+        /// <summary>
+        /// Gets the <see cref="AWS.Logger.AspNetCore.AWSLogger.IncludeNewline"/> property. This determines if a new line is added to the end of the log message.
+        /// <para>
+        /// The default is true.
+        /// </para>
+        /// </summary>
+        public bool IncludeNewline { get; set; } = AWS.Logger.AspNetCore.Constants.IncludeNewlineDefault;
+
+        /// <summary>
+        /// Gets the <see cref="AWS.Logger.AspNetCore.AWSLogger.IncludeException"/> property. This determines if exceptions are included in a log message.
+        /// <para>
+        /// The default is false.
+        /// </para>
+        /// </summary>
+        public bool IncludeException { get; set; } = AWS.Logger.AspNetCore.Constants.IncludeExceptionDefault;
 
         internal const string LOG_GROUP = "LogGroup";
         internal const string REGION = "Region";
         internal const string PROFILE = "Profile";
+        internal const string PROFILE_LOCATION = "ProfilesLocation";
         internal const string BATCH_PUSH_INTERVAL = "BatchPushInterval";
         internal const string BATCH_PUSH_SIZE_IN_BYTES = "BatchPushSizeInBytes";
         internal const string LOG_LEVEL = "LogLevel";
@@ -64,7 +125,13 @@ namespace Microsoft.Extensions.Configuration
         internal const string LOG_STREAM_NAME_SUFFIX = "LogStreamNameSuffix";
         internal const string LOG_STREAM_NAME_PREFIX = "LogStreamNamePrefix";
         internal const string LIBRARY_LOG_FILE_NAME = "LibraryLogFileName";
-        internal const string INCLUDE_SCOPES_NAME = "IncludeScopes";
+
+        private const string INCLUDE_LOG_LEVEL_KEY = "IncludeLogLevel";
+        private const string INCLUDE_CATEGORY_KEY = "IncludeCategory";
+        private const string INCLUDE_NEWLINE_KEY = "IncludeNewline";
+        private const string INCLUDE_EXCEPTION_KEY = "IncludeException";
+        private const string INCLUDE_EVENT_ID_KEY = "IncludeEventId";
+        private const string INCLUDE_SCOPES_KEY = "IncludeScopes";
 
         /// <summary>
         /// Construct an instance of AWSLoggerConfigSection
@@ -80,6 +147,10 @@ namespace Microsoft.Extensions.Configuration
             if (loggerConfigSection[PROFILE] != null)
             {
                 Config.Profile = loggerConfigSection[PROFILE];
+            }
+            if (loggerConfigSection[PROFILE_LOCATION] != null)
+            {
+                Config.ProfilesLocation = loggerConfigSection[PROFILE_LOCATION];
             }
             if (loggerConfigSection[BATCH_PUSH_INTERVAL] != null)
             {
@@ -105,10 +176,32 @@ namespace Microsoft.Extensions.Configuration
             {
                 Config.LibraryLogFileName = loggerConfigSection[LIBRARY_LOG_FILE_NAME];
             }
-            if (loggerConfigSection[INCLUDE_SCOPES_NAME] != null)
+
+            if (loggerConfigSection[INCLUDE_LOG_LEVEL_KEY] != null)
             {
-                this.IncludeScopes = Boolean.Parse(loggerConfigSection[INCLUDE_SCOPES_NAME]);
+                this.IncludeLogLevel = Boolean.Parse(loggerConfigSection[INCLUDE_LOG_LEVEL_KEY]);
             }
+            if (loggerConfigSection[INCLUDE_CATEGORY_KEY] != null)
+            {
+                this.IncludeCategory = Boolean.Parse(loggerConfigSection[INCLUDE_CATEGORY_KEY]);
+            }
+            if (loggerConfigSection[INCLUDE_NEWLINE_KEY] != null)
+            {
+                this.IncludeNewline = Boolean.Parse(loggerConfigSection[INCLUDE_NEWLINE_KEY]);
+            }
+            if (loggerConfigSection[INCLUDE_EXCEPTION_KEY] != null)
+            {
+                this.IncludeException = Boolean.Parse(loggerConfigSection[INCLUDE_EXCEPTION_KEY]);
+            }
+            if (loggerConfigSection[INCLUDE_EVENT_ID_KEY] != null)
+            {
+                this.IncludeEventId = Boolean.Parse(loggerConfigSection[INCLUDE_EVENT_ID_KEY]);
+            }
+            if (loggerConfigSection[INCLUDE_SCOPES_KEY] != null)
+            {
+                this.IncludeScopes = Boolean.Parse(loggerConfigSection[INCLUDE_SCOPES_KEY]);
+            }
+
             var logLevels = loggerConfigSection.GetSection(LOG_LEVEL);
             if (logLevels?.GetChildren().Any() == true)
             {

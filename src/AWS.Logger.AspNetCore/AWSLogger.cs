@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using AWS.Logger.Core;
 using System.Text;
+using System.Collections.Generic;
 
 namespace AWS.Logger.AspNetCore
 {
@@ -15,10 +16,52 @@ namespace AWS.Logger.AspNetCore
         private readonly Func<string, LogLevel, bool> _filter;
         private readonly Func<LogLevel, object, Exception, string> _customFormatter;
 
+        private bool _includeScopes;
         /// <summary>
         /// Prefix log messages with scopes created with ILogger.BeginScope
         /// </summary>
-        public bool IncludeScopes { get; set; }
+        public bool IncludeScopes
+        {
+            get
+            {
+                return this._includeScopes;
+            }
+            set
+            {
+                if(value && this.ScopeProvider == NullExternalScopeProvider.Instance)
+                {
+                    this.ScopeProvider = new LoggerExternalScopeProvider();
+                }
+                this._includeScopes = value;
+            }
+        }
+
+        /// <summary>
+        /// Include log level in log message
+        /// </summary>
+        public bool IncludeLogLevel { get; set; } = Constants.IncludeLogLevelDefault;
+
+        /// <summary>
+        /// Include category in log message
+        /// </summary>
+        public bool IncludeCategory { get; set; } = Constants.IncludeCategoryDefault;
+
+        /// <summary>
+        /// Include event id in log message
+        /// </summary>
+        public bool IncludeEventId { get; set; } = Constants.IncludeEventIdDefault;
+
+        /// <summary>
+        /// Include new line in log message
+        /// </summary>
+        public bool IncludeNewline { get; set; } = Constants.IncludeNewlineDefault;
+
+        /// <summary>
+        /// Include exception in log message
+        /// </summary>
+        public bool IncludeException { get; set; } = Constants.IncludeExceptionDefault;
+
+        internal IExternalScopeProvider ScopeProvider { get; set; } = NullExternalScopeProvider.Instance;
 
         /// <summary>
         /// Construct an instance of AWSLogger
@@ -33,6 +76,9 @@ namespace AWS.Logger.AspNetCore
             _core = core;
             _filter = filter;
             _customFormatter = customFormatter;
+
+            // This is done in the constructor to ensure the logic in the setter is run during initialization.
+            this.IncludeScopes = Constants.IncludeScopesDefault;
         }
 
         /// <inheritdoc />
@@ -40,7 +86,8 @@ namespace AWS.Logger.AspNetCore
         {
             if (state == null)
                 throw new ArgumentNullException(nameof(state));
-            return AWSLogScope.Push(_categoryName, state);
+
+            return ScopeProvider?.Push(state) ?? new NoOpDisposable();
         }
 
         /// <summary>
@@ -74,49 +121,95 @@ namespace AWS.Logger.AspNetCore
             {
                 if (formatter == null)
                     throw new ArgumentNullException(nameof(formatter));
-                message = formatter(state, exception);
+
+                var messageText = formatter(state, exception);
+                // If neither a message nor an exception are provided, don't log anything (there's nothing to log, after all).
+                if (string.IsNullOrEmpty(messageText) && exception == null)
+                    return;
+
+                // Format of the logged text, optional components are in {}
+                //  {[LogLevel] }{ Scopes: => }{Category: }{EventId: }MessageText {Exception}{\n}
+                var messageBuilder = new StringBuilder();
+                Action<string> addToBuilder = token =>
+                {
+                    if (string.IsNullOrEmpty(token))
+                        return;
+
+                    if (messageBuilder.Length > 0)
+                        messageBuilder.Append(" ");
+                    messageBuilder.Append(token);
+                };
+
+                if (IncludeLogLevel)
+                {
+                    addToBuilder($"[{logLevel}]");
+                }
+
+                GetScopeInformation(messageBuilder);
+
+                if (IncludeCategory)
+                {
+                    addToBuilder($"{_categoryName}:");
+                }
+                if (IncludeEventId)
+                {
+                    addToBuilder($"[{eventId}]:");
+                }
+
+                addToBuilder(messageText);
+
+                if (IncludeException)
+                {
+                    addToBuilder($"{exception}");
+                }
+                if (IncludeNewline)
+                {
+                    messageBuilder.Append(Environment.NewLine);
+                }
+
+                message = messageBuilder.ToString();
             }
             else
             {
                 message = _customFormatter(logLevel, state, exception);
-            }
 
-            if (string.IsNullOrEmpty(message) && exception == null)
                 // If neither a message nor an exception are provided, don't log anything (there's nothing to log, after all).
-                return;
+                if (string.IsNullOrEmpty(message) && exception == null)
+                    return;
+            }
 
-            var scope = IncludeScopes ? AddScopeInformation() : string.Empty;
-            if (exception != null && _customFormatter==null)
-            {
-                message = string.Concat(scope, message, Environment.NewLine, exception.ToString(), Environment.NewLine);
-            }
-            else
-            {
-                message = string.Concat(scope, message, Environment.NewLine);
-            }
             _core.AddMessage(message);
         }
 
-        private static string AddScopeInformation()
+        private void GetScopeInformation(StringBuilder messageBuilder)
         {
-            var deepestScope = AWSLogScope.Current;
-            var current = deepestScope;
+            var scopeProvider = ScopeProvider;
 
-            var sb = new StringBuilder();
-            while (current != null)
+            if (IncludeScopes && scopeProvider != null)
             {
-                var scopeLog = $"=> {current}";
-                sb.Insert(0, scopeLog);
+                var initialLength = messageBuilder.Length;
 
-                current = current.Parent;
-                if (current != null)
-                    sb.Insert(0, " ");
+                scopeProvider.ForEachScope((scope, builder) =>
+                {
+                    if(messageBuilder.Length > 0)
+                    {
+                        messageBuilder.Append(" ");
+                    }
+                    messageBuilder.Append(scope.ToString());
+                }, (messageBuilder));
+
+                if (messageBuilder.Length > initialLength)
+                {
+                    messageBuilder.Append(" =>");
+                }
             }
+        }
 
-            if (deepestScope != null)
-                sb.Append(": ");
-
-            return sb.ToString();
+        private class NoOpDisposable : IDisposable
+        {
+            public void Dispose()
+            {
+            }
         }
     }
 }
