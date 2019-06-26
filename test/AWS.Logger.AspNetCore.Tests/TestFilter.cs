@@ -54,9 +54,9 @@ namespace AWS.Logger.AspNetCore.Tests
             logger.LogCritical("critical");
 
             Assert.Equal(3, coreLogger.ReceivedMessages.Count);
-            Assert.Contains("[Warning] FilterLogLevel: warning\r\n", coreLogger.ReceivedMessages);
-            Assert.Contains("[Error] FilterLogLevel: error\r\n", coreLogger.ReceivedMessages);
-            Assert.Contains("[Critical] FilterLogLevel: critical\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains($"[Warning] FilterLogLevel: warning{Environment.NewLine}", coreLogger.ReceivedMessages);
+            Assert.Contains($"[Error] FilterLogLevel: error{Environment.NewLine}", coreLogger.ReceivedMessages);
+            Assert.Contains($"[Critical] FilterLogLevel: critical{Environment.NewLine}", coreLogger.ReceivedMessages);
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace AWS.Logger.AspNetCore.Tests
             logger.LogWarning("warning");
 
             Assert.Single(coreLogger.ReceivedMessages);
-            Assert.Contains("[Warning] goodCategory: warning\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains($"[Warning] goodCategory: warning{Environment.NewLine}", coreLogger.ReceivedMessages);
             string val;
             while (!coreLogger.ReceivedMessages.IsEmpty)
             {
@@ -112,9 +112,9 @@ namespace AWS.Logger.AspNetCore.Tests
             logger.LogCritical("critical");
 
             Assert.Equal(5, coreLogger.ReceivedMessages.Count);
-            Assert.Contains("[Warning] AWS.Logger.AspNetCore.Tests.TestFilter: warning\r\n", coreLogger.ReceivedMessages);
-            Assert.Contains("[Error] AWS.Logger.AspNetCore.Tests.TestFilter: error\r\n", coreLogger.ReceivedMessages);
-            Assert.Contains("[Critical] AWS.Logger.AspNetCore.Tests.TestFilter: critical\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains($"[Warning] AWS.Logger.AspNetCore.Tests.TestFilter: warning{Environment.NewLine}", coreLogger.ReceivedMessages);
+            Assert.Contains($"[Error] AWS.Logger.AspNetCore.Tests.TestFilter: error{Environment.NewLine}", coreLogger.ReceivedMessages);
+            Assert.Contains($"[Critical] AWS.Logger.AspNetCore.Tests.TestFilter: critical{Environment.NewLine}", coreLogger.ReceivedMessages);
         }
 
         [Fact]
@@ -155,9 +155,9 @@ namespace AWS.Logger.AspNetCore.Tests
             logger.LogCritical("critical");
 
             Assert.Equal(5, coreLogger.ReceivedMessages.Count);
-            Assert.Contains("[Warning] AWS.Log: warning\r\n", coreLogger.ReceivedMessages);
-            Assert.Contains("[Error] AWS.Log: error\r\n", coreLogger.ReceivedMessages);
-            Assert.Contains("[Critical] AWS.Log: critical\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains($"[Warning] AWS.Log: warning{Environment.NewLine}", coreLogger.ReceivedMessages);
+            Assert.Contains($"[Error] AWS.Log: error{Environment.NewLine}", coreLogger.ReceivedMessages);
+            Assert.Contains($"[Critical] AWS.Log: critical{Environment.NewLine}", coreLogger.ReceivedMessages);
         }
 
         [Fact]
@@ -183,9 +183,9 @@ namespace AWS.Logger.AspNetCore.Tests
             logger.LogCritical("critical");
 
             Assert.Equal(5, coreLogger.ReceivedMessages.Count);
-            Assert.Contains("[Warning] AWS.Log: warning\r\n", coreLogger.ReceivedMessages);
-            Assert.Contains("[Error] AWS.Log: error\r\n", coreLogger.ReceivedMessages);
-            Assert.Contains("[Critical] AWS.Log: critical\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains($"[Warning] AWS.Log: warning{Environment.NewLine}", coreLogger.ReceivedMessages);
+            Assert.Contains($"[Error] AWS.Log: error{Environment.NewLine}", coreLogger.ReceivedMessages);
+            Assert.Contains($"[Critical] AWS.Log: critical{Environment.NewLine}", coreLogger.ReceivedMessages);
         }
 
         [Fact]
@@ -211,9 +211,9 @@ namespace AWS.Logger.AspNetCore.Tests
             logger.LogCritical("critical");
 
             Assert.Equal(6, coreLogger.ReceivedMessages.Count);
-            Assert.Contains("[Warning] AWS.Logger.AspNetCore.Tests.TestFilter: warning\r\n", coreLogger.ReceivedMessages);
-            Assert.Contains("[Error] AWS.Logger.AspNetCore.Tests.TestFilter: error\r\n", coreLogger.ReceivedMessages);
-            Assert.Contains("[Critical] AWS.Logger.AspNetCore.Tests.TestFilter: critical\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains($"[Warning] AWS.Logger.AspNetCore.Tests.TestFilter: warning{Environment.NewLine}", coreLogger.ReceivedMessages);
+            Assert.Contains($"[Error] AWS.Logger.AspNetCore.Tests.TestFilter: error{Environment.NewLine}", coreLogger.ReceivedMessages);
+            Assert.Contains($"[Critical] AWS.Logger.AspNetCore.Tests.TestFilter: critical{Environment.NewLine}", coreLogger.ReceivedMessages);
 
         }
     }
