@@ -145,15 +145,26 @@ Checkout the [Log4net samples](/samples/Log4net) for examples of how you can use
 ASP.NET Core introduced a new [logging framework](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging) that has providers configured to send logs to destinations. 
 The AWS.Logger.AspNetCore NuGet package provides a log provider which adds CloudWatch Logs as a destination for the logs.
 
+**Note:** Starting with version 2.0.0 of AWS.Logger.AspNetCore this library targets netstandard2.0 and the dependencies have been
+upgraded to the ASP.NET Core 2.1 versions. For older versions of .NET Core, which Microsoft has made end of life, use versions before 2.0.0.
+
 The [WebSample](/samples/AspNetCore/WebSample) in this repository demonstrates how to configure
 this provider.
 
-The configuration is setup in the [appsettings.json](/samples/AspNetCore/WebSample/appsettings.json) file
+The configuration is setup in the [appsettings.json](/samples/AspNetCore/WebSample/appsettings.json) file. In versions before 2.0.0 the `AWS.Logging`
+was used as the configuration section root. Starting with 2.0.0 the library has switched to use the standard `Logging` configuration section root.
+For backwards compatibility if the `Logging` section does not contain a `LogGroup` then the library will fallback to `AWS.Logging`.
 
 ```json
-"AWS.Logging": {
+"Logging": {
   "Region": "us-east-1",
   "LogGroup": "AspNetCore.WebSample",
+  "IncludeLogLevel": true,
+  "IncludeCategory": true,
+  "IncludeNewline": true,
+  "IncludeException": true,
+  "IncludeEventId": false,
+  "IncludeScopes": false,
   "LogLevel": {
     "Default": "Debug",
     "System": "Information",
@@ -162,30 +173,16 @@ The configuration is setup in the [appsettings.json](/samples/AspNetCore/WebSamp
 }
 ```
 
-In Startup.cs the configuration is built using the config files and assigned to the Configuration property.
+In a typical ASP.NET Core application the `Program.cs` file contains a `CreateWebHostBuilder` method. To include AWS.Logger.AspNetCore
+add a call to `ConfigureLogging` and in the `Action<ILoggingBuilder>` passed into ConfigureLogging call `AddAWSProvider`. This will look up the configuration
+information from the IConfiguration added to the dependency injection system.
 
 ```csharp
-public Startup(IHostingEnvironment env)
-{
-    // Read the appsetting.json file for the configuration details
-    var builder = new ConfigurationBuilder()
-        .SetBasePath(env.ContentRootPath)
-        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-        .AddEnvironmentVariables();
-    Configuration = builder.Build();
-}
-```
-
-The `Configure` method is used to configure the services added to the dependency injection system. This is where 
-log providers are configured. For the `AWS.Logger.AspNetCore` the configuration for the provider is loaded from 
-the Configuration property and the AWS provider is added to the `ILoggerFactory`.
-
-```csharp
-public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
-{
-    // Create a logging provider based on the configuration information passed through the appsettings.json
-    loggerFactory.AddAWSProvider(this.Configuration.GetAWSLoggingConfigSection());
-
-    ...
+public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+    WebHost.CreateDefaultBuilder(args)
+        .ConfigureLogging(logging =>
+        {
+            logging.AddAWSProvider();
+        })
+        .UseStartup<Startup>();
 ```
