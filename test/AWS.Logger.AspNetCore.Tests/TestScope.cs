@@ -24,7 +24,7 @@ namespace AWS.Logger.AspNetCore.Tests
             }
 
             Assert.Single(coreLogger.ReceivedMessages);
-            Assert.True(coreLogger.ReceivedMessages.Contains("log\r\n"), "Messages don't contain actual log message.");
+            Assert.True(coreLogger.ReceivedMessages.Contains("[Information] MakeSureCanCreateScope: log  \r\n"), "Messages don't contain actual log message.");
         }
 
         [Fact]
@@ -40,10 +40,9 @@ namespace AWS.Logger.AspNetCore.Tests
             logger.LogInformation("log");
 
             Assert.Single(coreLogger.ReceivedMessages);
-            var msg = coreLogger.ReceivedMessages.SingleOrDefault(m => m.Contains("log\r\n"));
+            var msg = coreLogger.ReceivedMessages.SingleOrDefault(m => m.Contains("[Information] MakeSureCanCreateScope: log  \r\n"));
             Assert.True(msg != null, "Messages don't contain actual log message.");
             Assert.False(msg.Contains("=>"), "Fragment of scopes exists (\"=>\").");
-            Assert.False(msg.Contains(": "), "Fragment of scopes exists (\": \").");
         }
 
         [Fact]
@@ -62,10 +61,10 @@ namespace AWS.Logger.AspNetCore.Tests
             }
 
             Assert.Single(coreLogger.ReceivedMessages);
-            var msg = coreLogger.ReceivedMessages.SingleOrDefault(m => m.Contains("log\r\n"));
+            var msg = coreLogger.ReceivedMessages.SingleOrDefault(m => m.Contains("[Information] Test scope => MakeSureCanCreateScope: log  \r\n"));
             Assert.True(msg != null, "Messages don't contain actual log message.");
             // Same message should contain the scope
-            Assert.True(msg.Contains("=> Test scope: "), "Scope is not included.");
+            Assert.True(msg.Contains("Test scope => "), "Scope is not included.");
         }
 
         [Fact]
@@ -78,20 +77,20 @@ namespace AWS.Logger.AspNetCore.Tests
                 IncludeScopes = true
             };
 
-            using (logger.BeginScope("Outer scope"))
+            using (logger.BeginScope("OuterScope"))
             {
-                using (logger.BeginScope("Inner scope"))
+                using (logger.BeginScope("InnerScope"))
                 {
                     logger.LogInformation("log");
                 }
             }
 
             Assert.Single(coreLogger.ReceivedMessages);
-            var msg = coreLogger.ReceivedMessages.SingleOrDefault(m => m.Contains("log\r\n"));
+            var msg = coreLogger.ReceivedMessages.SingleOrDefault(m => m.Contains("[Information] OuterScope InnerScope => MakeSureCanCreateScope: log  \r\n"));
             Assert.True(msg != null, "Messages don't contain actual log message.");
             // Same message should contain the scope
-            Assert.True(msg.Contains("=> Outer scope"), "Outer scope is not included.");
-            Assert.True(msg.Contains("=> Inner scope: "), "Inner scope is not included.");
+            Assert.True(msg.Contains("OuterScope"), "Outer scope is not included.");
+            Assert.True(msg.Contains("InnerScope"), "Inner scope is not included.");
         }
     }
 }

@@ -96,7 +96,7 @@ namespace AWS.Logger.AspNetCore.Tests
                 coreLogger, null);
             var logMessageCount = 10;
             LogMessages(logMessageCount);
-            Assert.Contains("Error message\r\nSystem.Exception: Exception message.\r\n", coreLogger.ReceivedMessages);
+            Assert.Contains("[Error] testlogging: Error message System.Exception: Exception message. \r\n", coreLogger.ReceivedMessages);
         }
         /// <summary>
         /// Basic test case that creates multiple threads and each thread mocks log messages

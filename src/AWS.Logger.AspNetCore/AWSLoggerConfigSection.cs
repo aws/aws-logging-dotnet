@@ -63,13 +63,54 @@ namespace Microsoft.Extensions.Configuration
         /// </summary>
         public IConfiguration LogLevels { get; set; } = null;
 
+
         /// <summary>
         /// Gets the <see cref="AWS.Logger.AspNetCore.AWSLogger.IncludeScopes"/> property. This determines if scopes - if they exist - are included in a log message.
         /// <para>
         /// The default is false.
         /// </para>
         /// </summary>
-        public bool IncludeScopes { get; set; } = false;
+        public bool IncludeScopes { get; set; } = AWS.Logger.AspNetCore.Constants.IncludeScopesDefault;
+
+        /// <summary>
+        /// Gets the <see cref="AWS.Logger.AspNetCore.AWSLogger.IncludeLogLevel"/> property. This determines if log level is included in a log message.
+        /// <para>
+        /// The default is true.
+        /// </para>
+        /// </summary>
+        public bool IncludeLogLevel { get; set; } = AWS.Logger.AspNetCore.Constants.IncludeLogLevelDefault;
+
+        /// <summary>
+        /// Gets the <see cref="AWS.Logger.AspNetCore.AWSLogger.IncludeCategory"/> property. This determines if category is included in a log message.
+        /// <para>
+        /// The default is true.
+        /// </para>
+        /// </summary>
+        public bool IncludeCategory { get; set; } = AWS.Logger.AspNetCore.Constants.IncludeCategoryDefault;
+
+        /// <summary>
+        /// Gets the <see cref="AWS.Logger.AspNetCore.AWSLogger.IncludeEventId"/> property. This determines if event id is included in a log message.
+        /// <para>
+        /// The default is false.
+        /// </para>
+        /// </summary>
+        public bool IncludeEventId { get; set; } = AWS.Logger.AspNetCore.Constants.IncludeEventIdDefault;
+
+        /// <summary>
+        /// Gets the <see cref="AWS.Logger.AspNetCore.AWSLogger.IncludeNewline"/> property. This determines if a new line is added to the end of the log message.
+        /// <para>
+        /// The default is true.
+        /// </para>
+        /// </summary>
+        public bool IncludeNewline { get; set; } = AWS.Logger.AspNetCore.Constants.IncludeNewlineDefault;
+
+        /// <summary>
+        /// Gets the <see cref="AWS.Logger.AspNetCore.AWSLogger.IncludeException"/> property. This determines if exceptions are included in a log message.
+        /// <para>
+        /// The default is false.
+        /// </para>
+        /// </summary>
+        public bool IncludeException { get; set; } = AWS.Logger.AspNetCore.Constants.IncludeExceptionDefault;
 
         internal const string LOG_GROUP = "LogGroup";
         internal const string REGION = "Region";
@@ -81,7 +122,13 @@ namespace Microsoft.Extensions.Configuration
         internal const string LOG_STREAM_NAME_SUFFIX = "LogStreamNameSuffix";
         internal const string LOG_STREAM_NAME_PREFIX = "LogStreamNamePrefix";
         internal const string LIBRARY_LOG_FILE_NAME = "LibraryLogFileName";
-        internal const string INCLUDE_SCOPES_NAME = "IncludeScopes";
+
+        private const string INCLUDE_LOG_LEVEL_KEY = "IncludeLogLevel";
+        private const string INCLUDE_CATEGORY_KEY = "IncludeCategory";
+        private const string INCLUDE_NEWLINE_KEY = "IncludeNewline";
+        private const string INCLUDE_EXCEPTION_KEY = "IncludeException";
+        private const string INCLUDE_EVENT_ID_KEY = "IncludeEventId";
+        private const string INCLUDE_SCOPES_KEY = "IncludeScopes";
 
         /// <summary>
         /// Construct an instance of AWSLoggerConfigSection
@@ -122,10 +169,32 @@ namespace Microsoft.Extensions.Configuration
             {
                 Config.LibraryLogFileName = loggerConfigSection[LIBRARY_LOG_FILE_NAME];
             }
-            if (loggerConfigSection[INCLUDE_SCOPES_NAME] != null)
+
+            if (loggerConfigSection[INCLUDE_LOG_LEVEL_KEY] != null)
             {
-                this.IncludeScopes = Boolean.Parse(loggerConfigSection[INCLUDE_SCOPES_NAME]);
+                this.IncludeLogLevel = Boolean.Parse(loggerConfigSection[INCLUDE_LOG_LEVEL_KEY]);
             }
+            if (loggerConfigSection[INCLUDE_CATEGORY_KEY] != null)
+            {
+                this.IncludeCategory = Boolean.Parse(loggerConfigSection[INCLUDE_CATEGORY_KEY]);
+            }
+            if (loggerConfigSection[INCLUDE_NEWLINE_KEY] != null)
+            {
+                this.IncludeNewline = Boolean.Parse(loggerConfigSection[INCLUDE_NEWLINE_KEY]);
+            }
+            if (loggerConfigSection[INCLUDE_EXCEPTION_KEY] != null)
+            {
+                this.IncludeException = Boolean.Parse(loggerConfigSection[INCLUDE_EXCEPTION_KEY]);
+            }
+            if (loggerConfigSection[INCLUDE_EVENT_ID_KEY] != null)
+            {
+                this.IncludeEventId = Boolean.Parse(loggerConfigSection[INCLUDE_EVENT_ID_KEY]);
+            }
+            if (loggerConfigSection[INCLUDE_SCOPES_KEY] != null)
+            {
+                this.IncludeScopes = Boolean.Parse(loggerConfigSection[INCLUDE_SCOPES_KEY]);
+            }
+
             var logLevels = loggerConfigSection.GetSection(LOG_LEVEL);
             if (logLevels?.GetChildren().Any() == true)
             {

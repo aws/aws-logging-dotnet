@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using AWS.Logger.Core;
 using System.Text;
+using System.Collections.Generic;
 
 namespace AWS.Logger.AspNetCore
 {
@@ -15,10 +16,52 @@ namespace AWS.Logger.AspNetCore
         private readonly Func<string, LogLevel, bool> _filter;
         private readonly Func<LogLevel, object, Exception, string> _customFormatter;
 
+        private bool _includeScopes = Constants.IncludeScopesDefault;
         /// <summary>
         /// Prefix log messages with scopes created with ILogger.BeginScope
         /// </summary>
-        public bool IncludeScopes { get; set; }
+        public bool IncludeScopes
+        {
+            get
+            {
+                return this._includeScopes;
+            }
+            set
+            {
+                if(value && this.ScopeProvider == NullExternalScopeProvider.Instance)
+                {
+                    this.ScopeProvider = new LoggerExternalScopeProvider();
+                }
+                this._includeScopes = value;
+            }
+        }
+
+        /// <summary>
+        /// Include log level in log message
+        /// </summary>
+        public bool IncludeLogLevel { get; set; } = Constants.IncludeLogLevelDefault;
+
+        /// <summary>
+        /// Include category in log message
+        /// </summary>
+        public bool IncludeCategory { get; set; } = Constants.IncludeCategoryDefault;
+
+        /// <summary>
+        /// Include event id in log message
+        /// </summary>
+        public bool IncludeEventId { get; set; } = Constants.IncludeEventIdDefault;
+
+        /// <summary>
+        /// Include new line in log message
+        /// </summary>
+        public bool IncludeNewline { get; set; } = Constants.IncludeNewlineDefault;
+
+        /// <summary>
+        /// Include exception in log message
+        /// </summary>
+        public bool IncludeException { get; set; } = Constants.IncludeExceptionDefault;
+
+        internal IExternalScopeProvider ScopeProvider { get; set; } = NullExternalScopeProvider.Instance;
 
         /// <summary>
         /// Construct an instance of AWSLogger
@@ -40,7 +83,8 @@ namespace AWS.Logger.AspNetCore
         {
             if (state == null)
                 throw new ArgumentNullException(nameof(state));
-            return AWSLogScope.Push(_categoryName, state);
+
+            return ScopeProvider?.Push(state) ?? new NoOpDisposable();
         }
 
         /// <summary>
@@ -74,49 +118,82 @@ namespace AWS.Logger.AspNetCore
             {
                 if (formatter == null)
                     throw new ArgumentNullException(nameof(formatter));
-                message = formatter(state, exception);
+
+                // Format of the logged text, optional components are in {}
+                //  {[LogLevel] }{ => Scopes : }{Category: }{EventId: }MessageText {Exception}{\n}
+                var components = new List<string>(4);
+                if (IncludeLogLevel)
+                {
+                    components.Add($"[{logLevel}]");
+                }
+
+                GetScopeInformation(components);
+
+                if (IncludeCategory)
+                {
+                    components.Add($"{_categoryName}:");
+                }
+                if (IncludeEventId)
+                {
+                    components.Add($"[{eventId}]:");
+                }
+
+                string text;
+                if (_customFormatter == null)
+                {
+                    text = formatter(state, exception);
+                }
+                else
+                {
+                    text = _customFormatter(logLevel, state, exception);
+                }
+
+                components.Add(text);
+
+                if (IncludeException)
+                {
+                    components.Add($"{exception}");
+                }
+                if (IncludeNewline)
+                {
+                    components.Add(Environment.NewLine);
+                }
+
+                message = string.Join(" ", components);
             }
             else
             {
                 message = _customFormatter(logLevel, state, exception);
             }
 
-            if (string.IsNullOrEmpty(message) && exception == null)
-                // If neither a message nor an exception are provided, don't log anything (there's nothing to log, after all).
-                return;
-
-            var scope = IncludeScopes ? AddScopeInformation() : string.Empty;
-            if (exception != null && _customFormatter==null)
-            {
-                message = string.Concat(scope, message, Environment.NewLine, exception.ToString(), Environment.NewLine);
-            }
-            else
-            {
-                message = string.Concat(scope, message, Environment.NewLine);
-            }
             _core.AddMessage(message);
         }
 
-        private static string AddScopeInformation()
+        private void GetScopeInformation(List<string> logMessageComponents)
         {
-            var deepestScope = AWSLogScope.Current;
-            var current = deepestScope;
+            var scopeProvider = ScopeProvider;
 
-            var sb = new StringBuilder();
-            while (current != null)
+            if (IncludeScopes && scopeProvider != null)
             {
-                var scopeLog = $"=> {current}";
-                sb.Insert(0, scopeLog);
+                var initialCount = logMessageComponents.Count;
 
-                current = current.Parent;
-                if (current != null)
-                    sb.Insert(0, " ");
+                scopeProvider.ForEachScope((scope, list) =>
+                {
+                    list.Add(scope.ToString());
+                }, (logMessageComponents));
+
+                if (logMessageComponents.Count > initialCount)
+                {
+                    logMessageComponents.Add("=>");
+                }
             }
+        }
 
-            if (deepestScope != null)
-                sb.Append(": ");
-
-            return sb.ToString();
+        private class NoOpDisposable : IDisposable
+        {
+            public void Dispose()
+            {
+            }
         }
     }
 }
