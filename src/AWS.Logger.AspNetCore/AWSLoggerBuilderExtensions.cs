@@ -68,7 +68,9 @@ namespace Microsoft.Extensions.Logging
         {
             var serviceDescriptor = builder.Services.FirstOrDefault(x => x.ServiceType == typeof(IConfiguration));
             if (serviceDescriptor == null)
+            {
                 return builder;
+            }
 
             var configuration = serviceDescriptor.ImplementationInstance as IConfiguration;
 
@@ -77,10 +79,15 @@ namespace Microsoft.Extensions.Logging
             // and skip adding the provider. We don't want to prevent developers running their application
             // locally because they don't have access or want to use AWS for their local development.
             if (configuration == null)
+            {
                 return builder;
+            }
+
             var configSection = configuration.GetAWSLoggingConfigSection();
             if (configSection == null)
+            {
                 return builder;
+            }
 
             return AddAWSProvider(builder, configSection, formatter);
         }

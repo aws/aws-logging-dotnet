@@ -13,12 +13,12 @@ namespace Microsoft.Extensions.Configuration
     {
         // Default configuration block on the appsettings.json
         // Customer's information will be fetched from this block unless otherwise set.
-        const string DEFAULT_BLOCK = "Logging";
+        private const string DEFAULT_BLOCK = "Logging";
 
         // This library was originally written before logging standarized, or it at least we didn't realize it was standarized, on the "Logging" section in the config.
         // The library now uses "Logging" as the default section to look for config but to maintain backwards compatibility the package will fallback
         // AWS.Logging if a log group is not configured in the "Logging" config block".
-        const string LEGACY_DEFAULT_BLOCK = "AWS.Logging";
+        private const string LEGACY_DEFAULT_BLOCK = "AWS.Logging";
 
         /// <summary>
         /// Loads the AWS Logger Configuration from the ConfigSection
