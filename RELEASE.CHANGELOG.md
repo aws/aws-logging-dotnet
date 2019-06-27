@@ -1,3 +1,31 @@
+### Release 2019-06-27
+* **AWS.Logger.AspNetCore (2.0.0)**
+  * New extension methods for ILoggingBuilder to register AWS.Logger.AspNetCore as a log provider.
+  * Added support for [Microsoft.Extensions.Logging.ISupportExternalScope](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.logging.isupportexternalscope)
+  * Switched default IConfiguration section root to the standard `Logging` root. The library will fallback to the legacy `AWS.Logging` if `LogGroup` is not set in `Logging`.
+  * Improve default formatting of log message with new options to include log level, category, event id and exception. View  [README](https://github.com/aws/aws-logging-dotnet#aspnet-core-logging) for more information.
+  * Added missing ProfileLocation config setting
+  * New config setting for LogStreamNamePrefix
+  * Fixed issue with log filtering rules defined in IConfiguration not being evaluated correctly.
+  * Updated to version 1.4.0 of AWS.Logger.Core
+  * **Note:** Starting with version 2.0.0 this library targets **netstandard2.0** only and references the .NET Core 2.1 version of the Microsoft.Extensions.Logging. The library will work
+in newer versions of .NET Core but for versions before .NET Core 2.1 you must use a version before 2.0.0 of AWS.Logger.AspNetCore.
+* **AWS.Logger.Core (1.4.0)**
+  * Merged PR [#84](https://github.com/aws/aws-logging-dotnet/pull/84) adding support for user defined log stream prefix. Thanks [Bart Piotrowski](https://github.com/bartpio)
+  * Updated to latest version of AWSSDK.CloudWatchLogs and AWSSDK.Core to pick up fixes for AWS credential refreshing
+* **AWS.Logger.Log4net (1.4.0)**
+  * New config property for LogStreamNamePrefix
+  * Updated to version 1.4.0 of AWS.Logger.Core
+* **AWS.Logger.NLog (1.4.0)**
+  * New config property for LogStreamNamePrefix
+  * Updated to version 1.4.0 of AWS.Logger.Core
+* **AWS.Logger.SeriLog (1.4.0)**
+  * Fixed issue [#89](https://github.com/aws/aws-logging-dotnet/issues/89) with appending exception to the end of the message when using JSON formatter causing creating an invalid JSON document.
+  * New config setting for Serilog:LogStreamNamePrefix
+  * Added missing ProfileLocation config setting
+  * Updated to version 1.4.0 of AWS.Logger.Core
+
+
 ### Release 2019-05-15
 * **AWS.Logger.NLog (1.3.2)**
     * Merged PR https://github.com/aws/aws-logging-dotnet/pull/71 NLog AWSTarget apply Layout logic to config-properties. Thanks [Rolf Kristensen](https://github.com/snakefoot)
