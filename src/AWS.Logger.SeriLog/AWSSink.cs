@@ -41,7 +41,10 @@ namespace AWS.Logger.SeriLog
         public void Emit(LogEvent logEvent)
         {
             var message = RenderLogEvent(logEvent);
-            if (logEvent.Exception != null)
+
+            // If there is no custom formatter passed that would have taken care of logging the exception then append the 
+            // exception to the log if one exists.
+            if (_textFormatter == null && logEvent.Exception != null)
             {
                 message = string.Concat(message, Environment.NewLine, logEvent.Exception.ToString(), Environment.NewLine);
             }
