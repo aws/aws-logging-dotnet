@@ -14,6 +14,7 @@ namespace AWS.Logger.SeriLog
         internal const string LOG_GROUP = "Serilog:LogGroup";
         internal const string REGION = "Serilog:Region";
         internal const string PROFILE = "Serilog:Profile";
+        internal const string PROFILE_LOCATION = "Serilog:ProfilesLocation";
         internal const string BATCH_PUSH_INTERVAL = "Serilog:BatchPushInterval";
         internal const string BATCH_PUSH_SIZE_IN_BYTES = "Serilog:BatchPushSizeInBytes";
         internal const string MAX_QUEUED_MESSAGES = "Serilog:MaxQueuedMessages";
@@ -42,6 +43,10 @@ namespace AWS.Logger.SeriLog
             if (configuration[PROFILE] != null)
             {
                 config.Profile = configuration[PROFILE];
+            }
+            if (configuration[PROFILE_LOCATION] != null)
+            {
+                config.ProfilesLocation = configuration[PROFILE_LOCATION];
             }
             if (configuration[BATCH_PUSH_INTERVAL] != null)
             {
