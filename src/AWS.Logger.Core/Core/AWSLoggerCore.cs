@@ -366,6 +366,12 @@ namespace AWS.Logger.Core
 
                     executeFlush = await _flushTriggerEvent.WaitAsync(TimeSpan.FromMilliseconds(_config.MonitorSleepTime.TotalMilliseconds), token);
                 }
+                catch (OperationCanceledException ex) when (!token.IsCancellationRequested)
+                {
+                    // Workaround to handle timeouts of .net httpclient 
+                    // https://github.com/dotnet/corefx/issues/20296
+                    LogLibraryServiceError(ex);
+                }
                 catch (OperationCanceledException ex)
                 {
                     if (!token.IsCancellationRequested || !_repo.IsEmpty || !_pendingMessageQueue.IsEmpty)
