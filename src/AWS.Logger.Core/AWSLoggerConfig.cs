@@ -27,6 +27,15 @@ namespace AWS.Logger
         public string LogGroup { get; set; }
 
         /// <summary>
+        /// Determines whether or not to create a new Log Group, if the one specified by <see cref="LogGroup"/> doesn't already exist
+        /// If false (the default), the Log Group is created if it doesn't already exist. This requires logs:DescribeLogGroups
+        /// permission to determine if the group exists, and logs:CreateLogGroup permission to create the group if it doesn't already exist.
+        /// If true, creation of Log Groups is disabled. Logging functions only if the specified log group already exists.
+        /// When creation of log groups is disabled, logs:DescribeLogGroups permission is NOT required.
+        /// </summary>
+        public bool DontCreateLogGroup { get; set; }
+
+        /// <summary>
         /// Gets and sets the Profile property. The profile is used to look up AWS credentials in the profile store.
         /// <para>
         /// For understanding how credentials are determine view the top level documentation for AWSLoggerConfig class.

@@ -426,21 +426,25 @@ namespace AWS.Logger.Core
         private async Task<string> LogEventTransmissionSetup(CancellationToken token)
         {
             string serviceURL = GetServiceUrl();
-            var logGroupResponse = await _client.DescribeLogGroupsAsync(new DescribeLogGroupsRequest
-            {
-                LogGroupNamePrefix = _config.LogGroup
-            }, token).ConfigureAwait(false);
-            if (!IsSuccessStatusCode(logGroupResponse))
-            {
-                LogLibraryServiceError(new System.Net.WebException($"Lookup LogGroup {_config.LogGroup} returned status: {logGroupResponse.HttpStatusCode}"), serviceURL);
-            }
 
-            if (logGroupResponse.LogGroups.FirstOrDefault(x => string.Equals(x.LogGroupName, _config.LogGroup, StringComparison.Ordinal)) == null)
+            if (!_config.DontCreateLogGroup)
             {
-                var createGroupResponse = await _client.CreateLogGroupAsync(new CreateLogGroupRequest { LogGroupName = _config.LogGroup }, token).ConfigureAwait(false);
-                if (!IsSuccessStatusCode(createGroupResponse))
+                var logGroupResponse = await _client.DescribeLogGroupsAsync(new DescribeLogGroupsRequest
                 {
-                    LogLibraryServiceError(new System.Net.WebException($"Create LogGroup {_config.LogGroup} returned status: {createGroupResponse.HttpStatusCode}"), serviceURL);
+                    LogGroupNamePrefix = _config.LogGroup
+                }, token).ConfigureAwait(false);
+                if (!IsSuccessStatusCode(logGroupResponse))
+                {
+                    LogLibraryServiceError(new System.Net.WebException($"Lookup LogGroup {_config.LogGroup} returned status: {logGroupResponse.HttpStatusCode}"), serviceURL);
+                }
+
+                if (logGroupResponse.LogGroups.FirstOrDefault(x => string.Equals(x.LogGroupName, _config.LogGroup, StringComparison.Ordinal)) == null)
+                {
+                    var createGroupResponse = await _client.CreateLogGroupAsync(new CreateLogGroupRequest { LogGroupName = _config.LogGroup }, token).ConfigureAwait(false);
+                    if (!IsSuccessStatusCode(createGroupResponse))
+                    {
+                        LogLibraryServiceError(new System.Net.WebException($"Create LogGroup {_config.LogGroup} returned status: {createGroupResponse.HttpStatusCode}"), serviceURL);
+                    }
                 }
             }
 
