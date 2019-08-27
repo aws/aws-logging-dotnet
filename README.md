@@ -196,7 +196,7 @@ public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
 * NuGet Package: [AWS.Logger.SeriLog](https://www.nuget.org/packages/AWS.Logger.SeriLog/)
 
 Serilog can be configured with sinks to receive log messages either through a config file or through code. To use a config file with Serilog, follow the instructions [here](https://github.com/serilog/serilog/wiki/Configuration-Basics)
-to install the necessary extensions and nugent packages. In the json file, make sure **AWS.Logger.SeriLog** is in the **Using** 
+to install the necessary extensions and NuGet packages. In the json file, make sure **AWS.Logger.SeriLog** is in the **Using** 
 array. Set the **LogGroup** and **Region** under the **Serilog** node, and add **AWSSeriLog** as a sink under the **WriteTo** node. Here is an example.
 
 ```json
