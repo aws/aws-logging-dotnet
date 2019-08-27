@@ -23,6 +23,7 @@ When using Lambda it is recommended to use either the `ILambdaContext.Logger.Log
 1. [NLog](#nlog)
 2. [Apache log4net](#apache-log4net)
 3. [ASP.NET Core Logging](#aspnet-core-logging)
+4. [Serilog](#serilog)
 
 ### NLog
 
@@ -188,4 +189,57 @@ public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             logging.SetMinimumLevel(LogLevel.Debug);
         })
         .UseStartup<Startup>();
+```
+
+### Serilog
+
+* NuGet Package: [AWS.Logger.SeriLog](https://www.nuget.org/packages/AWS.Logger.SeriLog/)
+
+Serilog can be configured with sinks to receive log messages either through a config file or through code. To use a config file with Serilog, follow the instructions [here](https://github.com/serilog/serilog/wiki/Configuration-Basics)
+to install the necessary extensions and nugent packages. In the json file, make sure **AWS.Logger.SeriLog** is in the **Using** 
+array. Set the **LogGroup** and **Region** under the **Serilog** node, and add **AWSSeriLog** as a sink under the **WriteTo** node. Here is an example.
+
+```json
+{
+  "Serilog": {
+    "Using": [
+      "AWS.Logger.SeriLog"
+    ],
+    "LogGroup": "Serilog.ConfigExample",
+    "Region": "us-east-1",
+    "MinimumLevel": "Information",
+    "WriteTo": [
+      {
+        "Name": "AWSSeriLog"
+      }
+    ]
+  }
+}
+```
+
+Add the following code to configure the logger to read from the json file.
+
+```csharp
+var configuration = new ConfigurationBuilder()
+.AddJsonFile("appsettings.json")
+.Build();
+
+var logger = new LoggerConfiguration()
+.ReadFrom.Configuration(configuration)
+.CreateLogger();
+```
+
+The AWS Credentials will be found using the standard .NET credentials search path. It will search for a profile named default, environment variables, or an instance profile on an EC2 instance.
+In order to use a profile other than default, add a **Profile** under the **Serilog** node. 
+
+Below is an example of doing the same configuration as above via code. The AWS sink can be added to the logger by using the WriteTo
+method. 
+
+```csharp
+AWSLoggerConfig configuration = new AWSLoggerConfig("Serilog.ConfigExample");
+configuration.Region = "us-east-1";
+
+var logger = new LoggerConfiguration()
+.WriteTo.AWSSeriLog(configuration)
+.CreateLogger();
 ```
