@@ -243,3 +243,5 @@ var logger = new LoggerConfiguration()
 .WriteTo.AWSSeriLog(configuration)
 .CreateLogger();
 ```
+
+Checkout the [Serilog samples](/samples/Serilog) for examples of how you can use AWS and Serilog together.

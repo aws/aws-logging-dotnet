@@ -9,12 +9,12 @@ namespace SerilogTestCodeFromConfig
         {
             // logger configuration reads from appsettings.json
             var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .Build();
+                .AddJsonFile("appsettings.json")
+                .Build();
 
             var logger = new LoggerConfiguration()
-            .ReadFrom.Configuration(configuration)
-            .CreateLogger();
+                .ReadFrom.Configuration(configuration)
+                .CreateLogger();
 
             logger.Information("Hello!");
         }
