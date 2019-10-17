@@ -1,3 +1,16 @@
+### Release 2019-10-17
+* **AWS.Logger.Core (1.5.1)**
+  * Merge PR https://github.com/aws/aws-logging-dotnet/pull/96 fixed issue with SendMessages timeout led to Monitor loop break. Thanks [dimmy-timmy](https://github.com/dimmy-timmy)
+  * Merge PR https://github.com/aws/aws-logging-dotnet/pull/99 add new DisableLogGroupCreation property to skip creating auto creating Log Group avoiding needing to give IAM permissions to manage Log Group. Thanks [Bart Piotrowski](https://github.com/bartpio)
+* **AWS.Logger.AspNetCore (2.1.1)**
+  * Update to pull in latest AWS.Logger.Core version
+* **AWS.Logger.Log4net (1.5.1)**
+  * Update to pull in latest AWS.Logger.Core version
+* **AWS.Logger.NLog (1.5.1)**
+  * Update to pull in latest AWS.Logger.Core version
+* **AWS.Logger.SeriLog (1.5.1)**
+  * Update to pull in latest AWS.Logger.Core version
+
 ### Release 2019-06-27
 * **AWS.Logger.AspNetCore (2.0.0)**
   * New extension methods for ILoggingBuilder to register AWS.Logger.AspNetCore as a log provider.
