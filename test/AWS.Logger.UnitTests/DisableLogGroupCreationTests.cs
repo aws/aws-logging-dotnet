@@ -12,12 +12,12 @@ using Xunit.Abstractions;
 
 namespace AWS.Logger.UnitTests
 {
-    public class DontCreateLogGroupTests : IClassFixture<TestFixture>
+    public class DisableLogGroupCreationTests : IClassFixture<TestFixture>
     {
         /*AmazonCloudWatchLogsClient client; */
 
 
-        public DontCreateLogGroupTests(TestFixture testFixture, ITestOutputHelper output)
+        public DisableLogGroupCreationTests(TestFixture testFixture, ITestOutputHelper output)
         {
             _testFixure = testFixture;
             _output = output;
@@ -27,16 +27,16 @@ namespace AWS.Logger.UnitTests
         private readonly ITestOutputHelper _output;
 
         [Fact]
-        public async Task TestCoreWithDontCreateLogGroup()
+        public async Task TestCoreWithDisableLogGroupCreation()
         {
-            var logGroupName = nameof(TestCoreWithDontCreateLogGroup);
+            var logGroupName = nameof(TestCoreWithDisableLogGroupCreation);
 
             using (var client = new AmazonCloudWatchLogsClient(RegionEndpoint.USWest2))
             {
                 var config = new AWSLoggerConfig(logGroupName ) 
                 {
                     Region = RegionEndpoint.USWest2.SystemName,
-                    DontCreateLogGroup = true,
+                    DisableLogGroupCreation = true,
                 };
 
                 var resourceNotFoundPromise = new TaskCompletionSource<bool>();  // true means we saw expected exception; false otherwise
@@ -78,16 +78,16 @@ namespace AWS.Logger.UnitTests
         }
 
         [Fact]
-        public void TestCoreWithoutDontCreateLogGroup()
+        public void TestCoreWithoutDisableLogGroupCreation()
         {
-            var logGroupName = nameof(TestCoreWithoutDontCreateLogGroup) + DateTime.UtcNow.Ticks; // this one will have to be auto-created.
+            var logGroupName = nameof(TestCoreWithoutDisableLogGroupCreation) + DateTime.UtcNow.Ticks; // this one will have to be auto-created.
 
             using (var client = new AmazonCloudWatchLogsClient(RegionEndpoint.USWest2))
             {
                 var config = new AWSLoggerConfig(logGroupName)
                 {
                     Region = RegionEndpoint.USWest2.SystemName,
-                    DontCreateLogGroup = false,
+                    DisableLogGroupCreation = false,
                 };
 
                 var core = new AWSLoggerCore(config, "unit");

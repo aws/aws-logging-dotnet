@@ -115,7 +115,7 @@ namespace Microsoft.Extensions.Configuration
         public bool IncludeException { get; set; } = AWS.Logger.AspNetCore.Constants.IncludeExceptionDefault;
 
         internal const string LOG_GROUP = "LogGroup";
-        internal const string DONT_CREATE_LOG_GROUP = "DontCreateLogGroup";
+        internal const string DISABLE_LOG_GROUP_CREATION = "DisableLogGroupCreation";
         internal const string REGION = "Region";
         internal const string PROFILE = "Profile";
         internal const string PROFILE_LOCATION = "ProfilesLocation";
@@ -141,7 +141,7 @@ namespace Microsoft.Extensions.Configuration
         public AWSLoggerConfigSection(IConfiguration loggerConfigSection)
         {
             Config.LogGroup = loggerConfigSection[LOG_GROUP];
-            Config.DontCreateLogGroup = loggerConfigSection.GetValue<bool>(DONT_CREATE_LOG_GROUP);
+            Config.DisableLogGroupCreation = loggerConfigSection.GetValue<bool>(DISABLE_LOG_GROUP_CREATION);
             if (loggerConfigSection[REGION] != null)
             {
                 Config.Region = loggerConfigSection[REGION];

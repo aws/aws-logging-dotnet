@@ -21,7 +21,7 @@ namespace AWS.Logger
         /// If true, creation of Log Groups is disabled. Logging functions only if the specified log group already exists.
         /// When creation of log groups is disabled, logs:DescribeLogGroups permission is NOT required.
         /// </summary>
-        bool DontCreateLogGroup { get; set; }
+        bool DisableLogGroupCreation { get; set; }
 
         /// <summary>
         /// Gets the Profile property. The profile is used to look up AWS credentials in the profile store.

@@ -15,22 +15,22 @@ using Amazon.CloudWatchLogs.Model;
 using AWS.Logger.TestUtils;
 namespace AWS.Logger.AspNetCore.Tests
 {
-    public class TestDontCreateLogGroup : TestConfigurationBase
+    public class TestDisableLogGroupCreation : TestConfigurationBase
     {
         [Fact]
-        public void TestMissingDontCreateLogGroup()
+        public void TestMissingDisableLogGroupCreation()
         {
-            var config = LoggerConfigSectionSetup("dontCreateLogGroupMissing.json", null);
+            var config = LoggerConfigSectionSetup("disableLogGroupCreationMissing.json", null);
             var typed = new AWSLoggerConfigSection(config);
-            Assert.False(typed.Config.DontCreateLogGroup);
+            Assert.False(typed.Config.DisableLogGroupCreation);
         }
 
         [Fact]
-        public void TestTrueDontCreateLogGroup()
+        public void TestTrueDisableLogGroupCreation()
         {
-            var config = LoggerConfigSectionSetup("dontCreateLogGroupTrue.json", null);
+            var config = LoggerConfigSectionSetup("disableLogGroupCreationTrue.json", null);
             var typed = new AWSLoggerConfigSection(config);
-            Assert.True(typed.Config.DontCreateLogGroup);
+            Assert.True(typed.Config.DisableLogGroupCreation);
         }
     }
 }

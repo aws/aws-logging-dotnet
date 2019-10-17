@@ -36,12 +36,12 @@ namespace AWS.Logger.Log4net
 
         /// <summary>
         /// Determines whether or not to create a new Log Group, if the one specified by <see cref="LogGroup"/> doesn't already exist
-        /// <seealso cref="AWSLoggerConfig.DontCreateLogGroup"/>
+        /// <seealso cref="AWSLoggerConfig.DisableLogGroupCreation"/>
         /// </summary>
-        public bool DontCreateLogGroup
+        public bool DisableLogGroupCreation
         {
-            get { return _config.DontCreateLogGroup; }
-            set { _config.DontCreateLogGroup = value; }
+            get { return _config.DisableLogGroupCreation; }
+            set { _config.DisableLogGroupCreation = value; }
         }
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace AWS.Logger.Log4net
 
             var config = new AWSLoggerConfig(this.LogGroup)
             {
-                DontCreateLogGroup = DontCreateLogGroup,
+                DisableLogGroupCreation = DisableLogGroupCreation,
                 Region = Region,
                 Credentials = Credentials,
                 Profile = Profile,

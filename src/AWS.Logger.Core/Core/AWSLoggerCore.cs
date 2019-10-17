@@ -433,7 +433,7 @@ namespace AWS.Logger.Core
         {
             string serviceURL = GetServiceUrl();
 
-            if (!_config.DontCreateLogGroup)
+            if (!_config.DisableLogGroupCreation)
             {
                 var logGroupResponse = await _client.DescribeLogGroupsAsync(new DescribeLogGroupsRequest
                 {
