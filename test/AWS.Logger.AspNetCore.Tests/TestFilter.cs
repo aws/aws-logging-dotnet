@@ -12,34 +12,11 @@ namespace AWS.Logger.AspNetCore.Tests
 {
     // This project can output the Class library as a NuGet Package.
     // To enable this option, right-click on the project and select the Properties menu item. In the Build tab select "Produce outputs on build".
-    public class TestFilter
+    public class TestFilter : TestConfigurationBase
     {
         public AWSLoggerConfigSection ConfigSection;
 
-        public IConfiguration LoggerConfigSectionSetup(string jsonFileName,string configSectionInfoBlockName, [System.Runtime.CompilerServices.CallerFilePath]string sourceFilePath="")
-        {
-            var configurationBuilder = new ConfigurationBuilder()
-                                       .SetBasePath(Path.GetDirectoryName(sourceFilePath))
-                                       .AddJsonFile(jsonFileName);
 
-            IConfiguration Config;
-            if (configSectionInfoBlockName != null)
-            {
-                Config = configurationBuilder
-                    .Build()
-                    .GetSection(configSectionInfoBlockName);
-            }
-
-            else
-            {
-                Config = configurationBuilder
-                      .Build()
-                      .GetSection("AWS.Logging");
-            }
-
-            return Config;
-
-        }
         [Fact]
         public void FilterLogLevel()
         {

@@ -35,6 +35,16 @@ namespace AWS.Logger.Log4net
         }
 
         /// <summary>
+        /// Determines whether or not to create a new Log Group, if the one specified by <see cref="LogGroup"/> doesn't already exist
+        /// <seealso cref="AWSLoggerConfig.DontCreateLogGroup"/>
+        /// </summary>
+        public bool DontCreateLogGroup
+        {
+            get { return _config.DontCreateLogGroup; }
+            set { _config.DontCreateLogGroup = value; }
+        }
+
+        /// <summary>
         /// Gets and sets the Profile property. The profile is used to look up AWS credentials in the profile store.
         /// <para>
         /// For understanding how credentials are determine view the top level documentation for AWSLoggerConfig class.
@@ -178,6 +188,7 @@ namespace AWS.Logger.Log4net
 
             var config = new AWSLoggerConfig(this.LogGroup)
             {
+                DontCreateLogGroup = DontCreateLogGroup,
                 Region = Region,
                 Credentials = Credentials,
                 Profile = Profile,
