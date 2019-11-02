@@ -37,7 +37,10 @@ is **NLog.config**. Here is an example config file that configures the AWS Regio
 <?xml version="1.0" encoding="utf-8" ?>
 <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      throwExceptions="true">
+	  throwConfigExceptions="true">
+  <extensions>
+    <add assembly="NLog.AWS.Logger" />
+  </extensions>
   <targets>
     <target name="aws" type="AWSTarget" logGroup="NLog.ConfigExample" region="us-east-1"/>
   </targets>
