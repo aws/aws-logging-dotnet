@@ -117,6 +117,7 @@ namespace Microsoft.Extensions.Configuration
         internal const string LOG_GROUP = "LogGroup";
         internal const string DONT_CREATE_LOG_GROUP = "DontCreateLogGroup";
         internal const string REGION = "Region";
+        internal const string SERVICEURL = "ServiceUrl";
         internal const string PROFILE = "Profile";
         internal const string PROFILE_LOCATION = "ProfilesLocation";
         internal const string BATCH_PUSH_INTERVAL = "BatchPushInterval";
@@ -145,6 +146,10 @@ namespace Microsoft.Extensions.Configuration
             if (loggerConfigSection[REGION] != null)
             {
                 Config.Region = loggerConfigSection[REGION];
+            }
+            if (loggerConfigSection[SERVICEURL] != null)
+            {
+                Config.ServiceUrl = loggerConfigSection[SERVICEURL];
             }
             if (loggerConfigSection[PROFILE] != null)
             {

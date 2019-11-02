@@ -97,6 +97,17 @@ namespace AWS.Logger.Log4net
 
 
         /// <summary>
+        /// Gets and sets of the ServiceURL property. This is an optional property; change
+        /// it only if you want to try a different service endpoint. Ex. for LocalStack
+        /// </summary>
+        public string ServiceUrl
+        {
+            get { return _config.ServiceUrl; }
+            set { _config.ServiceUrl = value; }
+        }
+
+
+        /// <summary>
         /// Gets and sets the BatchPushInterval property. For performance the log messages are sent to AWS in batch sizes. BatchPushInterval 
         /// dictates the frequency of when batches are sent. If either BatchPushInterval or BatchSizeInBytes are exceeded the batch will be sent.
         /// <para>
@@ -190,6 +201,7 @@ namespace AWS.Logger.Log4net
             {
                 DontCreateLogGroup = DontCreateLogGroup,
                 Region = Region,
+                ServiceUrl = ServiceUrl,
                 Credentials = Credentials,
                 Profile = Profile,
                 ProfilesLocation = ProfilesLocation,
@@ -215,6 +227,13 @@ namespace AWS.Logger.Log4net
                 return;
 
             _core.AddMessage(RenderLoggingEvent(loggingEvent));
+        }
+
+        /// <inheritdoc />
+        public override bool Flush(int millisecondsTimeout)
+        {
+            _core?.Flush();
+            return base.Flush(millisecondsTimeout);
         }
     }
 }
