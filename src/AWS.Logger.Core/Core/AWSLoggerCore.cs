@@ -82,7 +82,7 @@ namespace AWS.Logger.Core
             if (!string.IsNullOrEmpty(_config.ServiceUrl))
             {
                 var awsConfig = new AmazonCloudWatchLogsConfig() { ServiceURL = _config.ServiceUrl };
-                if (_config.ServiceUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                if (_config.ServiceUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
                     awsConfig.UseHttp = true;
                 if (_config.Credentials != null)
                     _client = new AmazonCloudWatchLogsClient(_config.Credentials, awsConfig);
