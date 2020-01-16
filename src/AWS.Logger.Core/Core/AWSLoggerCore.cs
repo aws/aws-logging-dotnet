@@ -79,15 +79,23 @@ namespace AWS.Logger.Core
             _config = config;
             _logType = logType;
 
-            if (!string.IsNullOrEmpty(_config.ServiceUrl))
+            if (!string.IsNullOrWhiteSpace(_config.ServiceUrl))
             {
-                var awsConfig = new AmazonCloudWatchLogsConfig() { ServiceURL = _config.ServiceUrl };
-                if (_config.ServiceUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+                var serviceUrl = _config.ServiceUrl.Trim();
+                var awsConfig = new AmazonCloudWatchLogsConfig() { ServiceURL = serviceUrl };
+                if (serviceUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+                {
                     awsConfig.UseHttp = true;
+                }
+
                 if (_config.Credentials != null)
+                {
                     _client = new AmazonCloudWatchLogsClient(_config.Credentials, awsConfig);
+                }
                 else
-                    _client = new AmazonCloudWatchLogsClient("aws", "aws", awsConfig);
+                {
+                    _client = new AmazonCloudWatchLogsClient("aws", "", awsConfig);
+                }
             }
             else
             {
