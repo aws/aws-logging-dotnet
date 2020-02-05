@@ -100,6 +100,15 @@ namespace NLog.AWS.Logger
             set { _config.Region = value; }
         }
 
+        /// <summary>
+        /// Gets and sets of the ServiceURL property. This is an optional property; change
+        /// it only if you want to try a different service endpoint. Ex. for LocalStack
+        /// </summary>
+        public string ServiceUrl
+        {
+            get { return _config.ServiceUrl; }
+            set { _config.ServiceUrl = value; }
+        }
 
         /// <summary>
         /// Gets and sets the BatchPushInterval property. For performance the log messages are sent to AWS in batch sizes. BatchPushInterval 
@@ -192,6 +201,7 @@ namespace NLog.AWS.Logger
             {
                 DisableLogGroupCreation = DisableLogGroupCreation,
                 Region = RenderSimpleLayout(Region, nameof(Region)),
+                ServiceUrl = RenderSimpleLayout(ServiceUrl, nameof(ServiceUrl)),
                 Credentials = Credentials,
                 Profile = RenderSimpleLayout(Profile, nameof(Profile)),
                 ProfilesLocation = RenderSimpleLayout(ProfilesLocation, nameof(ProfilesLocation)),

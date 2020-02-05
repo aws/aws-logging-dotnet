@@ -79,16 +79,36 @@ namespace AWS.Logger.Core
             _config = config;
             _logType = logType;
 
-            var credentials = DetermineCredentials(config);
-
-            if (_config.Region != null)
+            if (!string.IsNullOrWhiteSpace(_config.ServiceUrl))
             {
-                _client = new AmazonCloudWatchLogsClient(credentials, Amazon.RegionEndpoint.GetBySystemName(_config.Region));
+                var serviceUrl = _config.ServiceUrl.Trim();
+                var awsConfig = new AmazonCloudWatchLogsConfig() { ServiceURL = serviceUrl };
+                if (serviceUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+                {
+                    awsConfig.UseHttp = true;
+                }
+
+                if (_config.Credentials != null)
+                {
+                    _client = new AmazonCloudWatchLogsClient(_config.Credentials, awsConfig);
+                }
+                else
+                {
+                    _client = new AmazonCloudWatchLogsClient("aws", "", awsConfig);
+                }
             }
             else
             {
-                _client = new AmazonCloudWatchLogsClient(credentials);
-            }
+                var credentials = DetermineCredentials(config);
+                if (_config.Region != null)
+                {
+                    _client = new AmazonCloudWatchLogsClient(credentials, Amazon.RegionEndpoint.GetBySystemName(_config.Region));
+                }
+                else
+                {
+                    _client = new AmazonCloudWatchLogsClient(credentials);
+                }
+            }            
 
             ((AmazonCloudWatchLogsClient)this._client).BeforeRequestEvent += ServiceClientBeforeRequestEvent;
             ((AmazonCloudWatchLogsClient)this._client).ExceptionEvent += ServiceClienExceptionEvent;
