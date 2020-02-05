@@ -60,13 +60,18 @@ namespace AWS.Logger
         /// </summary>
         public AWSCredentials Credentials { get; set; }
 
-
         /// <summary>
         /// Gets and sets the Region property. This is the AWS Region that will be used for CloudWatch Logs. If this is not
         /// the AWS SDK for .NET will use its fall back logic to try and determine the region through environment variables and EC2 instance metadata.
         /// If the Region is not set and no region is found by the SDK's fall back logic then an exception will be thrown.
         /// </summary>
         public string Region { get; set; }
+
+        /// <summary>
+        /// Gets and sets of the ServiceURL property. This is an optional property; change
+        /// it only if you want to try a different service endpoint. Ex. for LocalStack
+        /// </summary>
+        public string ServiceUrl { get; set; }
 
         /// <summary>
         /// Gets and sets the BatchPushInterval property. For performance the log messages are sent to AWS in batch sizes. BatchPushInterval 
