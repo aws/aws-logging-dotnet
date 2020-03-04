@@ -1,3 +1,21 @@
+### Release 2020-03-03
+* **AWS.Logger.Core (1.6.0)**
+  * Merge PR [#94](https://github.com/aws/aws-logging-dotnet/pull/94) Added ability to set the ServiceUrl in AWSLoggerConfig to help support using LocalStack. Thanks [Rolf Kristensen](https://github.com/snakefoot).
+* **AWS.Logger.AspNetCore (2.2.0)**
+  * Updated ILoggingBuilder extension method AddAWSProvider to work with .NET Core 3.X
+  * Added support to read ServiceUrl from IConfiguration
+  * Update to pull in latest AWS.Logger.Core version
+* **AWS.Logger.Log4net (1.5.2)**
+  * Added support to read ServiceUrl from AWSAppender
+  * Update to pull in latest AWS.Logger.Core version
+* **AWS.Logger.NLog (1.5.2)**
+  * Added support to read ServiceUrl from AWSTarget
+  * Update to pull in latest AWS.Logger.Core version
+* **AWS.Logger.SeriLog (1.5.2)**
+  * Added support to read ServiceUrl from IConfiguration
+  * Update to pull in latest AWS.Logger.Core version
+
+
 ### Release 2019-10-17
 * **AWS.Logger.Core (1.5.1)**
   * Merge PR https://github.com/aws/aws-logging-dotnet/pull/96 fixed issue with SendMessages timeout led to Monitor loop break. Thanks [dimmy-timmy](https://github.com/dimmy-timmy)
