@@ -177,6 +177,18 @@ namespace NLog.AWS.Logger
         }
 
         /// <summary>
+        /// Gets and sets the LibraryLogErrors property. This is the boolean value of whether or not you would like this library to log logging errors.
+        /// <para>
+        /// The default is "true".
+        /// </para>
+        /// </summary>
+        public bool LibraryLogErrors
+        {
+            get { return _config.LibraryLogErrors; }
+            set { _config.LibraryLogErrors = value; }
+        }
+
+        /// <summary>
         /// Gets and sets the LibraryLogFileName property. This is the name of the file into which errors from the AWS.Logger.Core library will be wriiten into.
         /// <para>
         /// The default is "aws-logger-errors.txt".
@@ -210,6 +222,7 @@ namespace NLog.AWS.Logger
                 MaxQueuedMessages = MaxQueuedMessages,
                 LogStreamNameSuffix = RenderSimpleLayout(LogStreamNameSuffix, nameof(LogStreamNameSuffix)),
                 LogStreamNamePrefix = RenderSimpleLayout(LogStreamNamePrefix, nameof(LogStreamNamePrefix)),
+                LibraryLogErrors = LibraryLogErrors,
                 LibraryLogFileName = LibraryLogFileName
             };
             _core = new AWSLoggerCore(config, "NLog");

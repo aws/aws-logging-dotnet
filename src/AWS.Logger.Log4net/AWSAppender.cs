@@ -175,6 +175,18 @@ namespace AWS.Logger.Log4net
         }
 
         /// <summary>
+        /// Gets and sets the LibraryLogErrors property. This is the boolean value of whether or not you would like this library to log logging errors.
+        /// <para>
+        /// The default is "true".
+        /// </para>
+        /// </summary>
+        public bool LibraryLogErrors
+        {
+            get { return _config.LibraryLogErrors; }
+            set { _config.LibraryLogErrors = value; }
+        }
+        
+        /// <summary>
         /// Gets and sets the LibraryLogFileName property. This is the name of the file into which errors from the AWS.Logger.Core library will be wriiten into.
         /// <para>
         /// The default is going to "aws-logger-errors.txt".
@@ -210,6 +222,7 @@ namespace AWS.Logger.Log4net
                 MaxQueuedMessages = MaxQueuedMessages,
 				LogStreamNameSuffix = LogStreamNameSuffix,
                 LogStreamNamePrefix = LogStreamNamePrefix,
+                LibraryLogErrors = LibraryLogErrors,
 				LibraryLogFileName = LibraryLogFileName
             };
             _core = new AWSLoggerCore(config, "Log4net");

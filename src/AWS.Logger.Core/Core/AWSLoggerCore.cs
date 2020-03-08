@@ -646,7 +646,7 @@ namespace AWS.Logger.Core
         private void LogLibraryServiceError(Exception ex, string serviceUrl = null)
         {
             LogLibraryAlert?.Invoke(this, new LogLibraryEventArgs(ex) { ServiceUrl = serviceUrl ?? GetServiceUrl() } );
-            if (!string.IsNullOrEmpty(_config.LibraryLogFileName))
+            if (!string.IsNullOrEmpty(_config.LibraryLogFileName) && _config.LibraryLogErrors)
             {
                 LogLibraryError(ex, _config.LibraryLogFileName);
             }

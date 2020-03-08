@@ -161,7 +161,15 @@ namespace AWS.Logger
         public string LogStreamNamePrefix { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets and sets the LibraryLogFileName property. This is the name of the file into which errors from the AWS.Logger.Core library will be wriiten into.
+        /// Gets and sets the LibraryLogErrors property. This is the boolean value of whether or not you would like this library to log logging errors.
+        /// <para>
+        /// The default is "true".
+        /// </para>
+        /// </summary>
+        public bool LibraryLogErrors { get; set; } = true;
+       
+        /// <summary>
+        /// Gets and sets the LibraryLogFileName property. This is the name of the file into which errors from the AWS.Logger.Core library will be written into.
         /// <para>
         /// The default is "aws-logger-errors.txt".
         /// </para>
