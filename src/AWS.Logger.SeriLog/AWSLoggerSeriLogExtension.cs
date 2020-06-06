@@ -23,6 +23,7 @@ namespace AWS.Logger.SeriLog
         internal const string LOG_STREAM_NAME_SUFFIX = "Serilog:LogStreamNameSuffix";
         internal const string LOG_STREAM_NAME_PREFIX = "Serilog:LogStreamNamePrefix";
         internal const string LIBRARY_LOG_FILE_NAME = "Serilog:LibraryLogFileName";
+        internal const string LIBRARY_LOG_ERRORS = "Serilog:LibraryLogErrors";
 
         /// <summary>
         /// AWSSeriLogger target that is called when the customer is using 
@@ -81,6 +82,10 @@ namespace AWS.Logger.SeriLog
             if (configuration[LIBRARY_LOG_FILE_NAME] != null)
             {
                 config.LibraryLogFileName = configuration[LIBRARY_LOG_FILE_NAME];
+            }
+            if (configuration[LIBRARY_LOG_ERRORS] != null)
+            {
+                config.LibraryLogErrors = Boolean.Parse(configuration[LIBRARY_LOG_ERRORS]);
             }
             return AWSSeriLog(loggerConfiguration, config, iFormatProvider, textFormatter);
         }
