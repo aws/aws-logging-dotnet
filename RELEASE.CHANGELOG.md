@@ -1,3 +1,16 @@
+### Release 2020-10-07
+* **AWS.Logger.Core (2.0.0)**
+  * Updated AWS SDK for .NET dependency to version 3.5.
+* **AWS.Logger.AspNetCore (3.0.0)**
+  * Updated AWS SDK for .NET dependency to version 3.5.
+* **AWS.Logger.Log4net (2.0.0)**
+  * Updated AWS SDK for .NET dependency to version 3.5.
+* **AWS.Logger.NLog (2.0.0)**
+  * Updated AWS SDK for .NET dependency to version 3.5.
+* **AWS.Logger.SeriLog (2.0.0)**
+  * Updated AWS SDK for .NET dependency to version 3.5.
+
+
 ### Release 2020-03-03
 * **AWS.Logger.Core (1.6.0)**
   * Merge PR [#94](https://github.com/aws/aws-logging-dotnet/pull/94) Added ability to set the ServiceUrl in AWSLoggerConfig to help support using LocalStack. Thanks [Rolf Kristensen](https://github.com/snakefoot).
