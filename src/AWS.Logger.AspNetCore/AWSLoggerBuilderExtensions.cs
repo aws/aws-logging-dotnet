@@ -1,6 +1,8 @@
 ﻿using AWS.Logger;
 using AWS.Logger.AspNetCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Linq;
 
@@ -66,14 +68,7 @@ namespace Microsoft.Extensions.Logging
         /// <returns></returns>
         public static ILoggingBuilder AddAWSProvider(this ILoggingBuilder builder, Func<LogLevel, object, Exception, string> formatter = null)
         {
-            var serviceDescriptor = builder.Services.FirstOrDefault(x => x.ServiceType == typeof(IConfiguration));
-            if (serviceDescriptor == null)
-            {
-                return builder;
-            }
-
-            var configuration = serviceDescriptor.ImplementationInstance as IConfiguration;
-
+            var configuration = GetConfiguration(builder.Services);
 
             // If configuration or configSection is null. Assuming the logger is being activated in a debug environment
             // and skip adding the provider. We don't want to prevent developers running their application
@@ -92,6 +87,23 @@ namespace Microsoft.Extensions.Logging
             return AddAWSProvider(builder, configSection, formatter);
         }
 
+        private static IConfiguration GetConfiguration(IServiceCollection services)
+        {
+            var serviceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IConfiguration));
+            if (serviceDescriptor == null)
+            {
+                return null;
+            }
+
+            var configuration = serviceDescriptor.ImplementationInstance as IConfiguration;
+            if (configuration == null && serviceDescriptor.ImplementationFactory != null)
+            {
+                var provider = services.BuildServiceProvider();
+                configuration = serviceDescriptor.ImplementationFactory(provider) as IConfiguration;
+            }
+
+            return configuration;
+        }
 
         /// <summary>
         /// Adds the AWS logging provider to the log builder using the configuration specified in the AWSLoggerConfig

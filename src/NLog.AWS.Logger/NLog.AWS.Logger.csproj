@@ -23,8 +23,8 @@
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.5' ">1.6.0</NetStandardImplicitPackageVersion>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\awssdk.dll.snk</AssemblyOriginatorKeyFile>
-    <Version>1.5.1</Version>
     <NoWarn>NU5048</NoWarn>
+    <Version>2.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

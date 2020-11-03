@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp1.0;net452</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;net452</TargetFrameworks>
     <AssemblyName>AWS.Logger.NLog.Tests</AssemblyName>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -35,7 +35,7 @@
   <ItemGroup>
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <!-- This needs to be referenced to allow testing via AssumeRole credentials -->
-    <PackageReference Include="AWSSDK.SecurityToken" Version="3.3.101.4" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="3.5.1.4" />
   </ItemGroup>
 
   <ItemGroup>
