@@ -11,7 +11,7 @@
     <PackageTags>AWS;Cloudwatch;Logger</PackageTags>
     <PackageIconUrl>https://sdk-for-net.amazonwebservices.com/images/AWSLogo128x128.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/aws/aws-logging-dotnet</PackageProjectUrl>
-    <PackageLicenseUrl>https://aws.amazon.com/apache-2-0/</PackageLicenseUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/aws/aws-logging-dotnet.git</RepositoryUrl>
 
@@ -24,6 +24,7 @@
     <DelaySign>False</DelaySign>
     <AssemblyOriginatorKeyFile>..\..\awssdk.dll.snk</AssemblyOriginatorKeyFile>
     <Version>1.5.1</Version>
+    <NoWarn>NU5048</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
