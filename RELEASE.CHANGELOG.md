@@ -1,3 +1,16 @@
+### Release 2020-12-09
+* **AWS.Logger.Core (2.0.1)**
+  * Merge PR [#134](https://github.com/aws/aws-logging-dotnet/pull/135) Handle ResourceNotFoundException whe CloudWatch Log stream is deleted. Thanks [Rolf Kristensen](https://github.com/snakefoot).
+* **AWS.Logger.AspNetCore (3.0.1)**
+  * Updated to latest version of AWS.Logger.Core.
+* **AWS.Logger.Log4net (2.0.1)**
+  * Updated to latest version of AWS.Logger.Core.
+* **AWS.Logger.NLog (2.0.1)**
+  * Updated to latest version of AWS.Logger.Core.
+* **AWS.Logger.SeriLog (2.0.1)**
+  * Updated to latest version of AWS.Logger.Core.
+
+
 ### Release 2020-10-07
 * **AWS.Logger.Core (2.0.0)**
   * Updated AWS SDK for .NET dependency to version 3.5.
