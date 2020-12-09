@@ -9,9 +9,9 @@
     <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
     <Copyright>Copyright 2016-$(CurrentYear) Amazon.com, Inc. or its affiliates. All Rights Reserved.</Copyright>
     <PackageTags>AWS;Cloudwatch;Logger;Log4net</PackageTags>
-    <PackageIconUrl>https://sdk-for-net.amazonwebservices.com/images/AWSLogo128x128.png</PackageIconUrl>
+    <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://github.com/aws/aws-logging-dotnet</PackageProjectUrl>
-    <PackageLicenseUrl>https://aws.amazon.com/apache-2-0/</PackageLicenseUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/aws/aws-logging-dotnet.git</RepositoryUrl>
 
@@ -24,6 +24,11 @@
     <AssemblyOriginatorKeyFile>..\..\awssdk.dll.snk</AssemblyOriginatorKeyFile>
     <Version>2.0.1</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../LICENSE" Pack="true" PackagePath="" />
+    <None Include="../../icon.png" Pack="true" PackagePath="" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AWS.Logger.Core\AWS.Logger.Core.csproj" />
