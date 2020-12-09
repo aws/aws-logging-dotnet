@@ -285,7 +285,7 @@ namespace AWS.Logger.Core
             else
             {
                 var messageParts = BreakupMessage(rawMessage);
-                foreach(var message in messageParts)
+                foreach (var message in messageParts)
                 {
                     AddSingleMessage(message);
                 }
@@ -419,6 +419,7 @@ namespace AWS.Logger.Core
                 //In case the NextSequenceToken is invalid for the last sent message, a new stream would be 
                 //created for the said application.
                 LogLibraryServiceError(ex);
+
                 if (_requestCount > 0)
                 {
                     _requestCount--;
@@ -433,6 +434,13 @@ namespace AWS.Logger.Core
                 {
                     _currentStreamName = await LogEventTransmissionSetup(token).ConfigureAwait(false);
                 }
+            }
+            catch (ResourceNotFoundException ex)
+            {
+                // The specified log stream does not exist. Refresh or create new stream.
+                LogLibraryServiceError(ex);
+
+                _currentStreamName = await LogEventTransmissionSetup(token).ConfigureAwait(false);
             }
         }
 
@@ -490,7 +498,6 @@ namespace AWS.Logger.Core
         {
             var streamName = new StringBuilder();
 
-            
             var prefix = config.LogStreamNamePrefix;
             if (!string.IsNullOrEmpty(prefix))
             {
@@ -645,7 +652,7 @@ namespace AWS.Logger.Core
 
         private void LogLibraryServiceError(Exception ex, string serviceUrl = null)
         {
-            LogLibraryAlert?.Invoke(this, new LogLibraryEventArgs(ex) { ServiceUrl = serviceUrl ?? GetServiceUrl() } );
+            LogLibraryAlert?.Invoke(this, new LogLibraryEventArgs(ex) { ServiceUrl = serviceUrl ?? GetServiceUrl() });
             if (!string.IsNullOrEmpty(_config.LibraryLogFileName))
             {
                 LogLibraryError(ex, _config.LibraryLogFileName);
