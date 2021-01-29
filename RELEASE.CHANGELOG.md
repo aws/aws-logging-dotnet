@@ -1,3 +1,8 @@
+### Release 2021-01-29
+* **AWS.Logger.Log4net (3.0.0)**
+  * Updated to version 2.0.10 of the log4net. Version 2.0.10 contains a security fix for [CVE-2018-1285](https://github.com/advisories/GHSA-2cwj-8chv-9pp9)
+  * Removed support for .NET Standard 1.5.
+
 ### Release 2020-12-09
 * **AWS.Logger.Core (2.0.1)**
   * Merge PR [#134](https://github.com/aws/aws-logging-dotnet/pull/135) Handle ResourceNotFoundException whe CloudWatch Log stream is deleted. Thanks [Rolf Kristensen](https://github.com/snakefoot).
