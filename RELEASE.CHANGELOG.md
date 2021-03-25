@@ -1,3 +1,15 @@
+### Release 2021-03-24
+* **AWS.Logger.Core (2.1.0)**
+  * Pull Request [#117](https://github.com/aws/aws-logging-dotnet/pull/117) Updated library with new property to disable library error logging. Thanks [Alex](https://github.com/aleybe)
+* **AWS.Logger.AspNetCore (3.1.0)**
+  * Updated to latest AWS.Logger.Core and incorporate PR [#117](https://github.com/aws/aws-logging-dotnet/pull/117).
+* **AWS.Logger.Log4net (3.1.0)**
+  * Updated to latest AWS.Logger.Core and incorporate PR [#117](https://github.com/aws/aws-logging-dotnet/pull/117).
+* **AWS.Logger.NLog (2.1.0)**
+  * Updated to latest AWS.Logger.Core and incorporate PR [#117](https://github.com/aws/aws-logging-dotnet/pull/117).
+* **AWS.Logger.SeriLog (2.1.0)**
+  * Updated to latest AWS.Logger.Core and incorporate PR [#117](https://github.com/aws/aws-logging-dotnet/pull/117).
+  
 ### Release 2021-01-29
 * **AWS.Logger.Log4net (3.0.0)**
   * Updated to version 2.0.10 of the log4net. Version 2.0.10 contains a security fix for [CVE-2018-1285](https://github.com/advisories/GHSA-2cwj-8chv-9pp9)
