@@ -1,3 +1,19 @@
+### Release 2021-04-02
+* **AWS.Logger.Core (3.0.0)**
+  * Updated AWS SDK for .NET dependency to version 3.7.
+  * Removed support for .NET Standard 1.5.
+* **AWS.Logger.AspNetCore (3.2.0)**
+  * Updated to latest AWS.Logger.Core.
+* **AWS.Logger.Log4net (3.2.0)**
+  * Updated to latest AWS.Logger.Core.
+* **AWS.Logger.NLog (3.0.0)**
+  * Updated to latest AWS.Logger.Core.
+  * Removed support for .NET Standard 1.5.
+* **AWS.Logger.SeriLog (3.0.0)**
+  * Updated to latest AWS.Logger.Core.
+  * Removed support for .NET Standard 1.5.
+
+
 ### Release 2021-03-24
 * **AWS.Logger.Core (2.1.0)**
   * Pull Request [#117](https://github.com/aws/aws-logging-dotnet/pull/117) Updated library with new property to disable library error logging. Thanks [Alex](https://github.com/aleybe)
