@@ -1,3 +1,7 @@
+### Release 2021-04-26
+* **AWS.Logger.Log4net (3.2.1)**
+  * Updated to version 2.0.12 of the log4net.
+
 ### Release 2021-04-02
 * **AWS.Logger.Core (3.0.0)**
   * Updated AWS SDK for .NET dependency to version 3.7.
