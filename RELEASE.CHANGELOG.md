@@ -1,3 +1,7 @@
+### Release 2021-05-21
+* **AWS.Logger.SeriLog (3.1.0)**
+  * Added support for restrictedToMinimumLevel to SeriLog.
+
 ### Release 2021-04-26
 * **AWS.Logger.Log4net (3.2.1)**
   * Updated to version 2.0.12 of the log4net.
