@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
 using Serilog;
-using Serilog.Formatting;
 using Serilog.Configuration;
-using Microsoft.Extensions.Configuration;
+using Serilog.Events;
+using Serilog.Formatting;
+using System;
 
 namespace AWS.Logger.SeriLog
 {
@@ -34,7 +35,8 @@ namespace AWS.Logger.SeriLog
                   this LoggerSinkConfiguration loggerConfiguration,
                   IConfiguration configuration, 
                   IFormatProvider iFormatProvider = null,
-                  ITextFormatter textFormatter = null )
+                  ITextFormatter textFormatter = null,
+                  LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose)
         {
             AWSLoggerConfig config = new AWSLoggerConfig();
 
@@ -99,9 +101,10 @@ namespace AWS.Logger.SeriLog
                   this LoggerSinkConfiguration loggerConfiguration,
                    AWSLoggerConfig configuration = null,
                    IFormatProvider iFormatProvider = null, 
-                   ITextFormatter textFormatter = null)
+                   ITextFormatter textFormatter = null,
+                   LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose)
         {
-            return loggerConfiguration.Sink(new AWSSink(configuration, iFormatProvider, textFormatter));
+            return loggerConfiguration.Sink(new AWSSink(configuration, iFormatProvider, textFormatter), restrictedToMinimumLevel);
         }
     }
 }
