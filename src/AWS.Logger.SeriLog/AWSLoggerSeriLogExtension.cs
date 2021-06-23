@@ -89,7 +89,7 @@ namespace AWS.Logger.SeriLog
             {
                 config.LibraryLogErrors = Boolean.Parse(configuration[LIBRARY_LOG_ERRORS]);
             }
-            return AWSSeriLog(loggerConfiguration, config, iFormatProvider, textFormatter);
+            return AWSSeriLog(loggerConfiguration, config, iFormatProvider, textFormatter, restrictedToMinimumLevel);
         }
 
         /// <summary>

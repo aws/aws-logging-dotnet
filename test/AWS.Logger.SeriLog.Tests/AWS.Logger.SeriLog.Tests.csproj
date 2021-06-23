@@ -11,9 +11,13 @@
   <ItemGroup>
     <None Remove="AWSNLogGroupMultiThreadBufferFullTest.json" />
     <None Remove="AWSNLogGroupMultiThreadTest.json" />
+    <None Remove="AWSSeriLogGroupRestrictedToMinimumLevel.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="AWSSeriLogGroupRestrictedToMinimumLevel.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="AWSSeriLogGroup.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -32,8 +36,8 @@
 
   <ItemGroup>
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="1.0.2" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="2.5.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
     <!-- This needs to be referenced to allow testing via AssumeRole credentials -->
     <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.0.5" />
   </ItemGroup>
