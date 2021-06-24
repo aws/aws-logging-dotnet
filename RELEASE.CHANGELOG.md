@@ -1,3 +1,8 @@
+### Release 2021-06-23
+* **AWS.Logger.SeriLog (3.1.1)**
+  * Fixed an issue where restrictedToMinimumLevel from appsettings.json was ignored.
+  * Updated to version 2.6.0 of Serilog.
+
 ### Release 2021-05-21
 * **AWS.Logger.SeriLog (3.1.0)**
   * Added support for restrictedToMinimumLevel to SeriLog.
