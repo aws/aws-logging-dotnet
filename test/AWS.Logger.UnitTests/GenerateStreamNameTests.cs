@@ -113,38 +113,106 @@ namespace AWS.Logger.UnitTests
             Assert.True(IsTokenDate(tokens[1]));
         }
 
+        [Fact]
+        public void NoTimestampSuffixSet()
+        {
+            var config = new AWSLoggerConfig
+            {
+                IncludeTimestampInLogStreamName = false,
+                LogStreamNameSuffix = "TheSuffix"
+            };
+            var streamName = AWSLoggerCore.GenerateStreamName(config);
+
+            var tokens = SplitStreamName(streamName);
+            Assert.Single(tokens);
+
+            Assert.Equal(config.LogStreamNameSuffix, tokens[0]);
+        }
+
+        [Fact]
+        public void PrefixSetNoTimestampSuffixAtDefault()
+        {
+            var config = new AWSLoggerConfig
+            {
+                IncludeTimestampInLogStreamName = false,
+                LogStreamNamePrefix = "ThePrefix"
+            };
+            var streamName = AWSLoggerCore.GenerateStreamName(config);
+
+            var tokens = SplitStreamName(streamName);
+            Assert.Equal(2, tokens.Length);
+
+            Assert.Equal(config.LogStreamNamePrefix, tokens[0]);
+            Assert.True(IsTokenGuid(tokens[1]));
+        }
+
+        [Fact]
+        public void PrefixSetNoTimestampSuffixSet()
+        {
+            var config = new AWSLoggerConfig
+            {
+                IncludeTimestampInLogStreamName = false,
+                LogStreamNamePrefix = "ThePrefix",
+                LogStreamNameSuffix = "TheSuffix"
+            };
+            var streamName = AWSLoggerCore.GenerateStreamName(config);
+
+            var tokens = SplitStreamName(streamName);
+            Assert.Equal(2, tokens.Length);
+
+            Assert.Equal(config.LogStreamNamePrefix, tokens[0]);
+            Assert.Equal(config.LogStreamNameSuffix, tokens[1]);
+        }
+
+        [Fact]
+        public void PrefixSetNoTimestampSuffixSetToNull()
+        {
+            var config = new AWSLoggerConfig
+            {
+                IncludeTimestampInLogStreamName = false,
+                LogStreamNamePrefix = "ThePrefix",
+                LogStreamNameSuffix = null
+            };
+            var streamName = AWSLoggerCore.GenerateStreamName(config);
+
+            var tokens = SplitStreamName(streamName);
+            Assert.Single(tokens);
+
+            Assert.Equal(config.LogStreamNamePrefix, tokens[0]);
+        }
+
+        [Fact]
+        public void PrefixSetNoTimestampSuffixSetToEmptyString()
+        {
+            var config = new AWSLoggerConfig
+            {
+                IncludeTimestampInLogStreamName = false,
+                LogStreamNamePrefix = "ThePrefix",
+                LogStreamNameSuffix = string.Empty
+            };
+            var streamName = AWSLoggerCore.GenerateStreamName(config);
+
+            var tokens = SplitStreamName(streamName);
+            Assert.Single(tokens);
+
+            Assert.Equal(config.LogStreamNamePrefix, tokens[0]);
+        }
+
 
         private string[] SplitStreamName(string streamName)
         {
-            const string searchToken = " - ";
-            var tokens = new List<string>();
-            int currentPos = 0;
-            int pos = streamName.IndexOf(searchToken);
-            while(pos != -1)
-            {
-                tokens.Add(streamName.Substring(currentPos, pos - currentPos));
-                currentPos = pos + searchToken.Length;
-                pos = streamName.IndexOf(searchToken, currentPos);
-            }
-
-            if(currentPos < streamName.Length)
-            {
-                tokens.Add(streamName.Substring(currentPos, streamName.Length - currentPos));
-            }
-
-            return tokens.ToArray();
+            return streamName.Split(" - ");
         }
 
         private bool IsTokenDate(string token)
         {
-            DateTime dt;
-            return DateTime.TryParseExact(token, "yyyy/MM/ddTHH.mm.ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt);
+            // This assumes the date separator on the system where tests are run is '/'. If it's '-' or anything else, tests will break.
+            return DateTime.TryParseExact(token, "yyyy/MM/ddTHH.mm.ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
         }
 
         private bool IsTokenGuid(string token)
         {
-            Guid guid;
-            return Guid.TryParse(token, out guid);
+            return Guid.TryParse(token, out _);
         }
     }
 }

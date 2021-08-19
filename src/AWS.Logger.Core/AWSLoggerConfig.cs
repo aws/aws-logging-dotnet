@@ -141,9 +141,18 @@ namespace AWS.Logger
         }
 
         /// <summary>
-        /// Gets and sets the LogStreamNameSuffix property. The LogStreamName consists of an optional user-defined LogStreamNamePrefix (that can be set here)
-        /// followed by a DateTimeStamp as the prefix, and a user defined suffix value
-        /// The LogstreamName then follows the pattern '[LogStreamNamePrefix]-[DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss")]-[LogStreamNameSuffix]'
+        /// Gets and sets the IncludeTimestampInLogStreamName property. Set to "true" if you wish to include a timestamp (formatted as "yyyy/MM/ddTHH.mm.ss")
+        /// as the core of the LogStreamName, set to "false" to omit the timestamp.
+        /// <para>
+        /// The default is "true".
+        /// </para>
+        /// </summary>
+        public bool IncludeTimestampInLogStreamName { get; set; } = true;
+
+        /// <summary>
+        /// Gets and sets the LogStreamNameSuffix property. The LogStreamName consists of an optional user-defined LogStreamNamePrefix
+        /// followed by a timestamp if IncludeTimestampInLogStreamName is "true", and a user defined suffix value.
+        /// The LogStreamName then follows the pattern '[LogStreamNamePrefix] - [DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss")] - [LogStreamNameSuffix]'.
         /// <para>
         /// The default is new a Guid.
         /// </para>
@@ -152,8 +161,8 @@ namespace AWS.Logger
 
         /// <summary>
         /// Gets and sets the LogStreamNamePrefix property. The LogStreamName consists of an optional user-defined LogStreamNamePrefix (that can be set here)
-        /// followed by a DateTimeStamp as the prefix, and a user defined suffix value
-        /// The LogstreamName then follows the pattern '[LogStreamNamePrefix]-[DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss")]-[LogStreamNameSuffix]'
+        /// followed by a timestamp if IncludeTimestampInLogStreamName is "true", and a user defined suffix value
+        /// The LogstreamName then follows the pattern '[LogStreamNamePrefix] - [DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss")] - [LogStreamNameSuffix]'
         /// <para>
         /// The default is an empty string.
         /// </para>

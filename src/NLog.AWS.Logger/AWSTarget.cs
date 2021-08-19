@@ -151,6 +151,19 @@ namespace NLog.AWS.Logger
         }
 
         /// <summary>
+        /// Gets and sets the IncludeTimestampInLogStreamName property. Set to "true" if you wish to include a timestamp (formatted as "yyyy/MM/ddTHH.mm.ss")
+        /// as the core of the LogStreamName, set to "false" to omit the timestamp.
+        /// <para>
+        /// The default is "true".
+        /// </para>
+        /// </summary>
+        public bool IncludeTimestampInLogStreamName
+        {
+            get { return _config.IncludeTimestampInLogStreamName; }
+            set { _config.IncludeTimestampInLogStreamName = value; }
+        }
+
+        /// <summary>
         /// Gets and sets the LogStreamNameSuffix property. The LogStreamName consists of an optional user-defined prefix segment, then a DateTimeStamp as the
         /// system-defined prefix segment, and a user defined suffix value that can be set using the LogStreamNameSuffix property defined here.
         /// <para>

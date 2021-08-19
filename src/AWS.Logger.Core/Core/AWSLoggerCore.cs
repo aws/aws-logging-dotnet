@@ -493,29 +493,19 @@ namespace AWS.Logger.Core
         /// <summary>
         /// Generate a logstream name
         /// </summary>
-        /// <returns>logstream name that ALWAYS includes a unique date-based segment</returns>
+        /// <returns>A logstream name with a format based on the configuration passed to the method.</returns>
         public static string GenerateStreamName(IAWSLoggerConfig config)
         {
-            var streamName = new StringBuilder();
+            List<string> nameParts = new List<string>();
 
-            var prefix = config.LogStreamNamePrefix;
-            if (!string.IsNullOrEmpty(prefix))
-            {
-                streamName.Append(prefix);
-                streamName.Append(" - ");
-            }
+            if (!string.IsNullOrEmpty(config.LogStreamNamePrefix))
+                nameParts.Add(config.LogStreamNamePrefix);
+            if (config.IncludeTimestampInLogStreamName)
+                nameParts.Add(DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss"));
+            if (!string.IsNullOrEmpty(config.LogStreamNameSuffix))
+                nameParts.Add(config.LogStreamNameSuffix);
 
-            streamName.Append(DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss"));
-
-            var suffix = config.LogStreamNameSuffix;
-            if (!string.IsNullOrEmpty(suffix))
-            {
-                streamName.Append(" - ");
-                streamName.Append(suffix);
-            }
-
-
-            return streamName.ToString();
+            return string.Join(" - ", nameParts);
         }
 
         private static bool IsSuccessStatusCode(AmazonWebServiceResponse serviceResponse)
