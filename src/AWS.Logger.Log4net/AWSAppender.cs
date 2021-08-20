@@ -233,6 +233,7 @@ namespace AWS.Logger.Log4net
                 BatchPushInterval = BatchPushInterval,
                 BatchSizeInBytes = BatchSizeInBytes,
                 MaxQueuedMessages = MaxQueuedMessages,
+                IncludeTimestampInLogStreamName = IncludeTimestampInLogStreamName,
 				LogStreamNameSuffix = LogStreamNameSuffix,
                 LogStreamNamePrefix = LogStreamNamePrefix,
                 LibraryLogErrors = LibraryLogErrors,

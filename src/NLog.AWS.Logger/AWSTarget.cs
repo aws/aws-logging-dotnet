@@ -233,6 +233,7 @@ namespace NLog.AWS.Logger
                 BatchPushInterval = BatchPushInterval,
                 BatchSizeInBytes = BatchSizeInBytes,
                 MaxQueuedMessages = MaxQueuedMessages,
+                IncludeTimestampInLogStreamName = IncludeTimestampInLogStreamName,
                 LogStreamNameSuffix = RenderSimpleLayout(LogStreamNameSuffix, nameof(LogStreamNameSuffix)),
                 LogStreamNamePrefix = RenderSimpleLayout(LogStreamNamePrefix, nameof(LogStreamNamePrefix)),
                 LibraryLogErrors = LibraryLogErrors,

@@ -475,17 +475,35 @@ namespace AWS.Logger.Core
 
             var currentStreamName = GenerateStreamName(_config);
 
-            var streamResponse = await _client.CreateLogStreamAsync(new CreateLogStreamRequest
+            var logStreamsResponse = await _client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest()
             {
                 LogGroupName = _config.LogGroup,
-                LogStreamName = currentStreamName
+                LogStreamNamePrefix = currentStreamName
             }, token).ConfigureAwait(false);
-            if (!IsSuccessStatusCode(streamResponse))
+            if (!IsSuccessStatusCode(logStreamsResponse))
             {
-                LogLibraryServiceError(new System.Net.WebException($"Create LogStream {currentStreamName} for LogGroup {_config.LogGroup} returned status: {streamResponse.HttpStatusCode}"), serviceURL);
+                LogLibraryServiceError(new System.Net.WebException($"Create LogStream {currentStreamName} for LogGroup {_config.LogGroup} returned status: {logStreamsResponse.HttpStatusCode}"), serviceURL);
             }
+            var stream = logStreamsResponse.LogStreams.FirstOrDefault(ls => ls.LogStreamName == currentStreamName);
+            if (stream == null)
+            {
+                var streamResponse = await _client.CreateLogStreamAsync(new CreateLogStreamRequest
+                {
+                    LogGroupName = _config.LogGroup,
+                    LogStreamName = currentStreamName
+                }, token).ConfigureAwait(false);
+                if (!IsSuccessStatusCode(streamResponse))
+                {
+                    LogLibraryServiceError(new System.Net.WebException($"Create LogStream {currentStreamName} for LogGroup {_config.LogGroup} returned status: {streamResponse.HttpStatusCode}"), serviceURL);
+                }
 
-            _repo = new LogEventBatch(_config.LogGroup, currentStreamName, Convert.ToInt32(_config.BatchPushInterval.TotalSeconds), _config.BatchSizeInBytes);
+                _repo = new LogEventBatch(_config.LogGroup, currentStreamName, Convert.ToInt32(_config.BatchPushInterval.TotalSeconds), _config.BatchSizeInBytes);
+            }
+            else
+            {
+                _repo = new LogEventBatch(_config.LogGroup, currentStreamName, Convert.ToInt32(_config.BatchPushInterval.TotalSeconds), _config.BatchSizeInBytes);
+                _repo.Reset(stream.UploadSequenceToken);
+            }
 
             return currentStreamName;
         }
