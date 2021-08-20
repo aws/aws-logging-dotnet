@@ -1,0 +1,15 @@
+﻿{
+  "Logging": {
+    "LogGroup": "AWSILoggerNoTimestampTest",
+    "Region": "us-west-2",
+    "LogStreamNameSuffix": "Custom",
+    "LogStreamNamePrefix": "CustomPrefix",
+    "IncludeTimestampInLogStreamName": "false",
+    "LogLevel": {
+      "Default": "Debug",
+      "System": "Information",
+      "Microsoft": "Information",
+      "AWS": "Debug"
+    }
+  }
+}

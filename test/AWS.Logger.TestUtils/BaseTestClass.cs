@@ -3,6 +3,7 @@ using Amazon.CloudWatchLogs.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -83,7 +84,7 @@ namespace AWS.Logger.TestUtils
 
         protected abstract void LogMessages(int count);
 
-        protected void SimpleLoggingTest(string logGroupName)
+        protected void SimpleLoggingTest(string logGroupName, bool hasTimestamp = true)
         {
             LogMessages(SIMPLELOGTEST_COUNT);
             GetLogEventsResponse getLogEventsResponse = new GetLogEventsResponse();
@@ -104,10 +105,20 @@ namespace AWS.Logger.TestUtils
                     LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
                 }).Result;
 
-                var customStreamSuffix = describeLogstreamsResponse.LogStreams[0].LogStreamName.Split('-').Last().Trim();
+                var streamNameParts = describeLogstreamsResponse.LogStreams[0].LogStreamName.Split(new string[] { " - " }, StringSplitOptions.None);
+
+                var customStreamSuffix = streamNameParts.Last();
                 Assert.Equal(CUSTOMSTREAMSUFFIX, customStreamSuffix);
-                var customStreamPrefix = describeLogstreamsResponse.LogStreams[0].LogStreamName.Split('-').First().Trim();
+                var customStreamPrefix = streamNameParts.First();
                 Assert.Equal(CUSTOMSTREAMPREFIX, customStreamPrefix);
+
+                if (hasTimestamp)
+                {
+                    Assert.Equal(3, streamNameParts.Length);
+                    Assert.True(DateTime.TryParseExact(streamNameParts[1], "yyyy/MM/ddTHH.mm.ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out _));
+                }
+                else
+                    Assert.Equal(2, streamNameParts.Length);
             }
             Assert.Equal(SIMPLELOGTEST_COUNT, getLogEventsResponse.Events.Count());
 

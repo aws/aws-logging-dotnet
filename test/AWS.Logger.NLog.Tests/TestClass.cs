@@ -33,6 +33,14 @@ namespace AWS.Logger.NLogger.Tests
         }
 
         [Fact]
+        public void NoTimestampTest()
+        {
+            CreateLoggerFromConfiguration("NoTimestamp.config");
+            Logger = LogManager.GetLogger("loggerNoTimestamp");
+            SimpleLoggingTest("AWSNLogGroupNoTimestampTest", false);
+        }
+
+        [Fact]
         public void MultiThreadTest()
         {
             CreateLoggerFromConfiguration("AWSNLogGroupMultiThreadTest.config");

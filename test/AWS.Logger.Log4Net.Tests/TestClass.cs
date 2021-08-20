@@ -34,6 +34,13 @@ namespace AWS.Logger.Log4Net.Tests
         }
 
         [Fact]
+        public void NoTimestampTest()
+        {
+            GetLog4NetLogger("NoTimestamp.config", "NoTimestampTest");
+            SimpleLoggingTest("AWSLog4NetGroupLog4NetNoTimestampTest", false);
+        }
+
+        [Fact]
         public void MultiThreadTest()
         {
             GetLog4NetLogger("MultiThreadTest.config", "MultiThreadTest");

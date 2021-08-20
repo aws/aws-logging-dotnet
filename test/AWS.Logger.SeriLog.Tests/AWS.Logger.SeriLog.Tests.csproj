@@ -11,10 +11,14 @@
   <ItemGroup>
     <None Remove="AWSNLogGroupMultiThreadBufferFullTest.json" />
     <None Remove="AWSNLogGroupMultiThreadTest.json" />
+    <None Remove="AWSSeriLogGroupNoTimestampTest.json" />
     <None Remove="AWSSeriLogGroupRestrictedToMinimumLevel.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="AWSSeriLogGroupNoTimestampTest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="AWSSeriLogGroupRestrictedToMinimumLevel.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>

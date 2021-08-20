@@ -22,6 +22,9 @@
     <None Update="Nlog.config">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
+    <None Update="NoTimestamp.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Regular.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

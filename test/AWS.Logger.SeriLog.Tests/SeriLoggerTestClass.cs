@@ -38,6 +38,13 @@ namespace AWS.Logger.SeriLog.Tests
         }
 
         [Fact]
+        public void NoTimestampTest()
+        {
+            CreateLoggerFromConfiguration("AWSSeriLogGroupNoTimestampTest.json");
+            SimpleLoggingTest("AWSSeriLogGroupNoTimestampTest", false);
+        }
+
+        [Fact]
         public void MultiThreadTest()
         {
             CreateLoggerFromConfiguration("AWSSeriLogGroupMultiThreadTest.json");
@@ -97,6 +104,8 @@ namespace AWS.Logger.SeriLog.Tests
                 }).Result;
             }
             Assert.Equal(6, getLogEventsResponse.Events.Count);
+
+            _testFixture.LogGroupNameList.Add(logGroupName);
         }
 
         /// <summary>

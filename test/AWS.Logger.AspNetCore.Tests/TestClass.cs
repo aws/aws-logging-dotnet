@@ -87,6 +87,13 @@ namespace AWS.Logger.AspNetCore.Tests
         }
 
         [Fact]
+        public void NoTimestampTest()
+        {
+            LoggingSetup("noTimestamp.json", null);
+            SimpleLoggingTest(ConfigSection.Config.LogGroup, false);
+        }
+
+        [Fact]
         public void ExceptionMockTest()
         {
             var categoryName = "testlogging";
