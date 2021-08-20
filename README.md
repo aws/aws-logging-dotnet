@@ -26,6 +26,7 @@ logs:CreateLogGroup
 logs:CreateLogStream
 logs:PutLogEvents
 logs:DescribeLogGroups
+logs:DescribeLogStreams
 ```
 
 The practice of granting least privilege access is recommended when setting up credentials. You can further reduce access by limiting permission scope to specific resources (such as a Log Stream) by referencing its ARN during policy creation.
