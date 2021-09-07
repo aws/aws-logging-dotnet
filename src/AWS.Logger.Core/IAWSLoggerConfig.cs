@@ -123,5 +123,13 @@ namespace AWS.Logger
         /// </para>
         /// </summary>
         string LibraryLogFileName { get; }
+
+        /// <summary>
+        /// Set how much time we will wait until flush complete
+        /// <para>
+        /// The default is 30 seconds
+        /// </para>
+        /// </summary>
+        TimeSpan MaxWaitTimeForFlushCompletion { get; }
     }
 }

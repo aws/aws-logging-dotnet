@@ -200,6 +200,19 @@ namespace NLog.AWS.Logger
             set { _config.LibraryLogFileName = value; }
         }
 
+        /// <summary>
+        /// Set how much time we will wait until flush complete
+        /// <para>
+        /// The default is 30 seconds
+        /// </para>
+        /// </summary>
+        public TimeSpan MaxWaitTimeForFlushCompletion
+        {
+            get { return _config.MaxWaitTimeForFlushCompletion; }
+            set { _config.MaxWaitTimeForFlushCompletion = value; }
+        }
+
+
         /// <inheritdoc/>
         protected override void InitializeTarget()
         {

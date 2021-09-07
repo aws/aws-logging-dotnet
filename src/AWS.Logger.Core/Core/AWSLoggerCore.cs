@@ -206,7 +206,7 @@ namespace AWS.Logger.Core
                     }
 
                     // Waiting for Monitor-Task to complete flush
-                    if (!_flushCompletedEvent.Wait(TimeSpan.FromSeconds(30), _cancelStartSource.Token))
+                    if (!_flushCompletedEvent.Wait(_config.MaxWaitTimeForFlushCompletion, _cancelStartSource.Token))
                     {
                         var serviceUrl = GetServiceUrl();
                         LogLibraryServiceError(new TimeoutException($"Flush Timeout - ServiceURL={serviceUrl}, StreamName={_currentStreamName}, PendingMessages={_pendingMessageQueue.Count}, CurrentBatch={_repo.CurrentBatchMessageCount}"), serviceUrl);

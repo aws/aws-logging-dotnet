@@ -175,5 +175,13 @@ namespace AWS.Logger
         /// </para>
         /// </summary>
         public string LibraryLogFileName { get; set; } = "aws-logger-errors.txt";
+
+        /// <summary>
+        /// Set how much time we will wait until flush complete
+        /// <para>
+        /// The default is 30 seconds
+        /// </para>
+        /// </summary>
+        public TimeSpan MaxWaitTimeForFlushCompletion { get; set; } = TimeSpan.FromSeconds(30);
     }
 }

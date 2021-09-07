@@ -199,6 +199,18 @@ namespace AWS.Logger.Log4net
         }
 
         /// <summary>
+        /// Set how much time we will wait until flush complete
+        /// <para>
+        /// The default is 30 seconds
+        /// </para>
+        /// </summary>
+        public TimeSpan MaxWaitTimeForFlushCompletion
+        {
+            get { return _config.MaxWaitTimeForFlushCompletion; }
+            set { _config.MaxWaitTimeForFlushCompletion = value; }
+        }
+
+        /// <summary>
         /// Initialize the appender based on the options set.
         /// </summary>
         public override void ActivateOptions()
