@@ -185,7 +185,20 @@ namespace AWS.Logger.Log4net
             get { return _config.LibraryLogErrors; }
             set { _config.LibraryLogErrors = value; }
         }
-        
+
+        /// <summary>
+        /// Gets and sets the FlushTimeout property. When performing a flush of the in-memory queue this is the maximum period of time allowed to send the remaining
+        /// messages before it will be aborted. If this is exceeded, incoming log messages will be dropped.
+        /// <para>
+        /// The default is 30 seconds.
+        /// </para>
+        /// </summary>
+        public TimeSpan FlushTimeout
+        {
+            get { return _config.FlushTimeout; }
+            set { _config.FlushTimeout = value; }
+        }
+
         /// <summary>
         /// Gets and sets the LibraryLogFileName property. This is the name of the file into which errors from the AWS.Logger.Core library will be wriiten into.
         /// <para>
@@ -223,7 +236,8 @@ namespace AWS.Logger.Log4net
 				LogStreamNameSuffix = LogStreamNameSuffix,
                 LogStreamNamePrefix = LogStreamNamePrefix,
                 LibraryLogErrors = LibraryLogErrors,
-				LibraryLogFileName = LibraryLogFileName
+				LibraryLogFileName = LibraryLogFileName,
+                FlushTimeout = FlushTimeout
             };
             _core = new AWSLoggerCore(config, "Log4net");
         }

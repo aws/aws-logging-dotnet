@@ -107,7 +107,7 @@ namespace AWS.Logger
 
         /// <summary>
         /// Gets and sets the MaxQueuedMessages property. This specifies the maximum number of log messages that could be stored in-memory. MaxQueuedMessages 
-        /// dictates the total number of log messages that can be stored in-memory. If this exceeded, incoming log messages will be dropped.
+        /// dictates the total number of log messages that can be stored in-memory. If this is exceeded, incoming log messages will be dropped.
         /// <para>
         /// The default is 10000.
         /// </para>
@@ -175,5 +175,14 @@ namespace AWS.Logger
         /// </para>
         /// </summary>
         public string LibraryLogFileName { get; set; } = "aws-logger-errors.txt";
+
+        /// <summary>
+        /// Gets the FlushTimeout property. When performing a flush of the in-memory queue this is the maximum period of time allowed to send the remaining
+        /// messages before it will be aborted. If this is exceeded, incoming log messages will be dropped.
+        /// <para>
+        /// The default is 30 seconds.
+        /// </para>
+        /// </summary>
+        public TimeSpan FlushTimeout { get; set; } = TimeSpan.FromSeconds(30);
     }
 }
