@@ -662,22 +662,53 @@ namespace AWS.Logger.Core
         /// <summary>
         /// Write Exception details to the file specified with the filename
         /// </summary>
-        public static void LogLibraryError(Exception ex, string LibraryLogFileName)
+        private static void WriteToFile(string fileName, string text)
         {
-            try
+            //
+            // The locker ensures within process atomic access,
+            // but the same file can be accessed from multiple processes
+            // at the same time. On Windows, this will raise an
+            // IOException. Try again a number of times.
+            //
+            const int TRY_SLEEP_INTERVAL_MS = 50;
+            const int MAX_TRIES = 25;
+
+            bool written = false;
+            int tries = 0;
+
+            while (!written)
             {
-                using (StreamWriter w = File.AppendText(LibraryLogFileName))
+                try
                 {
-                    w.WriteLine("Log Entry : ");
-                    w.WriteLine("{0}", DateTime.Now.ToString());
-                    w.WriteLine("  :");
-                    w.WriteLine("  :{0}", ex.ToString());
-                    w.WriteLine("-------------------------------");
+                    tries++;
+
+                    locker.AcquireWriterLock(int.MaxValue);
+
+                    using (StreamWriter w = File.AppendText(fileName))
+                    {
+                        w.Write(text);
+                    }
+
+                    written = true;
                 }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Exception caught when writing error log to file" + e.ToString());
+                catch (IOException)
+                {
+                    //
+                    // Failed. Try again after some time.
+                    //
+                    if (tries < MAX_TRIES)
+                    {
+                        Thread.Sleep(TRY_SLEEP_INTERVAL_MS);
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                finally
+                {
+                    locker.ReleaseWriterLock();
+                }
             }
         }
     }
