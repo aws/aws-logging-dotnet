@@ -662,14 +662,35 @@ namespace AWS.Logger.Core
         /// <summary>
         /// Write Exception details to the file specified with the filename
         /// </summary>
+        public static void LogLibraryError(Exception? ex, string LibraryLogFileName)
+        {
+            try
+            {
+                StringBuilder sb = new StringBuilder(512);
+
+                sb.AppendLine("Log Entry : ");
+
+                sb.AppendLine(DateTime.Now.ToString());
+
+                sb.AppendLine("  :");
+
+                sb.Append("  :");
+                sb.AppendLine(ex.ToString());
+
+                sb.AppendLine("-------------------------------");
+
+                WriteToFile(LibraryLogFileName, sb.ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception caught when writing error log to file" + e.ToString());
+            }
+        }
+
+        static ReaderWriterLock locker = new ReaderWriterLock();
+
         private static void WriteToFile(string fileName, string text)
         {
-            //
-            // The locker ensures within process atomic access,
-            // but the same file can be accessed from multiple processes
-            // at the same time. On Windows, this will raise an
-            // IOException. Try again a number of times.
-            //
             const int TRY_SLEEP_INTERVAL_MS = 50;
             const int MAX_TRIES = 25;
 
