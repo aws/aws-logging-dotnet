@@ -475,14 +475,28 @@ namespace AWS.Logger.Core
 
             var currentStreamName = GenerateStreamName(_config);
 
-            var streamResponse = await _client.CreateLogStreamAsync(new CreateLogStreamRequest
+            CreateLogStreamResponse streamResponse;
+
+            try
             {
-                LogGroupName = _config.LogGroup,
-                LogStreamName = currentStreamName
-            }, token).ConfigureAwait(false);
-            if (!IsSuccessStatusCode(streamResponse))
+                streamResponse = await _client.CreateLogStreamAsync(new CreateLogStreamRequest
+                {
+                    LogGroupName = _config.LogGroup,
+                    LogStreamName = currentStreamName
+                }, token).ConfigureAwait(false);
+            }
+            catch (ResourceAlreadyExistsException)
             {
-                LogLibraryServiceError(new System.Net.WebException($"Create LogStream {currentStreamName} for LogGroup {_config.LogGroup} returned status: {streamResponse.HttpStatusCode}"), serviceURL);
+                // Ignore error, log stream already exists.
+                streamResponse = null;
+            }
+
+            if (streamResponse != null)
+            {
+                if (!IsSuccessStatusCode(streamResponse))
+                {
+                    LogLibraryServiceError(new System.Net.WebException($"Create LogStream {currentStreamName} for LogGroup {_config.LogGroup} returned status: {streamResponse.HttpStatusCode}"), serviceURL);
+                }
             }
 
             _repo = new LogEventBatch(_config.LogGroup, currentStreamName, Convert.ToInt32(_config.BatchPushInterval.TotalSeconds), _config.BatchSizeInBytes);
