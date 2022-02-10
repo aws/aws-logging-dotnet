@@ -54,7 +54,7 @@ is **NLog.config**. Here is an example config file that configures the AWS Regio
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	  throwConfigExceptions="true">
   <extensions>
-    <add assembly="NLog.AWS.Logger" />
+    <add assembly="AWS.Logger.NLog" />
   </extensions>
   <targets>
     <target name="aws" type="AWSTarget" logGroup="NLog.ConfigExample" region="us-east-1"/>
