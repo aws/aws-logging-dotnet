@@ -248,7 +248,7 @@ namespace AWS.Logger.Core
                     _maxBufferTimeStamp = DateTime.UtcNow;
                     _pendingMessageQueue.Enqueue(new InputLogEvent
                     {
-                        Timestamp = DateTime.Now,
+                        Timestamp = DateTime.UtcNow,
                         Message = message,
                     });
                 }
@@ -257,7 +257,7 @@ namespace AWS.Logger.Core
             {
                 _pendingMessageQueue.Enqueue(new InputLogEvent
                 {
-                    Timestamp = DateTime.Now,
+                    Timestamp = DateTime.UtcNow,
                     Message = message,
                 });
             }
