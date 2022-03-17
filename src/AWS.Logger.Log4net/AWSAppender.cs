@@ -137,7 +137,7 @@ namespace AWS.Logger.Log4net
 
         /// <summary>
         /// Gets and sets the MaxQueuedMessages property. This specifies the maximum number of log messages that could be stored in-memory. MaxQueuedMessages 
-        /// dictates the total number of log messages that can be stored in-memory. If this exceeded, incoming log messages will be dropped.
+        /// dictates the total number of log messages that can be stored in-memory. If this is exceeded, incoming log messages will be dropped.
         /// <para>
         /// The default is 10000.
         /// </para>
@@ -185,9 +185,22 @@ namespace AWS.Logger.Log4net
             get { return _config.LibraryLogErrors; }
             set { _config.LibraryLogErrors = value; }
         }
-        
+
         /// <summary>
-        /// Gets and sets the LibraryLogFileName property. This is the name of the file into which errors from the AWS.Logger.Core library will be wriiten into.
+        /// Gets and sets the FlushTimeout property. The value is in milliseconds. When performing a flush of the in-memory queue this is the maximum period of time allowed to send the remaining
+        /// messages before it will be aborted. If this is exceeded, incoming log messages will be dropped.
+        /// <para>
+        /// The default is 30000 milliseconds.
+        /// </para>
+        /// </summary>
+        public TimeSpan FlushTimeout
+        {
+            get { return _config.FlushTimeout; }
+            set { _config.FlushTimeout = value; }
+        }
+
+        /// <summary>
+        /// Gets and sets the LibraryLogFileName property. This is the name of the file into which errors from the AWS.Logger.Core library will be written into.
         /// <para>
         /// The default is going to "aws-logger-errors.txt".
         /// </para>
@@ -220,10 +233,11 @@ namespace AWS.Logger.Log4net
                 BatchPushInterval = BatchPushInterval,
                 BatchSizeInBytes = BatchSizeInBytes,
                 MaxQueuedMessages = MaxQueuedMessages,
-				LogStreamNameSuffix = LogStreamNameSuffix,
+                LogStreamNameSuffix = LogStreamNameSuffix,
                 LogStreamNamePrefix = LogStreamNamePrefix,
                 LibraryLogErrors = LibraryLogErrors,
-				LibraryLogFileName = LibraryLogFileName
+                LibraryLogFileName = LibraryLogFileName,
+                FlushTimeout = FlushTimeout
             };
             _core = new AWSLoggerCore(config, "Log4net");
         }

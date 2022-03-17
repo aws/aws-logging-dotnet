@@ -139,7 +139,7 @@ namespace NLog.AWS.Logger
 
         /// <summary>
         /// Gets and sets the MaxQueuedMessages property. This specifies the maximum number of log messages that could be stored in-memory. MaxQueuedMessages 
-        /// dictates the total number of log messages that can be stored in-memory. If this exceeded, incoming log messages will be dropped.
+        /// dictates the total number of log messages that can be stored in-memory. If this is exceeded, incoming log messages will be dropped.
         /// <para>
         /// The default is 10000.
         /// </para>
@@ -189,7 +189,7 @@ namespace NLog.AWS.Logger
         }
 
         /// <summary>
-        /// Gets and sets the LibraryLogFileName property. This is the name of the file into which errors from the AWS.Logger.Core library will be wriiten into.
+        /// Gets and sets the LibraryLogFileName property. This is the name of the file into which errors from the AWS.Logger.Core library will be written into.
         /// <para>
         /// The default is "aws-logger-errors.txt".
         /// </para>
@@ -198,6 +198,19 @@ namespace NLog.AWS.Logger
         {
             get { return _config.LibraryLogFileName; }
             set { _config.LibraryLogFileName = value; }
+        }
+
+        /// <summary>
+        /// Gets the FlushTimeout property. The value is in milliseconds. When performing a flush of the in-memory queue this is the maximum period of time allowed to send the remaining
+        /// messages before it will be aborted. If this is exceeded, incoming log messages will be dropped.
+        /// <para>
+        /// The default is 30000 milliseconds.
+        /// </para>
+        /// </summary>
+        public TimeSpan FlushTimeout
+        {
+            get { return _config.FlushTimeout; }
+            set { _config.FlushTimeout = value; }
         }
 
         /// <inheritdoc/>
@@ -223,7 +236,8 @@ namespace NLog.AWS.Logger
                 LogStreamNameSuffix = RenderSimpleLayout(LogStreamNameSuffix, nameof(LogStreamNameSuffix)),
                 LogStreamNamePrefix = RenderSimpleLayout(LogStreamNamePrefix, nameof(LogStreamNamePrefix)),
                 LibraryLogErrors = LibraryLogErrors,
-                LibraryLogFileName = LibraryLogFileName
+                LibraryLogFileName = LibraryLogFileName,
+                FlushTimeout = FlushTimeout
             };
             _core = new AWSLoggerCore(config, "NLog");
             _core.LogLibraryAlert += AwsLogLibraryAlert;
