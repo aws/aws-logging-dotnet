@@ -1,3 +1,16 @@
+### Release 2022-03-21
+* **AWS.Logger.Core (3.1.0)**
+  * Fixed an issue where AddSingleMessage in AWSLoggerCore was using DateTime.Now instead of DateTime.UtcNow.
+  * Added support for configurable flush timeout.
+* **AWS.Logger.AspNetCore (3.3.0)**
+  * Added support for configurable flush timeout.
+* **AWS.Logger.Log4net (3.3.0)**
+  * Added support for configurable flush timeout.
+* **AWS.Logger.NLog (3.1.0)**
+  * Added support for configurable flush timeout.
+* **AWS.Logger.SeriLog (3.2.0)**
+  * Added support for configurable flush timeout.
+
 ### Release 2021-06-23
 * **AWS.Logger.SeriLog (3.1.1)**
   * Fixed an issue where restrictedToMinimumLevel from appsettings.json was ignored.
