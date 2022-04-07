@@ -16,15 +16,15 @@ namespace ProgrammaticConfigurationExample
     {
         static void Main(string[] args)
         {
-            ConfigureNLog();
-
+            ConfigureNLog(args.Length > 0 ? args[0] : null);
+            
             Logger logger = LogManager.GetCurrentClassLogger();
             logger.Info("Check the AWS Console CloudWatch Logs console in us-east-1");
             logger.Info("to see messages in the log streams for the");
             logger.Info("log group NLog.ProgrammaticConfigurationExample");
         }
 
-        static void ConfigureNLog()
+        static void ConfigureNLog(string Key = null)
         {
             var config = new LoggingConfiguration();
 
@@ -36,6 +36,13 @@ namespace ProgrammaticConfigurationExample
                 LogGroup = "NLog.ProgrammaticConfigurationExample",
                 Region = "us-east-1"
             };
+
+            if (Key != null)
+            {
+                awsTarget.LogStreamNameUniqueKey = Key;
+                awsTarget.LogStreamNameSuffix = string.Empty;
+            };
+
             config.AddTarget("aws", awsTarget);
 
             config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, consoleTarget));

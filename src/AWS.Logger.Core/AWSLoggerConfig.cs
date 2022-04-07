@@ -151,6 +151,15 @@ namespace AWS.Logger
         public string LogStreamNameSuffix { get; set; } = Guid.NewGuid().ToString();
 
         /// <summary>
+        /// Sets a unique key for this instance. Keys should be unique to the instance to prevent multiple instances logging to the same stream.
+        /// CAUTION: This should be unique to a log instance to prevent conflicts between instances.
+        /// <para>
+        /// The default is DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss")
+        /// </para>
+        /// </summary>
+        public string LogStreamNameUniqueKey { get; set; } = DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss");
+
+        /// <summary>
         /// Gets and sets the LogStreamNamePrefix property. The LogStreamName consists of an optional user-defined LogStreamNamePrefix (that can be set here)
         /// followed by a DateTimeStamp as the prefix, and a user defined suffix value
         /// The LogstreamName then follows the pattern '[LogStreamNamePrefix]-[DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss")]-[LogStreamNameSuffix]'

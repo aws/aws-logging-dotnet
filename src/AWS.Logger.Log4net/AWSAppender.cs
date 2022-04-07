@@ -162,6 +162,19 @@ namespace AWS.Logger.Log4net
         }
 
         /// <summary>
+        /// Sets a unique key for this instance. Keys should be unique to the instance to prevent multiple instances logging to the same stream.
+        /// CAUTION: This should be unique to a log instance to prevent conflicts between instances.
+        /// <para>
+        /// The default is DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss")
+        /// </para>
+        /// </summary>
+        public string LogStreamNameUniqueKey
+        {
+            get { return _config.LogStreamNameUniqueKey; }
+            set { _config.LogStreamNameUniqueKey = value; }
+        }
+
+        /// <summary>
         /// Gets and sets the LogStreamNamePrefix property. The LogStreamName consists of an optional user-defined prefix segment (defined here), then a
         /// DateTimeStamp as the system-defined prefix segment, and a user defined suffix value that can be set using the LogStreamNameSuffix property.
         /// <para>

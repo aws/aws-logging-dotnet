@@ -475,17 +475,36 @@ namespace AWS.Logger.Core
 
             var currentStreamName = GenerateStreamName(_config);
 
-            var streamResponse = await _client.CreateLogStreamAsync(new CreateLogStreamRequest
+            var describeStreamResponse = await _client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
             {
                 LogGroupName = _config.LogGroup,
-                LogStreamName = currentStreamName
+                LogStreamNamePrefix = currentStreamName
             }, token).ConfigureAwait(false);
-            if (!IsSuccessStatusCode(streamResponse))
+            if (!IsSuccessStatusCode(describeStreamResponse))
             {
-                LogLibraryServiceError(new System.Net.WebException($"Create LogStream {currentStreamName} for LogGroup {_config.LogGroup} returned status: {streamResponse.HttpStatusCode}"), serviceURL);
+                LogLibraryServiceError(new System.Net.WebException($"Describe LogStream {currentStreamName} for LogGroup {_config.LogGroup} returned status: {describeStreamResponse.HttpStatusCode}"), serviceURL);
+            }
+
+            var logStream = describeStreamResponse.LogStreams.FirstOrDefault(x => string.Equals(x.LogStreamName, currentStreamName, StringComparison.Ordinal));
+            if(logStream == null)
+            {
+                var streamResponse = await _client.CreateLogStreamAsync(new CreateLogStreamRequest
+                {
+                    LogGroupName = _config.LogGroup,
+                    LogStreamName = currentStreamName
+                }, token).ConfigureAwait(false);
+                if (!IsSuccessStatusCode(streamResponse))
+                {
+                    LogLibraryServiceError(new System.Net.WebException($"Create LogStream {currentStreamName} for LogGroup {_config.LogGroup} returned status: {streamResponse.HttpStatusCode}"), serviceURL);
+                }
             }
 
             _repo = new LogEventBatch(_config.LogGroup, currentStreamName, Convert.ToInt32(_config.BatchPushInterval.TotalSeconds), _config.BatchSizeInBytes);
+
+            if (logStream != null)
+            {
+                _repo.Reset(logStream.UploadSequenceToken);
+            }
 
             return currentStreamName;
         }
@@ -493,7 +512,7 @@ namespace AWS.Logger.Core
         /// <summary>
         /// Generate a logstream name
         /// </summary>
-        /// <returns>logstream name that ALWAYS includes a unique date-based segment</returns>
+        /// <returns>logstream name built from [Prefix - UniqueKey - Suffix]</returns>
         public static string GenerateStreamName(IAWSLoggerConfig config)
         {
             var streamName = new StringBuilder();
@@ -505,7 +524,7 @@ namespace AWS.Logger.Core
                 streamName.Append(" - ");
             }
 
-            streamName.Append(DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss"));
+            streamName.Append(config.LogStreamNameUniqueKey);
 
             var suffix = config.LogStreamNameSuffix;
             if (!string.IsNullOrEmpty(suffix))
