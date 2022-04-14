@@ -39,8 +39,10 @@ namespace AWS.Logger.Core
         private string _logType;
         private int _requestCount = 5;
         const double MAX_BUFFER_TIMEDIFF = 5;
-        private readonly static Regex invalid_sequence_token_regex = new
+        private static readonly Regex invalid_sequence_token_regex = new
             Regex(@"The given sequenceToken is invalid. The next expected sequenceToken is: (\d+)");
+        private static bool isInitialized = false;
+        private static object initializedLock = new object();
         #endregion
 
         /// <summary>
@@ -103,7 +105,12 @@ namespace AWS.Logger.Core
 
             ((AmazonCloudWatchLogsClient)this._client).BeforeRequestEvent += ServiceClientBeforeRequestEvent;
             ((AmazonCloudWatchLogsClient)this._client).ExceptionEvent += ServiceClienExceptionEvent;
-
+            lock (initializedLock)
+            {
+                if (isInitialized)
+                    return;
+                isInitialized = true;
+            }
             StartMonitor();
             RegisterShutdownHook();
         }
