@@ -17,6 +17,17 @@ may not ever be unfrozen if more Lambda events are not received for some time.
 When using Lambda it is recommended to use either the `ILambdaContext.Logger.LogLine` or the 
 [Amazon.Lambda.Logging.AspNetCore](https://github.com/aws/aws-lambda-dotnet/tree/master/Libraries/src/Amazon.Lambda.Logging.AspNetCore) package.
 
+### Why can't the Log Stream name be configured?
+
+These libraries use CloudWatch Logs' best practice of having the log stream name be generated. The name can be customized by adding 
+a suffix or prefix using the LogStreamNameSuffix and LogStreamNamePrefix configuration properties.
+
+Generating the name ensures each process within an application has its own log stream to write to. When writing to log 
+stream a marker is maintained to append more messages to the stream. When more then one process writes to the same stream
+the marker maintained within the process goes out of sync. This generates errors and retries to post the log 
+message causing performance issues.
+
+To view logs across all log streams it is recommended to use the [Logs Insight](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html) feature for Cloud Watch Logs.
 
 ## Supported Logging Frameworks
 
