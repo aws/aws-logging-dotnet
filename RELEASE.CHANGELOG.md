@@ -1,4 +1,46 @@
-### Release 2021-03-29
+### Release 2022-03-21
+* **AWS.Logger.Core (3.1.0)**
+  * Fixed an issue where AddSingleMessage in AWSLoggerCore was using DateTime.Now instead of DateTime.UtcNow.
+  * Added support for configurable flush timeout.
+* **AWS.Logger.AspNetCore (3.3.0)**
+  * Added support for configurable flush timeout.
+* **AWS.Logger.Log4net (3.3.0)**
+  * Added support for configurable flush timeout.
+* **AWS.Logger.NLog (3.1.0)**
+  * Added support for configurable flush timeout.
+* **AWS.Logger.SeriLog (3.2.0)**
+  * Added support for configurable flush timeout.
+
+### Release 2021-06-23
+* **AWS.Logger.SeriLog (3.1.1)**
+  * Fixed an issue where restrictedToMinimumLevel from appsettings.json was ignored.
+  * Updated to version 2.6.0 of Serilog.
+
+### Release 2021-05-21
+* **AWS.Logger.SeriLog (3.1.0)**
+  * Added support for restrictedToMinimumLevel to SeriLog.
+
+### Release 2021-04-26
+* **AWS.Logger.Log4net (3.2.1)**
+  * Updated to version 2.0.12 of the log4net.
+
+### Release 2021-04-02
+* **AWS.Logger.Core (3.0.0)**
+  * Updated AWS SDK for .NET dependency to version 3.7.
+  * Removed support for .NET Standard 1.5.
+* **AWS.Logger.AspNetCore (3.2.0)**
+  * Updated to latest AWS.Logger.Core.
+* **AWS.Logger.Log4net (3.2.0)**
+  * Updated to latest AWS.Logger.Core.
+* **AWS.Logger.NLog (3.0.0)**
+  * Updated to latest AWS.Logger.Core.
+  * Removed support for .NET Standard 1.5.
+* **AWS.Logger.SeriLog (3.0.0)**
+  * Updated to latest AWS.Logger.Core.
+  * Removed support for .NET Standard 1.5.
+
+
+### Release 2021-03-24
 * **AWS.Logger.Core (2.1.0)**
   * Pull Request [#117](https://github.com/aws/aws-logging-dotnet/pull/117) Updated library with new property to disable library error logging. Thanks [Alex](https://github.com/aleybe)
 * **AWS.Logger.AspNetCore (3.1.0)**

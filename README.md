@@ -17,6 +17,22 @@ may not ever be unfrozen if more Lambda events are not received for some time.
 When using Lambda it is recommended to use either the `ILambdaContext.Logger.LogLine` or the 
 [Amazon.Lambda.Logging.AspNetCore](https://github.com/aws/aws-lambda-dotnet/tree/master/Libraries/src/Amazon.Lambda.Logging.AspNetCore) package.
 
+### Required IAM Permissions
+
+Regardless of the framework used, the following permissions must be allowed (via [IAM](https://aws.amazon.com/iam)) for the provided AWS credentials.
+
+```
+logs:CreateLogGroup
+logs:CreateLogStream
+logs:PutLogEvents
+logs:DescribeLogGroups
+```
+
+The practice of granting least privilege access is recommended when setting up credentials. You can further reduce access by limiting permission scope to specific resources (such as a Log Stream) by referencing its ARN during policy creation.
+
+For more information and a sample JSON policy template, please see [Amazon CloudWatch Logs and .NET Logging Frameworks](https://aws.amazon.com/blogs/developer/amazon-cloudwatch-logs-and-net-logging-frameworks/) on the AWS Developer Blog.
+
+
 ### Why can't the Log Stream name be configured?
 
 These libraries use CloudWatch Logs' best practice of having the log stream name be generated. The name can be customized by adding 

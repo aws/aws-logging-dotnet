@@ -128,6 +128,7 @@ namespace Microsoft.Extensions.Configuration
         internal const string LOG_STREAM_NAME_PREFIX = "LogStreamNamePrefix";
         internal const string LIBRARY_LOG_FILE_NAME = "LibraryLogFileName";
         internal const string LIBRARY_LOG_ERRORS = "LibraryLogErrors";
+        internal const string FLUSH_TIMEOUT = "FlushTimeout";
 
         private const string INCLUDE_LOG_LEVEL_KEY = "IncludeLogLevel";
         private const string INCLUDE_CATEGORY_KEY = "IncludeCategory";
@@ -187,6 +188,10 @@ namespace Microsoft.Extensions.Configuration
             if (loggerConfigSection[LIBRARY_LOG_ERRORS] != null)
             {
                 Config.LibraryLogErrors = Boolean.Parse(loggerConfigSection[LIBRARY_LOG_ERRORS]);
+            }
+            if (loggerConfigSection[FLUSH_TIMEOUT] != null)
+            {
+                Config.FlushTimeout = TimeSpan.FromMilliseconds(Int32.Parse(loggerConfigSection[FLUSH_TIMEOUT]));
             }
 
             if (loggerConfigSection[INCLUDE_LOG_LEVEL_KEY] != null)

@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
 using Serilog;
-using Serilog.Formatting;
 using Serilog.Configuration;
-using Microsoft.Extensions.Configuration;
+using Serilog.Events;
+using Serilog.Formatting;
+using System;
 
 namespace AWS.Logger.SeriLog
 {
@@ -24,6 +25,7 @@ namespace AWS.Logger.SeriLog
         internal const string LOG_STREAM_NAME_PREFIX = "Serilog:LogStreamNamePrefix";
         internal const string LIBRARY_LOG_FILE_NAME = "Serilog:LibraryLogFileName";
         internal const string LIBRARY_LOG_ERRORS = "Serilog:LibraryLogErrors";
+        internal const string FLUSH_TIMEOUT = "Serilog:FlushTimeout";
 
         /// <summary>
         /// AWSSeriLogger target that is called when the customer is using 
@@ -34,7 +36,8 @@ namespace AWS.Logger.SeriLog
                   this LoggerSinkConfiguration loggerConfiguration,
                   IConfiguration configuration, 
                   IFormatProvider iFormatProvider = null,
-                  ITextFormatter textFormatter = null )
+                  ITextFormatter textFormatter = null,
+                  LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose)
         {
             AWSLoggerConfig config = new AWSLoggerConfig();
 
@@ -87,7 +90,11 @@ namespace AWS.Logger.SeriLog
             {
                 config.LibraryLogErrors = Boolean.Parse(configuration[LIBRARY_LOG_ERRORS]);
             }
-            return AWSSeriLog(loggerConfiguration, config, iFormatProvider, textFormatter);
+            if (configuration[FLUSH_TIMEOUT] != null)
+            {
+                config.FlushTimeout = TimeSpan.FromMilliseconds(Int32.Parse(configuration[FLUSH_TIMEOUT]));
+            }
+            return AWSSeriLog(loggerConfiguration, config, iFormatProvider, textFormatter, restrictedToMinimumLevel);
         }
 
         /// <summary>
@@ -99,9 +106,10 @@ namespace AWS.Logger.SeriLog
                   this LoggerSinkConfiguration loggerConfiguration,
                    AWSLoggerConfig configuration = null,
                    IFormatProvider iFormatProvider = null, 
-                   ITextFormatter textFormatter = null)
+                   ITextFormatter textFormatter = null,
+                   LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose)
         {
-            return loggerConfiguration.Sink(new AWSSink(configuration, iFormatProvider, textFormatter));
+            return loggerConfiguration.Sink(new AWSSink(configuration, iFormatProvider, textFormatter), restrictedToMinimumLevel);
         }
     }
 }

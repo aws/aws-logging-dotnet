@@ -206,7 +206,7 @@ namespace AWS.Logger.Core
                     }
 
                     // Waiting for Monitor-Task to complete flush
-                    if (!_flushCompletedEvent.Wait(TimeSpan.FromSeconds(30), _cancelStartSource.Token))
+                    if (!_flushCompletedEvent.Wait(_config.FlushTimeout, _cancelStartSource.Token))
                     {
                         var serviceUrl = GetServiceUrl();
                         LogLibraryServiceError(new TimeoutException($"Flush Timeout - ServiceURL={serviceUrl}, StreamName={_currentStreamName}, PendingMessages={_pendingMessageQueue.Count}, CurrentBatch={_repo.CurrentBatchMessageCount}"), serviceUrl);
@@ -248,7 +248,7 @@ namespace AWS.Logger.Core
                     _maxBufferTimeStamp = DateTime.UtcNow;
                     _pendingMessageQueue.Enqueue(new InputLogEvent
                     {
-                        Timestamp = DateTime.Now,
+                        Timestamp = DateTime.UtcNow,
                         Message = message,
                     });
                 }
@@ -257,7 +257,7 @@ namespace AWS.Logger.Core
             {
                 _pendingMessageQueue.Enqueue(new InputLogEvent
                 {
-                    Timestamp = DateTime.Now,
+                    Timestamp = DateTime.UtcNow,
                     Message = message,
                 });
             }

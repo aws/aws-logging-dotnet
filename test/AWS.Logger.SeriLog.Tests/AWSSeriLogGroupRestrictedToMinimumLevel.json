@@ -1,0 +1,18 @@
+﻿{
+  "Serilog": {
+    "Using": [ "AWS.Logger.SeriLog" ],
+    "MinimumLevel": "Debug",
+    "LogGroup": "AWSSeriLogGroupRestrictedtoMinimumLevel",
+    "Region": "us-west-2",
+    "LogStreamNameSuffix": "Custom",
+    "LogStreamNamePrefix": "CustomPrefix",
+    "WriteTo": [
+      {
+        "Name": "AWSSeriLog",
+        "Args": {
+          "restrictedToMinimumLevel": "Error"
+        }
+      }
+    ]
+  }
+}

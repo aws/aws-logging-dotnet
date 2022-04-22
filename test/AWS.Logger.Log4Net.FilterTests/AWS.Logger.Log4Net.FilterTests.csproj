@@ -17,7 +17,7 @@
   <ItemGroup>
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <!-- This needs to be referenced to allow testing via AssumeRole credentials -->
-    <PackageReference Include="AWSSDK.SecurityToken" Version="3.5.1.4" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.0.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,6 +25,6 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <PackageReference Include="log4net" Version="2.0.10" />
+    <PackageReference Include="log4net" Version="2.0.12" />
   </ItemGroup>
 </Project>

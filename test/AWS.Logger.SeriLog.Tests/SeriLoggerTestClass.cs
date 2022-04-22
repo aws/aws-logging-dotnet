@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Amazon.CloudWatchLogs.Model;
 using AWS.Logger.SeriLog;
 using AWS.Logger.TestUtils;
 using Microsoft.Extensions.Configuration;
@@ -48,6 +49,54 @@ namespace AWS.Logger.SeriLog.Tests
         {
             CreateLoggerFromConfiguration("AWSSeriLogGroupMultiThreadBufferFullTest.json");
             MultiThreadBufferFullTestGroup("AWSSeriLogGroupMultiThreadBufferFullTest");
+        }
+
+        [Fact]
+        public void RestrictedToMinimumLevelTest()
+        {
+            string logGroupName = "AWSSeriLogGroupRestrictedtoMinimumLevel";
+            // Create logger
+            var configuration = new ConfigurationBuilder()
+            .AddJsonFile("AWSSeriLogGroupRestrictedToMinimumLevel.json")
+            .Build();
+
+            Log.Logger = new LoggerConfiguration().
+                ReadFrom.Configuration(configuration).CreateLogger();
+
+            ExecuteRestrictedToMinimumLevelTest(logGroupName);
+        }
+
+        private void ExecuteRestrictedToMinimumLevelTest(string logGroupName)
+        {
+            // Log 4 Debug messages
+            for (int i = 0; i < 3; i++)
+            {
+                Log.Debug(string.Format("Test logging message {0} SeriLog, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
+            }
+            // Log 5 Error messages
+            for (int i = 0; i < 5; i++)
+            {
+                Log.Error(string.Format("Test logging message {0} SeriLog, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
+            }
+            Log.Error(LASTMESSAGE);
+
+            GetLogEventsResponse getLogEventsResponse = new GetLogEventsResponse();
+            if (NotifyLoggingCompleted("AWSSeriLogGroupRestrictedtoMinimumLevel", "LASTMESSAGE"))
+            {
+                DescribeLogStreamsResponse describeLogstreamsResponse = Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
+                {
+                    Descending = true,
+                    LogGroupName = logGroupName,
+                    OrderBy = "LastEventTime"
+                }).Result;
+
+                getLogEventsResponse = Client.GetLogEventsAsync(new GetLogEventsRequest
+                {
+                    LogGroupName = logGroupName,
+                    LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
+                }).Result;
+            }
+            Assert.Equal(6, getLogEventsResponse.Events.Count);
         }
 
         /// <summary>
