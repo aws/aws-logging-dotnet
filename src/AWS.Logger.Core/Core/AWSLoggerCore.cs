@@ -38,6 +38,10 @@ namespace AWS.Logger.Core
         private DateTime _maxBufferTimeStamp = new DateTime();
         private string _logType;
         private int _requestCount = 5;
+        
+        /// <summary>
+        /// Minimum interval in minutes between two error messages on in-memory buffer overflow.
+        /// </summary>
         const double MAX_BUFFER_TIMEDIFF = 5;
         private readonly static Regex invalid_sequence_token_regex = new
             Regex(@"The given sequenceToken is invalid. The next expected sequenceToken is: (\d+)");
