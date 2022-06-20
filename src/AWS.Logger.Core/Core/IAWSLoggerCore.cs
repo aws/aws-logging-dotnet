@@ -18,7 +18,7 @@
         /// <summary>
         /// Sends message to CloudWatch Logs
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="message">Message to log.</param>
         void AddMessage(string message);
 
         /// <summary>
