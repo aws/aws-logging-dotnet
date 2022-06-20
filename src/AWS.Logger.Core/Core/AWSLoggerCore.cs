@@ -267,7 +267,7 @@ namespace AWS.Logger.Core
         /// A Concurrent Queue is used to store the messages from 
         /// the logger
         /// </summary>
-        /// <param name="rawMessage"></param>
+        /// <param name="rawMessage">Message to log.</param>
         public void AddMessage(string rawMessage)
         {
             if (string.IsNullOrEmpty(rawMessage))
