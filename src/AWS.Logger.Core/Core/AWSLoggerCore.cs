@@ -474,7 +474,16 @@ namespace AWS.Logger.Core
                     {
                         LogLibraryServiceError(new System.Net.WebException($"Create LogGroup {_config.LogGroup} returned status: {createGroupResponse.HttpStatusCode}"), serviceURL);
                     }
-                }
+                    
+                    if (_config.RetentionInDays > 0)
+                    {
+                        var retentionPolicyResponse = await _client.PutRetentionPolicyAsync(new PutRetentionPolicyRequest(_config.LogGroup, _config.RetentionInDays), token).ConfigureAwait(false);
+                        if (!IsSuccessStatusCode(retentionPolicyResponse))
+                        {
+                            LogLibraryServiceError(new System.Net.WebException($"RetentionPolicy LogGroup {_config.LogGroup} RetentionInDays {_config.RetentionInDays}  returned status: {retentionPolicyResponse.HttpStatusCode}"), serviceURL);
+                        }
+                    }
+                }     
             }
 
             var currentStreamName = GenerateStreamName(_config);

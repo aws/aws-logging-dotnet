@@ -18,7 +18,7 @@ namespace NLog.ConfigExample
             logger.Info("Check the AWS Console CloudWatch Logs console in us-east-1");
             logger.Info("to see messages in the log streams for the");
             logger.Info("log group NLog.ConfigExample");
-
+            Console.ReadKey();
         }
     }
 }

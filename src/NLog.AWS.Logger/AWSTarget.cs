@@ -213,6 +213,18 @@ namespace NLog.AWS.Logger
             set { _config.FlushTimeout = value; }
         }
 
+        /// <summary>
+        /// The number of days to retain the log events in the specified log group.
+        /// Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 2192, 2557, 2922, 3288, and 3653.
+        /// To set a log group to never have log events expire, use DeleteRetentionPolicy.
+        /// </summary>
+       public int RetentionInDays
+        {
+            get { return _config.RetentionInDays; }
+            set { _config.RetentionInDays = value; }
+        }
+
+
         /// <inheritdoc/>
         protected override void InitializeTarget()
         {
@@ -237,7 +249,8 @@ namespace NLog.AWS.Logger
                 LogStreamNamePrefix = RenderSimpleLayout(LogStreamNamePrefix, nameof(LogStreamNamePrefix)),
                 LibraryLogErrors = LibraryLogErrors,
                 LibraryLogFileName = LibraryLogFileName,
-                FlushTimeout = FlushTimeout
+                FlushTimeout = FlushTimeout,
+                RetentionInDays=RetentionInDays
             };
             _core = new AWSLoggerCore(config, "NLog");
             _core.LogLibraryAlert += AwsLogLibraryAlert;
