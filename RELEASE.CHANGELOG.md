@@ -1,3 +1,7 @@
+### Release 2023-01-10
+* **AWS.Logger.Log4net (3.3.1)**
+  * Updated to version 2.0.15 of the log4net.
+
 ### Release 2022-03-21
 * **AWS.Logger.Core (3.1.0)**
   * Fixed an issue where AddSingleMessage in AWSLoggerCore was using DateTime.Now instead of DateTime.UtcNow.
