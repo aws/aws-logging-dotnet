@@ -92,6 +92,7 @@ namespace AWS.Logger.Core
                 {
                     awsConfig.UseHttp = true;
                 }
+                awsConfig.AuthenticationRegion = _config.Region;
             }
             else
             {
