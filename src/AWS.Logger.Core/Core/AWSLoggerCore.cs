@@ -474,6 +474,12 @@ namespace AWS.Logger.Core
                     {
                         LogLibraryServiceError(new System.Net.WebException($"Create LogGroup {_config.LogGroup} returned status: {createGroupResponse.HttpStatusCode}"), serviceURL);
                     }
+                    else if (_config.NewLogGroupRetentionInDays.HasValue && _config.NewLogGroupRetentionInDays.Value > 0)
+                    {
+                        // If CreateLogGroup returns a success status code then this process is responsible for applying the retention policy.
+                        // This prevents a case of multiple instances each trying to set the retention policy. 
+                        PutRetentionPolicy(_config.NewLogGroupRetentionInDays.Value,_config.LogGroup, serviceURL, token);
+                    }
                 }
             }
 
@@ -492,6 +498,28 @@ namespace AWS.Logger.Core
             _repo = new LogEventBatch(_config.LogGroup, currentStreamName, Convert.ToInt32(_config.BatchPushInterval.TotalSeconds), _config.BatchSizeInBytes);
 
             return currentStreamName;
+        }
+
+        /// <summary>
+        ///     Puts a retention policy on a log group.
+        /// </summary>
+        private void PutRetentionPolicy(int logGroupRetentionInDays, string logGroup, string serviceURL, CancellationToken token)
+        {
+            _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        var putPolicyResponse = await _client.PutRetentionPolicyAsync(new PutRetentionPolicyRequest(logGroup, logGroupRetentionInDays), token).ConfigureAwait(false);
+                        if (!IsSuccessStatusCode(putPolicyResponse))
+                        {
+                            LogLibraryServiceError(new System.Net.WebException($"Put retention policy {logGroupRetentionInDays} for LogGroup {logGroup} returned status: {putPolicyResponse.HttpStatusCode}"), serviceURL);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        LogLibraryServiceError(new System.Net.WebException($"Unexpected error putting retention policy {logGroupRetentionInDays} for LogGroup {logGroup}", e), serviceURL); 
+                    }
+                }).ConfigureAwait(false);
         }
 
         /// <summary>

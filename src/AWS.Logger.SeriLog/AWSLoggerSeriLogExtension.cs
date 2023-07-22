@@ -14,6 +14,7 @@ namespace AWS.Logger.SeriLog
     {
         internal const string LOG_GROUP = "Serilog:LogGroup";
         internal const string DISABLE_LOG_GROUP_CREATION = "Serilog:DisableLogGroupCreation";
+        internal const string NEW_LOG_GROUP_RETENTION_IN_DAYS = "Serilog:NewLogGroupRetentionInDays";
         internal const string REGION = "Serilog:Region";
         internal const string SERVICEURL = "Serilog:ServiceUrl";
         internal const string PROFILE = "Serilog:Profile";
@@ -45,6 +46,10 @@ namespace AWS.Logger.SeriLog
             if (configuration[DISABLE_LOG_GROUP_CREATION] != null)
             {
                 config.DisableLogGroupCreation = bool.Parse(configuration[DISABLE_LOG_GROUP_CREATION]);
+            }
+            if (configuration[NEW_LOG_GROUP_RETENTION_IN_DAYS] is string s && int.TryParse(s, out var retentionInDays))
+            {
+                config.NewLogGroupRetentionInDays = retentionInDays;
             }
             if (configuration[REGION] != null)
             {

@@ -22,6 +22,22 @@ namespace AWS.Logger
         /// When creation of log groups is disabled, logs:DescribeLogGroups permission is NOT required.
         /// </summary>
         bool DisableLogGroupCreation { get; set; }
+        
+        /// <summary>
+        /// Specifies the days to retain events in log groups which are created by this logger, if the one specified by <see cref="LogGroup"/> doesn't already exist
+        /// and <see cref="DisableLogGroupCreation"/> is not <c>true</c>. Requires logs:PutRetentionPolicy permission to apply the retention policy to
+        /// newly created log groups. The default value of <c>null</c> will not apply a retention policy to new log groups.
+        /// <para>
+        /// Note that log groups which already exist will not have this retention policy applied for startup performance reasons.
+        /// </para>
+        /// <para>
+        /// Possible values could be found in the CloudWatchLogs API reference at https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutRetentionPolicy.html#API_PutRetentionPolicy_RequestSyntax
+        /// </para>
+        /// </summary>
+        /// <remarks>
+        /// Note that invalid retention policy values will result in the policy not being applied, however this error is non-fatal and the application and will continue without the policy.
+        /// </remarks>
+        int? NewLogGroupRetentionInDays { get; set; }
 
         /// <summary>
         /// Gets the Profile property. The profile is used to look up AWS credentials in the profile store.
