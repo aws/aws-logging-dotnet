@@ -32,6 +32,13 @@ The practice of granting least privilege access is recommended when setting up c
 
 For more information and a sample JSON policy template, please see [Amazon CloudWatch Logs and .NET Logging Frameworks](https://aws.amazon.com/blogs/developer/amazon-cloudwatch-logs-and-net-logging-frameworks/) on the AWS Developer Blog.
 
+### Optional IAM Permissions
+
+The following [IAM](https://aws.amazon.com/iam) permissions are optional depending on the configured features of the logger.
+
+| Feature                                                                       | IAM Permission(s) for feature | Configuration Setting         |
+|-------------------------------------------------------------------------------|-------------------------------|-------------------------------|
+| [Set new log group retention policy](#setting-new-log-group-retention-policy) | `logs:PutRetentionPolicy`     | `NewLogGroupRetentionInDays`  |
 
 ### Why can't the Log Stream name be configured?
 
@@ -44,6 +51,21 @@ the marker maintained within the process goes out of sync. This generates errors
 message causing performance issues.
 
 To view logs across all log streams it is recommended to use the [Logs Insight](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html) feature for Cloud Watch Logs.
+
+### Setting new Log Group Retention Policy
+
+These libraries support setting a [log retention policy](https://docs.aws.amazon.com/managedservices/latest/userguide/log-customize-retention.html) 
+on any CloudWatch Log Groups which they create.  This feature is enabled using the NewLogGroupRetentionInDays configuration property. 
+The DisableLogGroupCreation configuration property must not be set to true. Retention policies configured in this manner 
+are only applied to _new_ Log Groups created directly by these libraries. By default no retention policy is applied to newly created Log Groups.
+
+
+Note that any value of NewLogGroupRetentionInDays which is not one supported by CloudWatch [which can be found here](https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutRetentionPolicy.html#API_PutRetentionPolicy_RequestSyntax) - and listed below - is a configuration error which will result
+in a non-fatal error applying the policy. The application and logging will continue however no retention policy will be applied. 
+ 
+```csharp
+null, 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096, 1827, 2192, 2557, 2922, 3288, 3653
+```
 
 ## Supported Logging Frameworks
 

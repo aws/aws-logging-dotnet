@@ -116,6 +116,7 @@ namespace Microsoft.Extensions.Configuration
 
         internal const string LOG_GROUP = "LogGroup";
         internal const string DISABLE_LOG_GROUP_CREATION = "DisableLogGroupCreation";
+        internal const string NEW_LOG_GROUP_RETENTION_IN_DAYS = "NewLogGroupRetentionInDays";
         internal const string REGION = "Region";
         internal const string SERVICEURL = "ServiceUrl";
         internal const string PROFILE = "Profile";
@@ -145,6 +146,7 @@ namespace Microsoft.Extensions.Configuration
         {
             Config.LogGroup = loggerConfigSection[LOG_GROUP];
             Config.DisableLogGroupCreation = loggerConfigSection.GetValue<bool>(DISABLE_LOG_GROUP_CREATION);
+            Config.NewLogGroupRetentionInDays = loggerConfigSection.GetValue<int?>(NEW_LOG_GROUP_RETENTION_IN_DAYS);
             if (loggerConfigSection[REGION] != null)
             {
                 Config.Region = loggerConfigSection[REGION];

@@ -97,7 +97,62 @@ namespace AWS.Logger.UnitTests
                 core.Close();
             }
         }
+        
+        [Fact]
+        public async Task TestCoreWithoutDisableLogGroupCreation_With_RetentionPolicy()
+        {
+            var logGroupName = nameof(TestCoreWithoutDisableLogGroupCreation) + DateTime.UtcNow.Ticks; // this one will have to be auto-created.
 
+            using (var client = new AmazonCloudWatchLogsClient(RegionEndpoint.USWest2))
+            {
+                var config = new AWSLoggerConfig(logGroupName)
+                {
+                    Region = RegionEndpoint.USWest2.SystemName,
+                    DisableLogGroupCreation = false,
+                    NewLogGroupRetentionInDays = 3
+                };
+
+                var core = new AWSLoggerCore(config, "unit");
+                core.AddMessage("Test message added at " + DateTimeOffset.UtcNow.ToString());
+                core.Flush();
+                _testFixure.LogGroupNameList.Add(logGroupName); // let's enlist the auto-created group for deletion.
+                var logGroupResponse = await client.DescribeLogGroupsAsync(new DescribeLogGroupsRequest
+                {
+                    LogGroupNamePrefix = logGroupName
+                }).ConfigureAwait(false);
+                var retention = logGroupResponse.LogGroups.Find(x => x.LogGroupName == logGroupName)?.RetentionInDays;
+                Assert.Equal(3,retention);
+                core.Close();
+            }
+        }
+
+        [Fact]
+        public async Task  TestCoreWithoutDisableLogGroupCreation_With_Incorrect_RetentionPolicy()
+        {
+            var logGroupName = nameof(TestCoreWithoutDisableLogGroupCreation) + DateTime.UtcNow.Ticks; // this one will have to be auto-created.
+
+            using (var client = new AmazonCloudWatchLogsClient(RegionEndpoint.USWest2))
+            {
+                var config = new AWSLoggerConfig(logGroupName)
+                {
+                    Region = RegionEndpoint.USWest2.SystemName,
+                    DisableLogGroupCreation = false,
+                    NewLogGroupRetentionInDays = 2
+                };
+
+                var core = new AWSLoggerCore(config, "unit");
+                core.AddMessage("Test message added at " + DateTimeOffset.UtcNow.ToString());
+                core.Flush();
+                _testFixure.LogGroupNameList.Add(logGroupName); // let's enlist the auto-created group for deletion.
+                var logGroupResponse = await client.DescribeLogGroupsAsync(new DescribeLogGroupsRequest
+                {
+                    LogGroupNamePrefix = logGroupName
+                }).ConfigureAwait(false);
+                var incorrectRetention = logGroupResponse.LogGroups.Find(x => x.LogGroupName == logGroupName)?.RetentionInDays;
+                Assert.Null(incorrectRetention);
+                core.Close();
+            }
+        }
     }
 }
 
