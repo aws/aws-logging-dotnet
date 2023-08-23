@@ -1,3 +1,15 @@
+### Release 2023-08-23
+* **AWS.Logger.Core (3.2.0)**
+  * Pull Request [#224](https://github.com/aws/aws-logging-dotnet/pull/224) Implementing Retention Policy to Cloudwatch. Thanks [Will](https://github.com/Will-Boulton)
+* **AWS.Logger.AspNetCore (3.4.0)**
+  * Pull Request [#224](https://github.com/aws/aws-logging-dotnet/pull/224) Implementing Retention Policy to Cloudwatch. Thanks [Will](https://github.com/Will-Boulton)
+* **AWS.Logger.Log4net (3.4.0)**
+  * Pull Request [#224](https://github.com/aws/aws-logging-dotnet/pull/224) Implementing Retention Policy to Cloudwatch. Thanks [Will](https://github.com/Will-Boulton)
+* **AWS.Logger.NLog (3.2.0)**
+  * Pull Request [#224](https://github.com/aws/aws-logging-dotnet/pull/224) Implementing Retention Policy to Cloudwatch. Thanks [Will](https://github.com/Will-Boulton)
+* **AWS.Logger.SeriLog (3.3.0)**
+  * Pull Request [#224](https://github.com/aws/aws-logging-dotnet/pull/224) Implementing Retention Policy to Cloudwatch. Thanks [Will](https://github.com/Will-Boulton)
+
 ### Release 2023-01-10
 * **AWS.Logger.Log4net (3.3.1)**
   * Updated to version 2.0.15 of the log4net.
