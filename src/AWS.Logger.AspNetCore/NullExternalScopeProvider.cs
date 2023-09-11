@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions.Internal;
 using System;
 
 namespace AWS.Logger.AspNetCore
@@ -7,7 +6,7 @@ namespace AWS.Logger.AspNetCore
     /// <summary>
     /// Scope provider that does nothing.
     /// </summary>
-    internal class NullExternalScopeProvider : IExternalScopeProvider
+    internal sealed class NullExternalScopeProvider : IExternalScopeProvider
     {
         private NullExternalScopeProvider()
         {
