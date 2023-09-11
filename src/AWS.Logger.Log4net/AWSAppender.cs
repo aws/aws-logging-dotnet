@@ -13,7 +13,7 @@ namespace AWS.Logger.Log4net
     /// </summary>
     public class AWSAppender : AppenderSkeleton, IAWSLoggerConfig
     {
-        AWSLoggerConfig _config = new AWSLoggerConfig();
+        private readonly AWSLoggerConfig _config = new AWSLoggerConfig();
         AWSLoggerCore _core = null;
 
         /// <summary>
@@ -58,7 +58,11 @@ namespace AWS.Logger.Log4net
         /// <remarks>
         /// Note that invalid retention policy values will result in the policy not being applied, however this error is non-fatal and the application and will continue without the policy.
         /// </remarks>
-        public int? NewLogGroupRetentionInDays { get; set; } = null;
+        public int? NewLogGroupRetentionInDays
+        {
+            get { return _config.NewLogGroupRetentionInDays; }
+            set { _config.NewLogGroupRetentionInDays = value; }
+        }
 
         /// <summary>
         /// Gets and sets the Profile property. The profile is used to look up AWS credentials in the profile store.
@@ -72,7 +76,6 @@ namespace AWS.Logger.Log4net
             set { _config.Profile = value; }
         }
 
-
         /// <summary>
         /// Gets and sets the ProfilesLocation property. If this is not set the default profile store is used by the AWS SDK for .NET 
         /// to look up credentials. This is most commonly used when you are running an application of on-priemse under a service account.
@@ -85,7 +88,6 @@ namespace AWS.Logger.Log4net
             get { return _config.ProfilesLocation; }
             set { _config.ProfilesLocation = value; }
         }
-
 
         /// <summary>
         /// Gets and sets the Credentials property. These are the AWS credentials used by the AWS SDK for .NET to make service calls.
@@ -136,7 +138,6 @@ namespace AWS.Logger.Log4net
             set { _config.BatchPushInterval = value; }
         }
 
-
         /// <summary>
         /// Gets and sets the BatchSizeInBytes property. For performance the log messages are sent to AWS in batch sizes. BatchSizeInBytes 
         /// dictates the total size of the batch in bytes when batches are sent. If either BatchPushInterval or BatchSizeInBytes are exceeded the batch will be sent.
@@ -149,7 +150,6 @@ namespace AWS.Logger.Log4net
             get { return _config.BatchSizeInBytes; }
             set { _config.BatchSizeInBytes = value; }
         }
-
 
         /// <summary>
         /// Gets and sets the MaxQueuedMessages property. This specifies the maximum number of log messages that could be stored in-memory. MaxQueuedMessages 
@@ -238,24 +238,7 @@ namespace AWS.Logger.Log4net
                 _core = null;
             }
 
-            var config = new AWSLoggerConfig(this.LogGroup)
-            {
-                DisableLogGroupCreation = DisableLogGroupCreation,
-                Region = Region,
-                ServiceUrl = ServiceUrl,
-                Credentials = Credentials,
-                Profile = Profile,
-                ProfilesLocation = ProfilesLocation,
-                BatchPushInterval = BatchPushInterval,
-                BatchSizeInBytes = BatchSizeInBytes,
-                MaxQueuedMessages = MaxQueuedMessages,
-                LogStreamNameSuffix = LogStreamNameSuffix,
-                LogStreamNamePrefix = LogStreamNamePrefix,
-                LibraryLogErrors = LibraryLogErrors,
-                LibraryLogFileName = LibraryLogFileName,
-                FlushTimeout = FlushTimeout
-            };
-            _core = new AWSLoggerCore(config, "Log4net");
+            _core = new AWSLoggerCore(_config, "Log4net");
         }
 
         /// <summary>
