@@ -87,7 +87,7 @@ namespace AWS.Logger.AspNetCore
             if (state == null)
                 throw new ArgumentNullException(nameof(state));
 
-            return ScopeProvider?.Push(state) ?? new NoOpDisposable();
+            return ScopeProvider?.Push(state) ?? NullScope.Instance;
         }
 
         /// <summary>
@@ -202,13 +202,6 @@ namespace AWS.Logger.AspNetCore
                 {
                     messageBuilder.Append(" =>");
                 }
-            }
-        }
-
-        private class NoOpDisposable : IDisposable
-        {
-            public void Dispose()
-            {
             }
         }
     }

@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-#if CORECLR
-using System.Runtime.Loader;
-#endif
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -112,19 +108,6 @@ namespace AWS.Logger.Core
             RegisterShutdownHook();
         }
 
-
-#if CORECLR
-        private void RegisterShutdownHook()
-        {
-            var currentAssembly = typeof(AWSLoggerCore).GetTypeInfo().Assembly;
-            AssemblyLoadContext.GetLoadContext(currentAssembly).Unloading += this.OnAssemblyLoadContextUnloading;
-        }
-
-        internal void OnAssemblyLoadContextUnloading(AssemblyLoadContext obj)
-        {
-            this.Close();
-        }
-#else
         private void RegisterShutdownHook()
         {
             AppDomain.CurrentDomain.DomainUnload += ProcessExit;
@@ -135,7 +118,6 @@ namespace AWS.Logger.Core
         {
             Close();
         }
-#endif
 
         private static AWSCredentials DetermineCredentials(AWSLoggerConfig config)
         {
