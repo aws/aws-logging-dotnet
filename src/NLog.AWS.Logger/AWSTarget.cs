@@ -19,7 +19,7 @@ namespace NLog.AWS.Logger
     {
         AWSLoggerConfig _config = new AWSLoggerConfig();
         AWSLoggerCore _core = null;
-		
+
         /// <summary>
         /// Default Constructor
         /// </summary>
@@ -48,7 +48,7 @@ namespace NLog.AWS.Logger
             get { return _config.DisableLogGroupCreation; }
             set { _config.DisableLogGroupCreation = value; }
         }
-        
+
         /// <summary>
         /// Specifies the days to retain events in log groups which are created by this logger, if the one specified by <see cref="LogGroup"/> doesn't already exist
         /// and <see cref="DisableLogGroupCreation"/> is not <c>true</c>. Requires logs:PutRetentionPolicy permission to apply the retention policy to
@@ -63,7 +63,11 @@ namespace NLog.AWS.Logger
         /// <remarks>
         /// Note that invalid retention policy values will result in the policy not being applied, however this error is non-fatal and the application and will continue without the policy.
         /// </remarks>
-        public int? NewLogGroupRetentionInDays { get; set; } = null;
+        public int? NewLogGroupRetentionInDays
+        {
+            get { return _config.NewLogGroupRetentionInDays; }
+            set { _config.NewLogGroupRetentionInDays = value; }
+        }
 
         /// <summary>
         /// Gets and sets the Profile property. The profile is used to look up AWS credentials in the profile store.
@@ -76,7 +80,6 @@ namespace NLog.AWS.Logger
             get { return _config.Profile; }
             set { _config.Profile = value; }
         }
-
 
         /// <summary>
         /// Gets and sets the ProfilesLocation property. If this is not set the default profile store is used by the AWS SDK for .NET 
@@ -91,7 +94,6 @@ namespace NLog.AWS.Logger
             set { _config.ProfilesLocation = value; }
         }
 
-
         /// <summary>
         /// Gets and sets the Credentials property. These are the AWS credentials used by the AWS SDK for .NET to make service calls.
         /// <para>
@@ -103,7 +105,6 @@ namespace NLog.AWS.Logger
             get { return _config.Credentials; }
             set { _config.Credentials = value; }
         }
-
 
         /// <summary>
         /// Gets and sets the Region property. This is the AWS Region that will be used for CloudWatch Logs. If this is not
@@ -253,7 +254,8 @@ namespace NLog.AWS.Logger
                 LogStreamNamePrefix = RenderSimpleLayout(LogStreamNamePrefix, nameof(LogStreamNamePrefix)),
                 LibraryLogErrors = LibraryLogErrors,
                 LibraryLogFileName = LibraryLogFileName,
-                FlushTimeout = FlushTimeout
+                FlushTimeout = FlushTimeout,
+                NewLogGroupRetentionInDays = NewLogGroupRetentionInDays,
             };
             _core = new AWSLoggerCore(config, "NLog");
             _core.LogLibraryAlert += AwsLogLibraryAlert;
