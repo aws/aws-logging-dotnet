@@ -1,3 +1,13 @@
+### Release 2023-09-14
+* **AWS.Logger.Core (3.2.1)**
+  * Remove unused code from old .NET Standard 1.5 target. Pull Request [#229](https://github.com/aws/aws-logging-dotnet/pull/229). Thank you [@snakefoot](https://github.com/snakefoot).
+* **AWS.Logger.AspNetCore (3.4.1)**
+  * Update NullExternalScopeProvider/NullScope handling for newer Microsoft.Extensions.Logging.Abstractions. Pull Request [#229](https://github.com/aws/aws-logging-dotnet/pull/229). Thank you [@snakefoot](https://github.com/snakefoot).
+* **AWS.Logger.Log4net (3.4.1)**
+  * Correctly honor `NewLogGroupRetentionInDays` during initialization. Pull Request [#228](https://github.com/aws/aws-logging-dotnet/pull/228). Thank you [@snakefoot](https://github.com/snakefoot).
+* **AWS.Logger.NLog (3.2.1)**
+  * Correctly honor `NewLogGroupRetentionInDays` during initialization. Pull Request [#228](https://github.com/aws/aws-logging-dotnet/pull/228). Thank you [@snakefoot](https://github.com/snakefoot).
+
 ### Release 2023-08-23
 * **AWS.Logger.Core (3.2.0)**
   * Pull Request [#224](https://github.com/aws/aws-logging-dotnet/pull/224) Implementing Retention Policy to Cloudwatch. Thanks [Will](https://github.com/Will-Boulton)
