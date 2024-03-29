@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions.Internal;
 using System;
 
 namespace AWS.Logger.AspNetCore
@@ -27,6 +26,15 @@ namespace AWS.Logger.AspNetCore
         IDisposable IExternalScopeProvider.Push(object state)
         {
             return NullScope.Instance;
+        }
+
+        private class NullScope : IDisposable
+        {
+            public static NullScope Instance { get; } = new NullScope();
+
+            public void Dispose()
+            {
+            }
         }
     }
 }

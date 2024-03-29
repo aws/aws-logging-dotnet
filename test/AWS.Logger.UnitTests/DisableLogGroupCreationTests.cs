@@ -60,7 +60,7 @@ namespace AWS.Logger.UnitTests
                     core.Flush();
                 });
 
-                await Task.WhenAny(tsk, resourceNotFoundPromise.Task).ConfigureAwait(false);
+                await Task.WhenAny(tsk, resourceNotFoundPromise.Task);
                 resourceNotFoundPromise.TrySetResult(false);
                 Assert.True(await resourceNotFoundPromise.Task);
 
@@ -72,7 +72,7 @@ namespace AWS.Logger.UnitTests
                 _testFixure.LogGroupNameList.Add(logGroupName);
 
                 // wait for the flusher task to finish, which should actually proceed OK, now that we've created the expected log group.
-                await tsk.ConfigureAwait(false);
+                await tsk;
                 core.Close();
             }
         }

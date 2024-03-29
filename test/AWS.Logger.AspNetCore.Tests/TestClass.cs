@@ -103,7 +103,7 @@ namespace AWS.Logger.AspNetCore.Tests
         /// onto the FakeCoreLogger. The results are then verified.
         /// </summary>
         [Fact]
-        public void MultiThreadTestMock()
+        public async Task MultiThreadTestMock()
         {
             var categoryName = "testlogging";
             var coreLogger = new FakeCoreLogger();
@@ -118,7 +118,7 @@ namespace AWS.Logger.AspNetCore.Tests
                 tasks.Add(Task.Factory.StartNew(() => LogMessages(logMessageCount)));
                 actualCount = actualCount + logMessageCount;
             }
-            Task.WaitAll(tasks.ToArray());
+            await Task.WhenAll(tasks.ToArray());
 
             Assert.Equal(actualCount, coreLogger.ReceivedMessages.Count);
         }
