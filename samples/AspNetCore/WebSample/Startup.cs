@@ -33,7 +33,7 @@ namespace WebSample
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             // Example Logging
             _logger.LogInformation("Check the AWS Console CloudWatch Logs console in us-east-1");

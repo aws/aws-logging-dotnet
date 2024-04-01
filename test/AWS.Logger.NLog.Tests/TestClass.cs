@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Amazon.CloudWatchLogs.Model;
 using AWS.Logger.TestUtils;
 using NLog;
@@ -49,7 +50,7 @@ namespace AWS.Logger.NLogger.Tests
         }
 
         [Fact]
-        public void MessageHasToBeBrokenUp()
+        public async Task MessageHasToBeBrokenUp()
         {
             string logGroupName = "AWSNLogGroupEventSizeExceededTest";
 
@@ -64,20 +65,20 @@ namespace AWS.Logger.NLogger.Tests
             if (NotifyLoggingCompleted(logGroupName, "LASTMESSAGE"))
             {
                 DescribeLogStreamsResponse describeLogstreamsResponse =
-                Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
+                await Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
                 {
                     Descending = true,
                     LogGroupName = logGroupName,
                     OrderBy = "LastEventTime"
-                }).Result;
+                });
 
                 // Wait for the large messages to propagate
                 Thread.Sleep(5000);
-                getLogEventsResponse = Client.GetLogEventsAsync(new GetLogEventsRequest
+                getLogEventsResponse = await Client.GetLogEventsAsync(new GetLogEventsRequest
                 {
                     LogGroupName = logGroupName,
                     LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
-                }).Result;
+                });
             }
             _testFixture.LogGroupNameList.Add(logGroupName);
             Assert.Equal(4, getLogEventsResponse.Events.Count);
