@@ -20,7 +20,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
     <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\awssdk.dll.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\public.snk</AssemblyOriginatorKeyFile>
     <Version>3.4.1</Version>
   </PropertyGroup>
 

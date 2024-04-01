@@ -1,10 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Hosting;
 using Xunit;
 using System;
-using Microsoft.Extensions.DependencyInjection;
-using System.IO;
 using System.Reflection;
 using System.Linq;
 
