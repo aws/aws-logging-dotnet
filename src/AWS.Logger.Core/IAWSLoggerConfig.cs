@@ -105,6 +105,15 @@ namespace AWS.Logger
         int MaxQueuedMessages { get; }
 
         /// <summary>
+        /// Gets and sets the LogStreamName property. When this is set the full name of the log stream will be equal to this value,
+        /// as opposed to the computed value using <see cref="LogStreamNamePrefix"/> and <see cref="LogStreamNameSuffix"/>, which will be ignored.
+        /// </summary>
+        /// <para>
+        /// The default is an empty string.
+        /// </para>
+        string LogStreamName { get; }
+
+        /// <summary>
         /// Gets and sets the LogStreamNameSuffix property. The LogStreamName consists of an optional user-defined LogStreamNamePrefix (that can be set here)
         /// followed by a DateTimeStamp as the prefix, and a user defined suffix value
         /// The LogstreamName then follows the pattern '[LogStreamNamePrefix]-[DateTime.Now.ToString("yyyy/MM/ddTHH.mm.ss")]-[LogStreamNameSuffix]'

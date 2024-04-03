@@ -25,7 +25,7 @@ namespace AWS.Logger.Log4Net.Tests
         {
         }
 
-        #region Test Cases                                                        
+        #region Test Cases
         [Fact]
         public void Log4Net()
         {
@@ -45,6 +45,17 @@ namespace AWS.Logger.Log4Net.Tests
         {
             GetLog4NetLogger("MultiThreadBufferFullTest.config", "MultiThreadBufferFullTest");
             MultiThreadBufferFullTestGroup("AWSLog4NetGroupMultiThreadBufferFullTest");
+        }
+
+        /// <summary>
+        /// Verifies that multiple producers can log to the same log stream
+        /// when an override log stream name is provided
+        /// </summary>
+        [Fact]
+        public void CustomLogStreamNameTest()
+        {
+            GetLog4NetLogger("OverrideLogStreamName.config", "OverrideLogStreamName");
+            MultiThreadTestGroup("AWSLog4NetGroupOverrideLogStreamName");
         }
 
         protected override void LogMessages(int count)

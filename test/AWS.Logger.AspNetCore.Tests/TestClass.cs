@@ -149,6 +149,13 @@ namespace AWS.Logger.AspNetCore.Tests
             MultiThreadBufferFullTestGroup(ConfigSection.Config.LogGroup);
         }
 
+        [Fact]
+        public void OverrideLogStreamNameTest()
+        {
+            LoggingSetup("overrideLogStreamName.json", null);
+            MultiThreadTestGroup(ConfigSection.Config.LogGroup, ConfigSection.Config.LogStreamName);
+        }
+
         /// <summary>
         /// This method posts debug messages onto CloudWatchLogs.
         /// </summary>

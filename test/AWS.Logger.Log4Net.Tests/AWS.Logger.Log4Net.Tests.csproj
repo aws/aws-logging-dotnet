@@ -12,6 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="OverrideLogStreamName.config">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="MultiThreadBufferFullTest.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
