@@ -23,7 +23,7 @@
     <SignAssembly>True</SignAssembly>
     <DelaySign>False</DelaySign>
     <AssemblyOriginatorKeyFile>..\..\public.snk</AssemblyOriginatorKeyFile>
-    <Version>3.2.1</Version>
+    <Version>3.3.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

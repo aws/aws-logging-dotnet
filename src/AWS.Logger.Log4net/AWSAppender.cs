@@ -165,6 +165,19 @@ namespace AWS.Logger.Log4net
         }
 
         /// <summary>
+        /// Gets and sets the LogStreamName property. When this is set the full name of the log stream will be equal to this value,
+        /// as opposed to the computed value using <see cref="LogStreamNamePrefix"/> and <see cref="LogStreamNameSuffix"/>, which will be ignored.
+        /// </summary>
+        /// <para>
+        /// The default is an empty string.
+        /// </para>
+        public string LogStreamName
+        {
+            get { return _config.LogStreamName; }
+            set { _config.LogStreamName = value; }
+        }
+
+        /// <summary>
         /// Gets and sets the LogStreamNameSuffix property. The LogStreamName consists of an optional user-defined prefix segment, then a DateTimeStamp as the
         /// system-defined prefix segment, and a user defined suffix value that can be set using the LogStreamNameSuffix property defined here.
         /// <para>

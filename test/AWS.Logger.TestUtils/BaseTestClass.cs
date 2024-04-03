@@ -15,7 +15,7 @@ namespace AWS.Logger.TestUtils
     {
         public const int SIMPLELOGTEST_COUNT = 10;
         public const int MULTITHREADTEST_COUNT = 200;
-        public const int THREAD_WAITTIME = 10;
+        public const int THREAD_WAITTIME = 25;
         public const int THREAD_COUNT = 2;
         public const string LASTMESSAGE = "LASTMESSAGE";
         public const string CUSTOMSTREAMSUFFIX = "Custom";
@@ -115,9 +115,22 @@ namespace AWS.Logger.TestUtils
             _testFixture.LogGroupNameList.Add(logGroupName);
         }
         
-
-        protected void MultiThreadTestGroup(string logGroupName)
+        /// <summary>
+        /// Publishes logs from multiple threads to the specified log group, and asserts
+        /// that the expected number of events are present
+        /// </summary>
+        /// <param name="logGroupName">Log group to publish events to</param>
+        /// <param name="expectedLogStreamName">
+        /// Optional name of the stream within the group to assert against. 
+        /// May be used when overriding the stream name as opposed to using the 
+        /// generated name based on the prefix and suffix.
+        /// </param>
+        protected void MultiThreadTestGroup(string logGroupName, string expectedLogStreamName = "")
         {
+            // This allows the fixture to delete the group at the end,
+            // whether or not the test passes
+            _testFixture.LogGroupNameList.Add(logGroupName);
+
             var tasks = new List<Task>();
             var streamNames = new List<string>();
             var count = MULTITHREADTEST_COUNT;
@@ -141,9 +154,15 @@ namespace AWS.Logger.TestUtils
                     OrderBy = "LastEventTime"
                 }).Result;
 
-
                 if (describeLogstreamsResponse.LogStreams.Count > 0)
                 {
+                    // If the caller provided an expected log stream name (when testing the explicit setting),
+                    // assert that all producers should share the same stream with the configured name.
+                    if (!string.IsNullOrEmpty(expectedLogStreamName))
+                    {
+                        Assert.Single(describeLogstreamsResponse.LogStreams);
+                        Assert.Equal(expectedLogStreamName, describeLogstreamsResponse.LogStreams[0].LogStreamName);
+                    }
                     testCount = 0;
                     foreach (var logStream in describeLogstreamsResponse.LogStreams)
                     {
@@ -163,8 +182,6 @@ namespace AWS.Logger.TestUtils
             }
 
             Assert.Equal(totalCount, testCount);
-
-            _testFixture.LogGroupNameList.Add(logGroupName);
         }
 
         protected void MultiThreadBufferFullTestGroup(string logGroupName)

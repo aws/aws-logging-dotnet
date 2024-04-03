@@ -505,11 +505,17 @@ namespace AWS.Logger.Core
         }
 
         /// <summary>
-        /// Generate a logstream name
+        /// Generates a log stream name based either on the explicit one specified in the config, or the generated one 
+        /// using the prefix, suffix, and date
         /// </summary>
-        /// <returns>logstream name that ALWAYS includes a unique date-based segment</returns>
+        /// <returns>Log stream name</returns>
         public static string GenerateStreamName(IAWSLoggerConfig config)
         {
+            if (!string.IsNullOrEmpty(config.LogStreamName))
+            {
+                return config.LogStreamName;
+            }
+
             var streamName = new StringBuilder();
 
             var prefix = config.LogStreamNamePrefix;
