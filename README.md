@@ -40,17 +40,24 @@ The following [IAM](https://aws.amazon.com/iam) permissions are optional dependi
 |-------------------------------------------------------------------------------|-------------------------------|-------------------------------|
 | [Set new log group retention policy](#setting-new-log-group-retention-policy) | `logs:PutRetentionPolicy`     | `NewLogGroupRetentionInDays`  |
 
-### Why can't the Log Stream name be configured?
+### Configuring the Log Stream Name
 
-These libraries use CloudWatch Logs' best practice of having the log stream name be generated. The name can be customized by adding 
-a suffix or prefix using the LogStreamNameSuffix and LogStreamNamePrefix configuration properties.
+Prior to the versions listed below, these libraries followed CloudWatch Logs' 
+best practice of having the log stream name be generated. The name could be customized by adding a suffix or prefix using the `LogStreamNameSuffix` and 
+`LogStreamNamePrefix` configuration properties.
 
-Generating the name ensures each process within an application has its own log stream to write to. When writing to log 
-stream a marker is maintained to append more messages to the stream. When more then one process writes to the same stream
-the marker maintained within the process goes out of sync. This generates errors and retries to post the log 
-message causing performance issues.
+Generating the name ensured that each process within an application has its own log stream to write to. Otherwise when one process writes to the same stream,
+the `sequenceToken` maintained within the process goes out of sync. This generated errors and retries causing performance issues.
 
-To view logs across all log streams it is recommended to use the [Logs Insight](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html) feature for Cloud Watch Logs.
+In 2023 [CloudWatch Logs removed the SequenceToken requirement](https://aws.amazon.com/about-aws/whats-new/2023/01/amazon-cloudwatch-logs-log-stream-transaction-quota-sequencetoken-requirement/),
+ which removes the need to split log ingestion across multiple log streams 
+ and coordinate the sequence token across multiple clients.
+
+The following versions introduce a new `LogStreamName` setting, which can be used to specify the full log stream name. When this is set `LogStreamNamePrefix` and `LogStreamNameSuffix` will be ignored.
+1. AWS.Logger.Nlog - 3.3.0
+2. AWS.Logger.Log4net - 3.5.0
+3. AWS.Logger.AspNetCore - 3.5.0
+4. AWS.Logger.SeriLog - 3.4.0
 
 ### Setting new Log Group Retention Policy
 

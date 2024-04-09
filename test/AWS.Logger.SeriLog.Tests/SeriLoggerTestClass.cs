@@ -51,6 +51,17 @@ namespace AWS.Logger.SeriLog.Tests
             MultiThreadBufferFullTestGroup("AWSSeriLogGroupMultiThreadBufferFullTest");
         }
 
+        /// <summary>
+        /// Verifies that multiple producers can log to the same log stream
+        /// when an override log stream name is provided
+        /// </summary>
+        [Fact]
+        public void CustomLogStreamNameTest()
+        {
+            CreateLoggerFromConfiguration("AWSSeriLogGroupOverrideLogStreamName.json");
+            MultiThreadTestGroup("AWSSeriLogGroupOverrideLogStreamName", "CustomLogStream");
+        }
+
         [Fact]
         public void RestrictedToMinimumLevelTest()
         {

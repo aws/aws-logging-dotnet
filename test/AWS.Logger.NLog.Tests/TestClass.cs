@@ -49,6 +49,18 @@ namespace AWS.Logger.NLogger.Tests
             MultiThreadBufferFullTestGroup("AWSNLogGroupMultiThreadBufferFullTest");
         }
 
+        /// <summary>
+        /// Verifies that multiple producers can log to the same log stream
+        /// when an override log stream name is provided
+        /// </summary>
+        [Fact]
+        public void CustomLogStreamNameTest()
+        {
+            CreateLoggerFromConfiguration("AWSNLogOverrideLogStreamName.config");
+            Logger = LogManager.GetLogger("overrideLogStreamName");
+            MultiThreadTestGroup("AWSNLogOverrideLogStreamName", "CustomStreamName");
+        }
+
         [Fact]
         public async Task MessageHasToBeBrokenUp()
         {

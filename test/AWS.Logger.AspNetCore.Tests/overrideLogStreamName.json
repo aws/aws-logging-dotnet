@@ -1,0 +1,13 @@
+﻿{
+  "AWS.Logging": {
+    "LogGroup": "AWSILoggerGroupOverrideLogStreamName",
+    "Region": "us-west-2",
+    "LogStreamName": "CustomLogStream",
+    "LogLevel": {
+      "Default": "Debug",
+      "System": "Information",
+      "Microsoft": "Information",
+      "AWS": "Debug"
+    }
+  }
+}

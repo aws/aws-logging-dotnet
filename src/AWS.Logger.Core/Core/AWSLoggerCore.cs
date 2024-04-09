@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using Amazon.CloudWatchLogs;
+﻿using Amazon.CloudWatchLogs;
 using Amazon.CloudWatchLogs.Model;
 using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AWS.Logger.Core
 {
@@ -33,14 +32,11 @@ namespace AWS.Logger.Core
         private IAmazonCloudWatchLogs _client;
         private DateTime _maxBufferTimeStamp = new DateTime();
         private string _logType;
-        private int _requestCount = 5;
         
         /// <summary>
         /// Minimum interval in minutes between two error messages on in-memory buffer overflow.
         /// </summary>
         const double MAX_BUFFER_TIMEDIFF = 5;
-        private readonly static Regex invalid_sequence_token_regex = new
-            Regex(@"The given sequenceToken is invalid. The next expected sequenceToken is: (\d+)");
         #endregion
 
         /// <summary>
@@ -397,29 +393,7 @@ namespace AWS.Logger.Core
                 //Make sure the log events are in the right order.
                 _repo._request.LogEvents.Sort((ev1, ev2) => ev1.Timestamp.CompareTo(ev2.Timestamp));
                 var response = await _client.PutLogEventsAsync(_repo._request, token).ConfigureAwait(false);
-                _repo.Reset(response.NextSequenceToken);
-                _requestCount = 5;
-            }
-            catch (InvalidSequenceTokenException ex)
-            {
-                //In case the NextSequenceToken is invalid for the last sent message, a new stream would be 
-                //created for the said application.
-                LogLibraryServiceError(ex);
-
-                if (_requestCount > 0)
-                {
-                    _requestCount--;
-                    var regexResult = invalid_sequence_token_regex.Match(ex.Message);
-                    if (regexResult.Success)
-                    {
-                        _repo._request.SequenceToken = regexResult.Groups[1].Value;
-                        await SendMessages(token).ConfigureAwait(false);
-                    }
-                }
-                else
-                {
-                    _currentStreamName = await LogEventTransmissionSetup(token).ConfigureAwait(false);
-                }
+                _repo.Reset();
             }
             catch (ResourceNotFoundException ex)
             {
@@ -505,11 +479,17 @@ namespace AWS.Logger.Core
         }
 
         /// <summary>
-        /// Generate a logstream name
+        /// Generates a log stream name based either on the explicit one specified in the config, or the generated one 
+        /// using the prefix, suffix, and date
         /// </summary>
-        /// <returns>logstream name that ALWAYS includes a unique date-based segment</returns>
+        /// <returns>Log stream name</returns>
         public static string GenerateStreamName(IAWSLoggerConfig config)
         {
+            if (!string.IsNullOrEmpty(config.LogStreamName))
+            {
+                return config.LogStreamName;
+            }
+
             var streamName = new StringBuilder();
 
             var prefix = config.LogStreamNamePrefix;
@@ -605,7 +585,7 @@ namespace AWS.Logger.Core
                 _request.LogStreamName = streamName;
                 TimeIntervalBetweenPushes = TimeSpan.FromSeconds(timeIntervalBetweenPushes);
                 MaxBatchSize = maxBatchSize;
-                Reset(null);
+                Reset();
             }
 
             public LogEventBatch()
@@ -636,11 +616,10 @@ namespace AWS.Logger.Core
                 _request.LogEvents.Add(ev);
             }
 
-            public void Reset(string SeqToken)
+            public void Reset()
             {
                 _request.LogEvents.Clear();
                 _totalMessageSize = 0;
-                _request.SequenceToken = SeqToken;
                 _nextPushTime = DateTime.UtcNow.Add(TimeIntervalBetweenPushes);
             }
         }
