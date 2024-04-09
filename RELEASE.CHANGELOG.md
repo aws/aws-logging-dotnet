@@ -1,3 +1,15 @@
+### Release 2024-04-09
+* **AWS.Logger.Core (3.3.0)**
+  * Adds a new `LogStreamName` setting, which allows configuring the full log stream name. When this is set `LogStreamNamePrefix` and `LogStreamNameSuffix` will be ignored.
+* **AWS.Logger.AspNetCore (3.5.0)**
+  * Adds a new `LogStreamName` setting, which allows configuring the full log stream name. When this is set `LogStreamNamePrefix` and `LogStreamNameSuffix` will be ignored.
+* **AWS.Logger.Log4net (3.5.0)**
+  * Adds a new `LogStreamName` setting, which allows configuring the full log stream name. When this is set `LogStreamNamePrefix` and `LogStreamNameSuffix` will be ignored.
+* **AWS.Logger.NLog (3.3.0)**
+  * Adds a new `LogStreamName` setting, which allows configuring the full log stream name. When this is set `LogStreamNamePrefix` and `LogStreamNameSuffix` will be ignored.
+* **AWS.Logger.SeriLog (3.4.0)**
+  * Adds a new `LogStreamName` setting, which allows configuring the full log stream name. When this is set `LogStreamNamePrefix` and `LogStreamNameSuffix` will be ignored.
+
 ### Release 2023-09-14
 * **AWS.Logger.Core (3.2.1)**
   * Remove unused code from old .NET Standard 1.5 target. Pull Request [#229](https://github.com/aws/aws-logging-dotnet/pull/229). Thank you [@snakefoot](https://github.com/snakefoot).
