@@ -7,6 +7,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,7 +33,10 @@ namespace AWS.Logger.Core
         private IAmazonCloudWatchLogs _client;
         private DateTime _maxBufferTimeStamp = new DateTime();
         private string _logType;
-        
+
+        private static readonly string _assemblyVersion = typeof(AWSLoggerCore).GetTypeInfo().Assembly.GetName().Version?.ToString() ?? string.Empty;
+        private static readonly string _baseUserAgentString = $"lib/aws-logger-core#{_assemblyVersion}";
+
         /// <summary>
         /// Minimum interval in minutes between two error messages on in-memory buffer overflow.
         /// </summary>
@@ -627,11 +631,12 @@ namespace AWS.Logger.Core
         const string UserAgentHeader = "User-Agent";
         void ServiceClientBeforeRequestEvent(object sender, RequestEventArgs e)
         {
+            var userAgentString = $"{_baseUserAgentString} ft/{_logType}";
             var args = e as Amazon.Runtime.WebServiceRequestEventArgs;
-            if (args == null || !args.Headers.ContainsKey(UserAgentHeader))
+            if (args == null || !args.Headers.ContainsKey(UserAgentHeader) || args.Headers[UserAgentHeader].Contains(userAgentString))
                 return;
 
-            args.Headers[UserAgentHeader] = args.Headers[UserAgentHeader] + " AWSLogger/" + _logType;
+            args.Headers[UserAgentHeader] = args.Headers[UserAgentHeader] + " " + userAgentString;
         }
 
         void ServiceClienExceptionEvent(object sender, ExceptionEventArgs e)

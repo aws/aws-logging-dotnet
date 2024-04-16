@@ -5,6 +5,7 @@ using log4net.Core;
 
 using Amazon.Runtime;
 using AWS.Logger.Core;
+using System.Reflection;
 
 namespace AWS.Logger.Log4net
 {
@@ -15,6 +16,9 @@ namespace AWS.Logger.Log4net
     {
         private readonly AWSLoggerConfig _config = new AWSLoggerConfig();
         AWSLoggerCore _core = null;
+
+        private static readonly string _assemblyVersion = typeof(AWSAppender).GetTypeInfo().Assembly.GetName().Version?.ToString() ?? string.Empty;
+        private static readonly string _userAgentString = $"aws-logger-log4net#{_assemblyVersion}";
 
         /// <summary>
         /// Default Constructor
@@ -251,7 +255,7 @@ namespace AWS.Logger.Log4net
                 _core = null;
             }
 
-            _core = new AWSLoggerCore(_config, "Log4net");
+            _core = new AWSLoggerCore(_config, _userAgentString);
         }
 
         /// <summary>

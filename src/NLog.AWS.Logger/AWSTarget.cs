@@ -8,6 +8,7 @@ using NLog.Config;
 using AWS.Logger;
 using AWS.Logger.Core;
 using Amazon.Runtime;
+using System.Reflection;
 
 namespace NLog.AWS.Logger
 {
@@ -19,6 +20,9 @@ namespace NLog.AWS.Logger
     {
         AWSLoggerConfig _config = new AWSLoggerConfig();
         AWSLoggerCore _core = null;
+
+        private static readonly string _assemblyVersion = typeof(AWSTarget).GetTypeInfo().Assembly.GetName().Version?.ToString() ?? string.Empty;
+        private static readonly string _userAgentString = $"aws-logger-nlog#{_assemblyVersion}";
 
         /// <summary>
         /// Default Constructor
@@ -271,7 +275,7 @@ namespace NLog.AWS.Logger
                 FlushTimeout = FlushTimeout,
                 NewLogGroupRetentionInDays = NewLogGroupRetentionInDays,
             };
-            _core = new AWSLoggerCore(config, "NLog");
+            _core = new AWSLoggerCore(config, _userAgentString);
             _core.LogLibraryAlert += AwsLogLibraryAlert;
         }
 

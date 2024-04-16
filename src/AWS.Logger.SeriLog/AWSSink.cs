@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using AWS.Logger.Core;
 using Serilog;
 using Serilog.Core;
@@ -17,6 +18,9 @@ namespace AWS.Logger.SeriLog
         IFormatProvider _iformatDriver;
         ITextFormatter _textFormatter;
 
+        private static readonly string _assemblyVersion = typeof(AWSSink).GetTypeInfo().Assembly.GetName().Version?.ToString() ?? string.Empty;
+        private static readonly string _userAgentString = $"aws-logger-serilog#{_assemblyVersion}";
+
         /// <summary>
         /// Default constructor
         /// </summary>
@@ -29,7 +33,7 @@ namespace AWS.Logger.SeriLog
         /// </summary>
         public AWSSink(AWSLoggerConfig loggerConfiguration, IFormatProvider iFormatProvider = null, ITextFormatter textFormatter = null)
         {
-            _core = new AWSLoggerCore(loggerConfiguration, "SeriLogger");
+            _core = new AWSLoggerCore(loggerConfiguration, _userAgentString);
             _iformatDriver = iFormatProvider;
             _textFormatter = textFormatter;
         }
