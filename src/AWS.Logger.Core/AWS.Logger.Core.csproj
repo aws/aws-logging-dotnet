@@ -23,7 +23,7 @@
     <SignAssembly>True</SignAssembly>
     <DelaySign>False</DelaySign>
     <AssemblyOriginatorKeyFile>..\..\public.snk</AssemblyOriginatorKeyFile>
-    <Version>3.3.0</Version>
+    <Version>3.3.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.0.5" />
+    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.305.15" />
   </ItemGroup>
 
 </Project>
