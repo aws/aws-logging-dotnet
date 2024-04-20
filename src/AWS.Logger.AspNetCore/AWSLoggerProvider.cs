@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reflection;
 using AWS.Logger.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,9 @@ namespace AWS.Logger.AspNetCore
         private readonly AWSLoggerConfigSection _configSection;
         private readonly Func<LogLevel, object, Exception, string> _customFormatter;
         private Func<string, LogLevel, bool> _customFilter;
+
+        private static readonly string _assemblyVersion = typeof(AWSLoggerProvider).GetTypeInfo().Assembly.GetName().Version?.ToString() ?? string.Empty;
+        private static readonly string _userAgentString = $"aws-logger-aspnetcore#{_assemblyVersion}";
 
         // Constants
         private const string DEFAULT_CATEGORY_NAME = "Default";
@@ -52,7 +56,7 @@ namespace AWS.Logger.AspNetCore
         public AWSLoggerProvider(AWSLoggerConfig config, Func<string, LogLevel, bool> filter, Func<LogLevel, object, Exception, string> formatter = null)
         {
             _scopeProvider = NullExternalScopeProvider.Instance;
-            _core = new AWSLoggerCore(config, "ILogger");
+            _core = new AWSLoggerCore(config, _userAgentString);
             _customFilter = filter;
             _customFormatter = formatter;
         }
@@ -76,7 +80,7 @@ namespace AWS.Logger.AspNetCore
         {
             _scopeProvider = configSection.IncludeScopes ? new LoggerExternalScopeProvider() : NullExternalScopeProvider.Instance;
             _configSection = configSection;
-            _core = new AWSLoggerCore(_configSection.Config, "ILogger");
+            _core = new AWSLoggerCore(_configSection.Config, _userAgentString);
         }        
 
         /// <summary>
