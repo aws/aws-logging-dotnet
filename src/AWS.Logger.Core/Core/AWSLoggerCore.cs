@@ -211,7 +211,9 @@ namespace AWS.Logger.Core
             try
             {
                 _client.Config.Validate();
+#pragma warning disable CS0618 // Type or member is obsolete
                 return _client.Config.DetermineServiceURL() ?? "Undetermined ServiceURL";
+#pragma warning restore CS0618 // Type or member is obsolete
             }
             catch (Exception ex)
             {
