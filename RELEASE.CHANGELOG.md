@@ -1,3 +1,15 @@
+### Release 2024-04-22
+* **AWS.Logger.Core (3.3.1)**
+  * Update User-Agent string
+* **AWS.Logger.AspNetCore (3.5.1)**
+  * Update User-Agent string
+* **AWS.Logger.Log4net (3.5.1)**
+   * Update User-Agent string
+* **AWS.Logger.NLog (3.3.1)**
+  * Update User-Agent string
+* **AWS.Logger.SeriLog (3.4.1)**
+  * Update User-Agent string
+
 ### Release 2024-04-09
 * **AWS.Logger.Core (3.3.0)**
   * Adds a new `LogStreamName` setting, which allows configuring the full log stream name. When this is set `LogStreamNamePrefix` and `LogStreamNameSuffix` will be ignored.
