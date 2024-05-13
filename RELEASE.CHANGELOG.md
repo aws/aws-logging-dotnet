@@ -1,3 +1,16 @@
+### Release 2024-05-13
+* **AWS.Logger.Core (3.3.2)**
+  * PR [#257](https://github.com/aws/aws-logging-dotnet/pull/257), fixes error when configured stream using the `LogStreamName` property already exists. Thanks [Michael Dimoudis](https://github.com/michaeldimoudis).
+  * Added new `AuthenticationRegion` property to set region to sign request when the region can not be detected by the configured endpoint for CloudWatch Logs.
+* **AWS.Logger.AspNetCore (3.5.2)**
+  * Updated to use latest version of AWS.Logger.Core
+* **AWS.Logger.Log4net (3.5.2)**
+   * pdated to use latest version of AWS.Logger.Core
+* **AWS.Logger.NLog (3.3.2)**
+  * pdated to use latest version of AWS.Logger.Core
+* **AWS.Logger.SeriLog (3.4.2)**
+  * pdated to use latest version of AWS.Logger.Core
+
 ### Release 2024-04-22
 * **AWS.Logger.Core (3.3.1)**
   * Update User-Agent string
