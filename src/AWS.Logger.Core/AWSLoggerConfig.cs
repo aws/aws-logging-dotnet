@@ -209,5 +209,11 @@ namespace AWS.Logger
         /// </para>
         /// </summary>
         public TimeSpan FlushTimeout { get; set; } = TimeSpan.FromMilliseconds(30000);
+
+        /// <summary>
+        /// Gets and sets the AuthenticationRegion property. Used in AWS4 request signing, this is an optional property; 
+        /// change it only if the region cannot be determined from the service endpoint.
+        /// </summary>
+        public string AuthenticationRegion { get; set; }
     }
 }

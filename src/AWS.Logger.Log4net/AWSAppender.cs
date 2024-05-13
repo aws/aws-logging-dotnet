@@ -245,6 +245,16 @@ namespace AWS.Logger.Log4net
         }
 
         /// <summary>
+        /// Gets and sets the AuthenticationRegion property. Used in AWS4 request signing, this is an optional property; 
+        /// change it only if the region cannot be determined from the service endpoint.
+        /// </summary>
+        public string AuthenticationRegion
+        {
+            get { return _config.AuthenticationRegion; }
+            set { _config.AuthenticationRegion = value; }
+        }
+
+        /// <summary>
         /// Initialize the appender based on the options set.
         /// </summary>
         public override void ActivateOptions()
