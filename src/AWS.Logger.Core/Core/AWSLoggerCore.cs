@@ -97,6 +97,11 @@ namespace AWS.Logger.Core
                 }
             }
 
+            if (!string.IsNullOrEmpty(_config.AuthenticationRegion))
+            {
+                awsConfig.AuthenticationRegion = _config.AuthenticationRegion;
+            }
+
             var credentials = DetermineCredentials(config);
             _client = new AmazonCloudWatchLogsClient(credentials, awsConfig);
 
