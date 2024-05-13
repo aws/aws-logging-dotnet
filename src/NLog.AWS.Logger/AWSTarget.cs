@@ -247,6 +247,16 @@ namespace NLog.AWS.Logger
             set { _config.FlushTimeout = value; }
         }
 
+        /// <summary>
+        /// Gets and sets the AuthenticationRegion property. Used in AWS4 request signing, this is an optional property; 
+        /// change it only if the region cannot be determined from the service endpoint.
+        /// </summary>
+        public string AuthenticationRegion
+        {
+            get { return _config.AuthenticationRegion; }
+            set { _config.AuthenticationRegion = value; }
+        }
+
         /// <inheritdoc/>
         protected override void InitializeTarget()
         {
@@ -274,6 +284,7 @@ namespace NLog.AWS.Logger
                 LibraryLogFileName = LibraryLogFileName,
                 FlushTimeout = FlushTimeout,
                 NewLogGroupRetentionInDays = NewLogGroupRetentionInDays,
+                AuthenticationRegion = AuthenticationRegion
             };
             _core = new AWSLoggerCore(config, _userAgentString);
             _core.LogLibraryAlert += AwsLogLibraryAlert;

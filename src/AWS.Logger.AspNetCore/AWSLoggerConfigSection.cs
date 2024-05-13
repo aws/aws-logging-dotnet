@@ -130,6 +130,7 @@ namespace Microsoft.Extensions.Configuration
         internal const string LIBRARY_LOG_FILE_NAME = "LibraryLogFileName";
         internal const string LIBRARY_LOG_ERRORS = "LibraryLogErrors";
         internal const string FLUSH_TIMEOUT = "FlushTimeout";
+        internal const string AUTHENTICATION_REGION = "AuthenticationRegion";
 
         private const string INCLUDE_LOG_LEVEL_KEY = "IncludeLogLevel";
         private const string INCLUDE_CATEGORY_KEY = "IncludeCategory";
@@ -194,6 +195,10 @@ namespace Microsoft.Extensions.Configuration
             if (loggerConfigSection[FLUSH_TIMEOUT] != null)
             {
                 Config.FlushTimeout = TimeSpan.FromMilliseconds(Int32.Parse(loggerConfigSection[FLUSH_TIMEOUT]));
+            }
+            if (loggerConfigSection[AUTHENTICATION_REGION] != null)
+            {
+                Config.AuthenticationRegion = loggerConfigSection[AUTHENTICATION_REGION];
             }
 
             if (loggerConfigSection[INCLUDE_LOG_LEVEL_KEY] != null)

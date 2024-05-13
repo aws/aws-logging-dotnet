@@ -28,6 +28,7 @@ namespace AWS.Logger.SeriLog
         internal const string LIBRARY_LOG_FILE_NAME = "Serilog:LibraryLogFileName";
         internal const string LIBRARY_LOG_ERRORS = "Serilog:LibraryLogErrors";
         internal const string FLUSH_TIMEOUT = "Serilog:FlushTimeout";
+        internal const string AUTHENTICATION_REGION = "Serilog:AuthenticationRegion";
 
         /// <summary>
         /// AWSSeriLogger target that is called when the customer is using 
@@ -104,6 +105,11 @@ namespace AWS.Logger.SeriLog
             {
                 config.FlushTimeout = TimeSpan.FromMilliseconds(Int32.Parse(configuration[FLUSH_TIMEOUT]));
             }
+            if (configuration[AUTHENTICATION_REGION] != null)
+            {
+                config.AuthenticationRegion = configuration[AUTHENTICATION_REGION];
+            }
+
             return AWSSeriLog(loggerConfiguration, config, iFormatProvider, textFormatter, restrictedToMinimumLevel);
         }
 

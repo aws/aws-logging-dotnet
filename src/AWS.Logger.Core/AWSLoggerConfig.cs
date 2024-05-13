@@ -194,7 +194,7 @@ namespace AWS.Logger
         public bool LibraryLogErrors { get; set; } = true;
        
         /// <summary>
-        /// Gets and sets the LibraryLogFileName property. This is the name of the file into which errors from the AWS.Logger.Core library will be written into.
+        /// Gets and sets the LibraryLogFileName property. This is the name (and optional path) of the file into which errors from the AWS.Logger.Core library will be written into.
         /// <para>
         /// The default is "aws-logger-errors.txt".
         /// </para>
@@ -209,5 +209,11 @@ namespace AWS.Logger
         /// </para>
         /// </summary>
         public TimeSpan FlushTimeout { get; set; } = TimeSpan.FromMilliseconds(30000);
+
+        /// <summary>
+        /// Gets and sets the AuthenticationRegion property. Used in AWS4 request signing, this is an optional property; 
+        /// change it only if the region cannot be determined from the service endpoint.
+        /// </summary>
+        public string AuthenticationRegion { get; set; }
     }
 }

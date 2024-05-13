@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      dotnet: 8.x
+    commands:
+      # Mono is needed to run the tests on Linux
+      - curl https://download.mono-project.com/repo/centos8-stable.repo | tee /etc/yum.repos.d/mono-stable.repo
+      - dnf install -y mono-complete mono-devel
+  build:
+    commands:
+      - dotnet test --verbosity normal test/AWS.Logger.AspNetCore.Tests/AWS.Logger.AspNetCore.Tests.csproj --configuration Release --logger trx --results-directory ./testresults
+      - dotnet test --verbosity normal test/AWS.Logger.Log4Net.FilterTests/AWS.Logger.Log4Net.FilterTests.csproj --configuration Release --logger trx --results-directory ./testresults
+      - dotnet test --verbosity normal test/AWS.Logger.Log4Net.Tests/AWS.Logger.Log4Net.Tests.csproj --configuration Release --logger trx --results-directory ./testresults
+      - dotnet test --verbosity normal test/AWS.Logger.NLog.FilterTests/AWS.Logger.NLog.FilterTests.csproj --configuration Release --logger trx --results-directory ./testresults
+      - dotnet test --verbosity normal test/AWS.Logger.NLog.Tests/AWS.Logger.NLog.Tests.csproj --configuration Release --logger trx --results-directory ./testresults
+      - dotnet test --verbosity normal test/AWS.Logger.SeriLog.Tests/AWS.Logger.SeriLog.Tests.csproj --configuration Release --logger trx --results-directory ./testresults
+      - dotnet test --verbosity normal test/AWS.Logger.UnitTests/AWS.Logger.UnitTests.csproj --configuration Release --logger trx --results-directory ./testresults
+reports:
+    aws-dotnet-messaging-tests:
+        file-format: VisualStudioTrx
+        files:
+            - '**/*'
+        base-directory: './testresults'
