@@ -18,7 +18,7 @@ namespace NLog.AWS.Logger
     [Target("AWSTarget")]
     public class AWSTarget : TargetWithLayout, IAWSLoggerConfig
     {
-        AWSLoggerConfig _config = new AWSLoggerConfig();
+        private readonly AWSLoggerConfig _config = new AWSLoggerConfig();
         AWSLoggerCore _core = null;
 
         private static readonly string _assemblyVersion = typeof(AWSTarget).GetTypeInfo().Assembly.GetName().Version?.ToString() ?? string.Empty;
@@ -284,7 +284,7 @@ namespace NLog.AWS.Logger
                 LibraryLogFileName = LibraryLogFileName,
                 FlushTimeout = FlushTimeout,
                 NewLogGroupRetentionInDays = NewLogGroupRetentionInDays,
-                AuthenticationRegion = AuthenticationRegion
+                AuthenticationRegion = RenderSimpleLayout(AuthenticationRegion, nameof(AuthenticationRegion)),
             };
             _core = new AWSLoggerCore(config, _userAgentString);
             _core.LogLibraryAlert += AwsLogLibraryAlert;
