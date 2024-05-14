@@ -5,11 +5,11 @@
 * **AWS.Logger.AspNetCore (3.5.2)**
   * Updated to use latest version of AWS.Logger.Core
 * **AWS.Logger.Log4net (3.5.2)**
-   * pdated to use latest version of AWS.Logger.Core
+  * Updated to use latest version of AWS.Logger.Core
 * **AWS.Logger.NLog (3.3.2)**
-  * pdated to use latest version of AWS.Logger.Core
+  * Updated to use latest version of AWS.Logger.Core
 * **AWS.Logger.SeriLog (3.4.2)**
-  * pdated to use latest version of AWS.Logger.Core
+  * Updated to use latest version of AWS.Logger.Core
 
 ### Release 2024-04-22
 * **AWS.Logger.Core (3.3.1)**
