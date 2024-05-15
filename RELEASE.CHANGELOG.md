@@ -1,3 +1,7 @@
+### Release 2024-05-15
+* **AWS.Logger.NLog (3.3.3)**
+  * PR [#263](https://github.com/aws/aws-logging-dotnet/pull/263), fixes issue of using layout logic for AuthenticationRegion. Thanks [Rolf Kristensen](https://github.com/snakefoot).
+
 ### Release 2024-05-13
 * **AWS.Logger.Core (3.3.2)**
   * PR [#257](https://github.com/aws/aws-logging-dotnet/pull/257), fixes error when configured stream using the `LogStreamName` property already exists. Thanks [Michael Dimoudis](https://github.com/michaeldimoudis).
