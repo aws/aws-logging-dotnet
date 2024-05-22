@@ -30,9 +30,24 @@ namespace AWS.Logger.Core
         private SemaphoreSlim _flushTriggerEvent;
         private ManualResetEventSlim _flushCompletedEvent;
         private AWSLoggerConfig _config;
-        private IAmazonCloudWatchLogs _client;
         private DateTime _maxBufferTimeStamp = new DateTime();
         private string _logType;
+
+        /// <summary>
+        /// Internal CloudWatch Logs client
+        /// </summary>
+        /// <remarks>
+        /// We defer the initialization of the client until it is first accessed. This avoids a deadlock for log4net:
+        ///   1. The thread creating the logger (which contains the CWL client) gets an internal lock in log4net, then tries to 
+        ///      access SDK configuration via the static FallbackInternalConfigurationFactory.
+        ///   2. The timer thread the SDK uses to load EC2 IMDS credentials requests SDK configuration via 
+        ///      FallbackInternalConfigurationFactory, which attempts to create additional loggers for logging the configuration loading.
+        /// There's an implicit lock around FallbackInternalConfigurationFactory's static constructor, so these two threads deadlock.
+        /// 
+        /// By delaying initializing the internal client, we delay starting thread 2 until thread 1 has finished, that way we're 
+        /// not creating additional log4net loggers in FallbackInternalConfigurationFactory while another thread is holding the log4net lock.
+        /// </remarks>
+        private Lazy<IAmazonCloudWatchLogs> _client;
 
         private static readonly string _assemblyVersion = typeof(AWSLoggerCore).GetTypeInfo().Assembly.GetName().Version?.ToString() ?? string.Empty;
         private static readonly string _baseUserAgentString = $"lib/aws-logger-core#{_assemblyVersion}";
@@ -102,12 +117,16 @@ namespace AWS.Logger.Core
                 awsConfig.AuthenticationRegion = _config.AuthenticationRegion;
             }
 
-            var credentials = DetermineCredentials(config);
-            _client = new AmazonCloudWatchLogsClient(credentials, awsConfig);
+            _client = new Lazy<IAmazonCloudWatchLogs>(() => 
+            {
+                var credentials = DetermineCredentials(config);
+                var client  = new AmazonCloudWatchLogsClient(credentials, awsConfig);
 
+                client.BeforeRequestEvent += ServiceClientBeforeRequestEvent;
+                client.ExceptionEvent += ServiceClienExceptionEvent;
 
-            ((AmazonCloudWatchLogsClient)this._client).BeforeRequestEvent += ServiceClientBeforeRequestEvent;
-            ((AmazonCloudWatchLogsClient)this._client).ExceptionEvent += ServiceClienExceptionEvent;
+                return client;
+            });
 
             StartMonitor();
             RegisterShutdownHook();
@@ -215,9 +234,9 @@ namespace AWS.Logger.Core
         {
             try
             {
-                _client.Config.Validate();
+                _client.Value.Config.Validate();
 #pragma warning disable CS0618 // Type or member is obsolete
-                return _client.Config.DetermineServiceURL() ?? "Undetermined ServiceURL";
+                return _client.Value.Config.DetermineServiceURL() ?? "Undetermined ServiceURL";
 #pragma warning restore CS0618 // Type or member is obsolete
             }
             catch (Exception ex)
@@ -331,7 +350,7 @@ namespace AWS.Logger.Core
                         LogLibraryServiceError(ex);
                     if (token.IsCancellationRequested)
                     {
-                        _client.Dispose();
+                        _client.Value.Dispose();
                         return;
                     }
                 }
@@ -380,7 +399,7 @@ namespace AWS.Logger.Core
                 {
                     if (!token.IsCancellationRequested || !_repo.IsEmpty || !_pendingMessageQueue.IsEmpty)
                         LogLibraryServiceError(ex);
-                    _client.Dispose();
+                    _client.Value.Dispose();
                     return;
                 }
                 catch (Exception ex)
@@ -403,7 +422,7 @@ namespace AWS.Logger.Core
             {
                 //Make sure the log events are in the right order.
                 _repo._request.LogEvents.Sort((ev1, ev2) => ev1.Timestamp.CompareTo(ev2.Timestamp));
-                var response = await _client.PutLogEventsAsync(_repo._request, token).ConfigureAwait(false);
+                var response = await _client.Value.PutLogEventsAsync(_repo._request, token).ConfigureAwait(false);
                 _repo.Reset();
             }
             catch (ResourceNotFoundException ex)
@@ -425,7 +444,7 @@ namespace AWS.Logger.Core
 
             if (!_config.DisableLogGroupCreation)
             {
-                var logGroupResponse = await _client.DescribeLogGroupsAsync(new DescribeLogGroupsRequest
+                var logGroupResponse = await _client.Value.DescribeLogGroupsAsync(new DescribeLogGroupsRequest
                 {
                     LogGroupNamePrefix = _config.LogGroup
                 }, token).ConfigureAwait(false);
@@ -436,7 +455,7 @@ namespace AWS.Logger.Core
 
                 if (logGroupResponse.LogGroups.FirstOrDefault(x => string.Equals(x.LogGroupName, _config.LogGroup, StringComparison.Ordinal)) == null)
                 {
-                    var createGroupResponse = await _client.CreateLogGroupAsync(new CreateLogGroupRequest { LogGroupName = _config.LogGroup }, token).ConfigureAwait(false);
+                    var createGroupResponse = await _client.Value.CreateLogGroupAsync(new CreateLogGroupRequest { LogGroupName = _config.LogGroup }, token).ConfigureAwait(false);
                     if (!IsSuccessStatusCode(createGroupResponse))
                     {
                         LogLibraryServiceError(new System.Net.WebException($"Create LogGroup {_config.LogGroup} returned status: {createGroupResponse.HttpStatusCode}"), serviceURL);
@@ -454,7 +473,7 @@ namespace AWS.Logger.Core
 
             try
             {
-                var streamResponse = await _client.CreateLogStreamAsync(new CreateLogStreamRequest
+                var streamResponse = await _client.Value.CreateLogStreamAsync(new CreateLogStreamRequest
                 {
                     LogGroupName = _config.LogGroup,
                     LogStreamName = currentStreamName
@@ -486,7 +505,7 @@ namespace AWS.Logger.Core
                 {
                     try
                     {
-                        var putPolicyResponse = await _client.PutRetentionPolicyAsync(new PutRetentionPolicyRequest(logGroup, logGroupRetentionInDays), token).ConfigureAwait(false);
+                        var putPolicyResponse = await _client.Value.PutRetentionPolicyAsync(new PutRetentionPolicyRequest(logGroup, logGroupRetentionInDays), token).ConfigureAwait(false);
                         if (!IsSuccessStatusCode(putPolicyResponse))
                         {
                             LogLibraryServiceError(new System.Net.WebException($"Put retention policy {logGroupRetentionInDays} for LogGroup {logGroup} returned status: {putPolicyResponse.HttpStatusCode}"), serviceURL);

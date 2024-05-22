@@ -23,7 +23,7 @@
 
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\public.snk</AssemblyOriginatorKeyFile>
-    <Version>3.3.3</Version>
+    <Version>3.3.4</Version>
   </PropertyGroup>
 
   <ItemGroup>
