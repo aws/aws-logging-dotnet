@@ -1,3 +1,15 @@
+### Release 2024-05-22
+* **AWS.Logger.Core (3.3.3)**
+  * Delay initializing the internal CloudWatch Logs client until it is needed, as opposed to when the logger is constructed. This avoids a deadlock between AWS.Logger.Log4net while it is initializing and internal areas in the AWS SDK for .NET that use log4net for logging.
+* **AWS.Logger.AspNetCore (3.5.3)**
+  * Updated to use latest version of AWS.Logger.Core
+* **AWS.Logger.Log4net (3.5.3)**
+  * Updated to use latest version of AWS.Logger.Core
+* **AWS.Logger.NLog (3.3.4)**
+  * Updated to use latest version of AWS.Logger.Core
+* **AWS.Logger.SeriLog (3.4.3)**
+  * Updated to use latest version of AWS.Logger.Core
+  
 ### Release 2024-05-15
 * **AWS.Logger.NLog (3.3.3)**
   * PR [#263](https://github.com/aws/aws-logging-dotnet/pull/263), fixes issue of using layout logic for AuthenticationRegion. Thanks [Rolf Kristensen](https://github.com/snakefoot).
