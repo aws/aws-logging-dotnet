@@ -233,7 +233,7 @@ namespace AWS.Logger.Log4net
         }
 
         /// <summary>
-        /// Gets and sets the LibraryLogFileName property. This is the name of the file into which errors from the AWS.Logger.Core library will be written into.
+        /// Gets and sets the LibraryLogFileName property. This is the name (and optional path) of the file into which errors from the AWS.Logger.Core library will be written into.
         /// <para>
         /// The default is going to "aws-logger-errors.txt".
         /// </para>
