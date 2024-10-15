@@ -22,3 +22,7 @@
 **/Deployment/
 /src/AWS.Logger.Core/AWS.Logger.Core45.nuget.props
 *.props
+
+# JetBrains Rider
+.idea/
+*.sln.iml
