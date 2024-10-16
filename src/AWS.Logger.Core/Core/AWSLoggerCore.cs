@@ -229,15 +229,22 @@ namespace AWS.Logger.Core
                 }
             }
         }
-
+        
+        private string _cachedServiceUrl;
         private string GetServiceUrl()
         {
             try
             {
                 _client.Value.Config.Validate();
-#pragma warning disable CS0618 // Type or member is obsolete
-                return _client.Value.Config.DetermineServiceURL() ?? "Undetermined ServiceURL";
-#pragma warning restore CS0618 // Type or member is obsolete
+                if (_cachedServiceUrl == null)
+                {
+                    _cachedServiceUrl = _client.Value.DetermineServiceOperationEndpoint(new DescribeLogGroupsRequest
+                    {
+                        LogGroupNamePrefix = _config.LogGroup
+                    }).URL ?? "Undetermined ServiceURL";
+                }
+
+                return _cachedServiceUrl;
             }
             catch (Exception ex)
             {
@@ -421,7 +428,8 @@ namespace AWS.Logger.Core
             try
             {
                 //Make sure the log events are in the right order.
-                _repo._request.LogEvents.Sort((ev1, ev2) => ev1.Timestamp.CompareTo(ev2.Timestamp));
+                _repo._request.LogEvents.Sort((ev1, ev2) => 
+                    ev1.Timestamp.GetValueOrDefault().CompareTo(ev2.Timestamp.GetValueOrDefault()));
                 var response = await _client.Value.PutLogEventsAsync(_repo._request, token).ConfigureAwait(false);
                 _repo.Reset();
             }

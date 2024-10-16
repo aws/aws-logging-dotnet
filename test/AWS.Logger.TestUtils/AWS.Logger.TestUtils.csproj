@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
     <AssemblyName>AWS.Logger.TestUtils</AssemblyName>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <DebugType Condition=" '$(TargetFramework)' == 'net462' ">Full</DebugType>
+    <DebugType Condition=" '$(TargetFramework)' == 'net472' ">Full</DebugType>
     <IsTestProject>true</IsTestProject>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.305.6" />
+    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="4.0.0-preview.4" />
     <PackageReference Include="xunit" Version="2.7.0" />
     <!-- This needs to be referenced to allow testing via AssumeRole credentials -->
-    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.300.75" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="4.0.0-preview.4" />
   </ItemGroup>
  
 </Project>

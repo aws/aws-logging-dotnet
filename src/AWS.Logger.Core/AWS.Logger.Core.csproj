@@ -1,39 +1,48 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
-
-    <Description>AWS Core logging library used to send logging messages to Amazon CloudWatch Logs</Description>
-    <Authors>Amazon Web Services</Authors>
-    <Company>Amazon Web Services</Company>
-    <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
-    <Copyright>Copyright 2016-$(CurrentYear) Amazon.com, Inc. or its affiliates. All Rights Reserved.</Copyright>
-    <PackageTags>AWS;Cloudwatch;Logger</PackageTags>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageProjectUrl>https://github.com/aws/aws-logging-dotnet</PackageProjectUrl>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/aws/aws-logging-dotnet.git</RepositoryUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PropertyGroup>
+        <TargetFrameworks>net472;netstandard2.0;net8.0</TargetFrameworks>
+        
+        <Description>AWS Core logging library used to send logging messages to Amazon CloudWatch Logs</Description>
+        <Authors>Amazon Web Services</Authors>
+        <Company>Amazon Web Services</Company>
+        <PackageTags>AWS;Cloudwatch;Logger</PackageTags>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageProjectUrl>https://github.com/aws/aws-logging-dotnet</PackageProjectUrl>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/aws/aws-logging-dotnet.git</RepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        
+        <SignAssembly>True</SignAssembly>
+        <DelaySign>False</DelaySign>
+        <AssemblyOriginatorKeyFile>..\..\public.snk</AssemblyOriginatorKeyFile>
+        
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        
+        <Version>4.0.0-preview.1</Version>
+    </PropertyGroup>
     
-    <SignAssembly>True</SignAssembly>
-    <DelaySign>False</DelaySign>
-    <AssemblyOriginatorKeyFile>..\..\public.snk</AssemblyOriginatorKeyFile>
-    <Version>3.3.3</Version>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="../../LICENSE" Pack="true" PackagePath="" />
-    <None Include="../../icon.png" Pack="true" PackagePath="" />
-    <None Include="../../README.md" Pack="true" PackagePath="" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.305.15" />
-  </ItemGroup>
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+        <IsTrimmable>true</IsTrimmable>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <None Include="../../LICENSE" Pack="true" PackagePath="" />
+        <None Include="../../icon.png" Pack="true" PackagePath="" />
+        <None Include="../../README.md" Pack="true" PackagePath="" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="AWSSDK.CloudWatchLogs" Version="4.0.0-preview.4" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    </ItemGroup>
 
 </Project>
