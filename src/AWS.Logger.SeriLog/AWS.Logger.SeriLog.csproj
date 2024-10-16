@@ -1,46 +1,55 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45;net46</TargetFrameworks>
+    <PropertyGroup>
+        <TargetFrameworks>net472;netstandard2.0;net8.0</TargetFrameworks>
+        
+        <Description>An AWS SeriLog sink that records logging messages to Amazon CloudWatch Logs.</Description>
+        <Authors>Amazon Web Services</Authors>
+        <Company>Amazon Web Services</Company>
+        <PackageTags>AWS;Cloudwatch;Logger;Serilog</PackageTags>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageProjectUrl>https://github.com/aws/aws-logging-dotnet</PackageProjectUrl>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/aws/aws-logging-dotnet.git</RepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>..\..\public.snk</AssemblyOriginatorKeyFile>
+        
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        
+        <Version>4.0.0-preview.1</Version>
+    </PropertyGroup>
     
-    <Description>An AWS SeriLog sink that records logging messages to Amazon CloudWatch Logs.</Description>
-    <Authors>Amazon Web Services</Authors>
-    <Company>Amazon Web Services</Company>
-    <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
-    <Copyright>Copyright 2016-$(CurrentYear) Amazon.com, Inc. or its affiliates. All Rights Reserved.</Copyright>
-    <PackageTags>AWS;Cloudwatch;Logger;Serilog</PackageTags>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageProjectUrl>https://github.com/aws/aws-logging-dotnet</PackageProjectUrl>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/aws/aws-logging-dotnet.git</RepositoryUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\public.snk</AssemblyOriginatorKeyFile>
-    <Version>3.4.3</Version>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="../../LICENSE" Pack="true" PackagePath="" />
-    <None Include="../../icon.png" Pack="true" PackagePath="" />
-    <None Include="../../README.md" Pack="true" PackagePath="" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Serilog" Version="2.6.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\AWS.Logger.Core\AWS.Logger.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="1.0.0" />
-  </ItemGroup>
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+        <IsTrimmable>true</IsTrimmable>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <None Include="../../LICENSE" Pack="true" PackagePath="" />
+        <None Include="../../icon.png" Pack="true" PackagePath="" />
+        <None Include="../../README.md" Pack="true" PackagePath="" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Serilog" Version="2.6.0" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\AWS.Logger.Core\AWS.Logger.Core.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="1.0.0" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    </ItemGroup>
 
 </Project>
