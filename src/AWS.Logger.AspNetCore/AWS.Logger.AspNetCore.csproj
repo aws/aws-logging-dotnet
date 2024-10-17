@@ -27,9 +27,9 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         
         <Version>4.0.0-preview.1</Version>
-        </PropertyGroup>
+    </PropertyGroup>
         
-        <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
         <IsTrimmable>true</IsTrimmable>
     </PropertyGroup>
     

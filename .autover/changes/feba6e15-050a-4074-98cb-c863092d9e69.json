@@ -1,0 +1,54 @@
+{
+  "Projects": [
+    {
+      "Name": "AWS.Logger.AspNetCore",
+      "Type": "Major",
+      "ChangelogMessages": [
+        "Updated .NET SDK project references to 4.0.0-preview.4",
+        "Added .NET 8 target framework",
+        "Enabled Trimming support",
+        "Added SourceLink support"
+      ]
+    },
+    {
+      "Name": "AWS.Logger.Core",
+      "Type": "Major",
+      "ChangelogMessages": [
+        "Updated .NET SDK project references to 4.0.0-preview.4",
+        "Added .NET 8 target framework",
+        "Enabled Trimming support",
+        "Added SourceLink support"
+      ]
+    },
+    {
+      "Name": "AWS.Logger.Log4net",
+      "Type": "Major",
+      "ChangelogMessages": [
+        "Updated .NET SDK project references to 4.0.0-preview.4",
+        "Added .NET 8 target framework",
+        "Enabled Trimming support",
+        "Added SourceLink support"
+      ]
+    },
+    {
+      "Name": "AWS.Logger.SeriLog",
+      "Type": "Major",
+      "ChangelogMessages": [
+        "Updated .NET SDK project references to 4.0.0-preview.4",
+        "Added .NET 8 target framework",
+        "Enabled Trimming support",
+        "Added SourceLink support"
+      ]
+    },
+    {
+      "Name": "NLog.AWS.Logger",
+      "Type": "Major",
+      "ChangelogMessages": [
+        "Updated .NET SDK project references to 4.0.0-preview.4",
+        "Added .NET 8 target framework",
+        "Enabled Trimming support",
+        "Added SourceLink support"
+      ]
+    }
+  ]
+}
