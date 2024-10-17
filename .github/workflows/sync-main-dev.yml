@@ -1,7 +1,7 @@
 # This GitHub Workflow is designed to run automatically after the Release PR, which was created by the `Create Release PR` workflow, is closed.
 # This workflow has 2 jobs. One will run if the `Release PR` is successfully merged, indicating that a release should go out.
 # The other will run if the `Release PR` was closed and a release is not intended to go out.
-name: Sync 'dev' and 'master'
+name: Sync 'v4sdk-development' and 'v4sdk-release'
 
 # The workflow will automatically be triggered when any PR is closed.
 on:
@@ -13,15 +13,15 @@ permissions:
   id-token: write
 
 jobs:
-  # This job will check if the PR was successfully merged, it's source branch is `releases/next-release` and target branch is `dev`. 
+  # This job will check if the PR was successfully merged, it's source branch is `releases/next-release` and target branch is `v4sdk-development`. 
   # This indicates that the merged PR was the `Release PR`. 
-  # This job will synchronize `dev` and `master`, create a GitHub Release and delete the `releases/next-release` branch.
+  # This job will synchronize `v4sdk-development` and `v4sdk-release`, create a GitHub Release and delete the `releases/next-release` branch.
   sync-dev-and-main:
-    name: Sync dev and master
+    name: Sync v4sdk-development and v4sdk-release
     if: |
       github.event.pull_request.merged == true &&
       github.event.pull_request.head.ref == 'releases/next-release' &&
-      github.event.pull_request.base.ref == 'dev'
+      github.event.pull_request.base.ref == 'v4sdk-development'
     runs-on: ubuntu-latest
     steps:
       # Assume an AWS Role that provides access to the Access Token
@@ -41,7 +41,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: dev
+          ref: v4sdk-development
           fetch-depth: 0
           token: ${{ env.AWS_SECRET_TOKEN }}
       # Install .NET8 which is needed for AutoVer
@@ -75,13 +75,13 @@ jobs:
         run: |
           changelog=$(autover changelog --output-to-console)
           echo "CHANGELOG<<EOF"$'\n'"$changelog"$'\n'EOF >> "$GITHUB_OUTPUT"
-      # Merge dev into master in order to synchronize the 2 branches
-      - name: Merge dev to master
+      # Merge v4sdk-development into v4sdk-release in order to synchronize the 2 branches
+      - name: Merge v4sdk-development to v4sdk-release
         run: |
           git fetch origin
-          git checkout master
-          git merge dev
-          git push origin master
+          git checkout v4sdk-release
+          git merge v4sdk-development
+          git push origin v4sdk-release
       # Create the GitHub Release
       - name: Create GitHub Release
         env:
@@ -93,7 +93,7 @@ jobs:
         run: |
           git fetch origin
           git push origin --delete releases/next-release
-  # This job will check if the PR was closed, it's source branch is `releases/next-release` and target branch is `dev`. 
+  # This job will check if the PR was closed, it's source branch is `releases/next-release` and target branch is `v4sdk-development`. 
   # This indicates that the closed PR was the `Release PR`.
   # This job will delete the tag created by AutoVer and the release branch.
   clean-up-closed-release:
@@ -101,7 +101,7 @@ jobs:
     if: |
       github.event.pull_request.merged == false &&
       github.event.pull_request.head.ref == 'releases/next-release' &&
-      github.event.pull_request.base.ref == 'dev'
+      github.event.pull_request.base.ref == 'v4sdk-development'
     runs-on: ubuntu-latest
     steps:
       # Checkout a full clone of the repo
