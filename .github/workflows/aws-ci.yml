@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - master
-      - dev
+      - v4sdk-release # Change to `master` when V4 is GA
+      - v4sdk-development # Change to `dev` when V4 is GA
       - 'feature/**'
 
 permissions:
