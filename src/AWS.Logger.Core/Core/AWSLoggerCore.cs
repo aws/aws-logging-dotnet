@@ -461,7 +461,7 @@ namespace AWS.Logger.Core
                     LogLibraryServiceError(new System.Net.WebException($"Lookup LogGroup {_config.LogGroup} returned status: {logGroupResponse.HttpStatusCode}"), serviceURL);
                 }
 
-                if (logGroupResponse.LogGroups.FirstOrDefault(x => string.Equals(x.LogGroupName, _config.LogGroup, StringComparison.Ordinal)) == null)
+                if (logGroupResponse.LogGroups?.FirstOrDefault(x => string.Equals(x.LogGroupName, _config.LogGroup, StringComparison.Ordinal)) == null)
                 {
                     var createGroupResponse = await _client.Value.CreateLogGroupAsync(new CreateLogGroupRequest { LogGroupName = _config.LogGroup }, token).ConfigureAwait(false);
                     if (!IsSuccessStatusCode(createGroupResponse))
@@ -626,7 +626,7 @@ namespace AWS.Logger.Core
 
             int _totalMessageSize { get; set; }
             DateTime _nextPushTime;
-            public PutLogEventsRequest _request = new PutLogEventsRequest();
+            public PutLogEventsRequest _request = new PutLogEventsRequest { LogEvents = new List<InputLogEvent>() };
             public LogEventBatch(string logGroupName, string streamName, int timeIntervalBetweenPushes, int maxBatchSize)
             {
                 _request.LogGroupName = logGroupName;
