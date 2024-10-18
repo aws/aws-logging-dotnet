@@ -1,27 +1,27 @@
 {
-    "Projects": [
-        {
-            "Name": "AWS.Logger.AspNetCore",
-            "Path": "src/AWS.Logger.AspNetCore/AWS.Logger.AspNetCore.csproj"
-        },
-        {
-            "Name": "AWS.Logger.Core",
-            "Path": "src/AWS.Logger.Core/AWS.Logger.Core.csproj"
-        },
-        {
-            "Name": "AWS.Logger.Log4net",
-            "Path": "src/AWS.Logger.Log4net/AWS.Logger.Log4net.csproj"
-        },
-        {
-            "Name": "AWS.Logger.SeriLog",
-            "Path": "src/AWS.Logger.SeriLog/AWS.Logger.SeriLog.csproj"
-        },
-        {
-            "Name": "NLog.AWS.Logger",
-            "Path": "src/NLog.AWS.Logger/NLog.AWS.Logger.csproj"
-        }
-    ],
-    "UseCommitsForChangelog": false,
-    "DefaultIncrementType": "Patch",
-    "ChangeFilesDetermineIncrementType": true
+  "Projects": [
+    {
+      "Name": "AWS.Logger.AspNetCore",
+      "Path": "src/AWS.Logger.AspNetCore/AWS.Logger.AspNetCore.csproj"
+    },
+    {
+      "Name": "AWS.Logger.Core",
+      "Path": "src/AWS.Logger.Core/AWS.Logger.Core.csproj"
+    },
+    {
+      "Name": "AWS.Logger.Log4net",
+      "Path": "src/AWS.Logger.Log4net/AWS.Logger.Log4net.csproj"
+    },
+    {
+      "Name": "AWS.Logger.SeriLog",
+      "Path": "src/AWS.Logger.SeriLog/AWS.Logger.SeriLog.csproj"
+    },
+    {
+      "Name": "NLog.AWS.Logger",
+      "Path": "src/NLog.AWS.Logger/NLog.AWS.Logger.csproj"
+    }
+  ],
+  "UseCommitsForChangelog": false,
+  "DefaultIncrementType": "Patch",
+  "ChangeFilesDetermineIncrementType": true
 }

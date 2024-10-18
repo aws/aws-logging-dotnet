@@ -1,3 +1,31 @@
+## Release 2024-10-18
+
+### AWS.Logger.AspNetCore (4.0.0-preview.1)
+* Updated .NET SDK project references to 4.0.0-preview.4
+* Added .NET 8 target framework
+* Enabled Trimming support
+* Added SourceLink support
+### AWS.Logger.Core (4.0.0-preview.1)
+* Updated .NET SDK project references to 4.0.0-preview.4
+* Added .NET 8 target framework
+* Enabled Trimming support
+* Added SourceLink support
+### AWS.Logger.Log4net (4.0.0-preview.1)
+* Updated .NET SDK project references to 4.0.0-preview.4
+* Added .NET 8 target framework
+* Enabled Trimming support
+* Added SourceLink support
+### AWS.Logger.SeriLog (4.0.0-preview.1)
+* Updated .NET SDK project references to 4.0.0-preview.4
+* Added .NET 8 target framework
+* Enabled Trimming support
+* Added SourceLink support
+### NLog.AWS.Logger (4.0.0-preview.1)
+* Updated .NET SDK project references to 4.0.0-preview.4
+* Added .NET 8 target framework
+* Enabled Trimming support
+* Added SourceLink support
+
 ## Release 2024-05-22
 
 ### AWS.Logger.Core (3.3.3)
