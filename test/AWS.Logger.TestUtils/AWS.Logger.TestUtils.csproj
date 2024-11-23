@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.305.6" />
-    <PackageReference Include="xunit" Version="2.7.0" />
+    <PackageReference Include="xunit" Version="2.9.2" />
     <!-- This needs to be referenced to allow testing via AssumeRole credentials -->
     <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.300.75" />
   </ItemGroup>
