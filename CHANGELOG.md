@@ -1,3 +1,10 @@
+## Release 2024-12-11
+
+### AWS.Logger.AspNetCore (3.5.4)
+* Update package dependencies to address security vulnerabilities
+### AWS.Logger.SeriLog (3.4.4)
+* Update package dependencies to address security vulnerabilities
+
 ## Release 2024-05-22
 
 ### AWS.Logger.Core (3.3.3)
