@@ -1,0 +1,18 @@
+{
+    "Projects": [
+      {
+        "Name": "AWS.Logger.AspNetCore",
+        "Type": "Patch",
+        "ChangelogMessages": [
+          "Update package dependencies to address security vulnerabilities"
+        ]
+      },
+      {
+        "Name": "AWS.Logger.SeriLog",
+        "Type": "Patch",
+        "ChangelogMessages": [
+          "Update package dependencies to address security vulnerabilities"
+        ]
+      }
+    ]
+}
