@@ -2,7 +2,7 @@
   "Serilog": {
     "Using": [ "AWS.Logger.SeriLog" ],
     "MinimumLevel": "Debug",
-    "LogGroup": "AWSSeriLogGroupMultiThreadTest",
+    "LogGroup": "{LOG_GROUP_NAME}",
     "Region": "us-west-2",
     "LogStreamNameSuffix": "Custom",
     "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ]
