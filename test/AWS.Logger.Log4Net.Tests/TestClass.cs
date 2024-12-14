@@ -1,6 +1,11 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
+using AWS.Logger.Log4net;
 using AWS.Logger.TestUtils;
 using log4net;
 using log4net.Config;
@@ -12,13 +17,18 @@ namespace AWS.Logger.Log4Net.Tests
     {
         public ILog Logger;
 
-        private void GetLog4NetLogger(string fileName, string logName)
+        private void GetLog4NetLogger(string fileName, string logName, string logGroupName)
         {
             // Create logger
             var repositoryAssembly = typeof(Log4NetTestClass).GetTypeInfo().Assembly;
             var loggerRepository = LogManager.GetRepository(repositoryAssembly);
-            XmlConfigurator.Configure(loggerRepository, new System.IO.FileInfo(fileName));
-            Logger = LogManager.GetLogger(repositoryAssembly, logName);
+            var fileInfo = new FileInfo(fileName);
+            var fileContent = File.ReadAllText(fileInfo.FullName);
+            using (Stream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(fileContent.Replace("{LOG_GROUP_NAME}", logGroupName))))
+            {
+                XmlConfigurator.Configure(loggerRepository, memoryStream);
+                Logger = LogManager.GetLogger(repositoryAssembly, logName);
+            }
         }
 
         public Log4NetTestClass(TestFixture testFixture) : base(testFixture)
@@ -27,24 +37,27 @@ namespace AWS.Logger.Log4Net.Tests
 
         #region Test Cases
         [Fact]
-        public void Log4Net()
+        public async Task Log4Net()
         {
-            GetLog4NetLogger("log4net.config","Log4Net");
-            SimpleLoggingTest("AWSLog4NetGroupLog4Net");
+            var logGroupName = $"AWSLog4NetGroupLog4Net{Guid.NewGuid().ToString().Split('-').Last()}";
+            GetLog4NetLogger("log4net.config","Log4Net", logGroupName);
+            await SimpleLoggingTest(logGroupName);
         }
 
         [Fact]
-        public void MultiThreadTest()
+        public async Task MultiThreadTest()
         {
-            GetLog4NetLogger("MultiThreadTest.config", "MultiThreadTest");
-            MultiThreadTestGroup("AWSLog4NetGroupLog4NetMultiThreadTest");
+            var logGroupName = $"AWSLog4NetGroupLog4NetMultiThreadTest{Guid.NewGuid().ToString().Split('-').Last()}";
+            GetLog4NetLogger("MultiThreadTest.config", "MultiThreadTest", logGroupName);
+            await MultiThreadTestGroup(logGroupName);
         }
 
         [Fact]
-        public void MultiThreadBufferFullTest()
+        public async Task MultiThreadBufferFullTest()
         {
-            GetLog4NetLogger("MultiThreadBufferFullTest.config", "MultiThreadBufferFullTest");
-            MultiThreadBufferFullTestGroup("AWSLog4NetGroupMultiThreadBufferFullTest");
+            var logGroupName = $"AWSLog4NetGroupMultiThreadBufferFullTest{Guid.NewGuid().ToString().Split('-').Last()}";
+            GetLog4NetLogger("MultiThreadBufferFullTest.config", "MultiThreadBufferFullTest", logGroupName);
+            await MultiThreadBufferFullTestGroup(logGroupName);
         }
 
         /// <summary>
@@ -52,17 +65,18 @@ namespace AWS.Logger.Log4Net.Tests
         /// when an override log stream name is provided
         /// </summary>
         [Fact]
-        public void CustomLogStreamNameTest()
+        public async Task CustomLogStreamNameTest()
         {
-            GetLog4NetLogger("OverrideLogStreamName.config", "OverrideLogStreamName");
-            MultiThreadTestGroup("AWSLog4NetGroupOverrideLogStreamName");
+            var logGroupName = $"AWSLog4NetGroupMultiThreadBufferFullTest{Guid.NewGuid().ToString().Split('-').Last()}";
+            GetLog4NetLogger("OverrideLogStreamName.config", "OverrideLogStreamName", logGroupName);
+            await MultiThreadTestGroup(logGroupName);
         }
 
         protected override void LogMessages(int count)
         {
             for (int i = 0; i < count-1; i++)
             {
-                Logger.Debug(string.Format("Test logging message {0} Log4Net, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
+                Logger.Debug(string.Format("Test logging message {0} Log4Net, Thread Id:{1}", i, Environment.CurrentManagedThreadId));
             }
             Logger.Debug(LASTMESSAGE);
         }
