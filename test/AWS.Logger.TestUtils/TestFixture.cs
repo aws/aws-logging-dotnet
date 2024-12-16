@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Amazon;
 using Amazon.CloudWatchLogs;
 using Amazon.CloudWatchLogs.Model;
-using System.Threading;
-using System.Diagnostics;
+using Xunit;
 
 namespace AWS.Logger.TestUtils
 {
@@ -15,45 +12,46 @@ namespace AWS.Logger.TestUtils
     // In the Build tab select "Produce outputs on build".
 
     //TestClass to dispose test generated LogGroups.
-    public class TestFixture : IDisposable
+    public class TestFixture : IAsyncLifetime
     {
         public List<string> LogGroupNameList;
+        public AmazonCloudWatchLogsClient Client;
 
-        public TestFixture()
+        public Task InitializeAsync()
         {
-            AmazonCloudWatchLogsClient Client = 
-                new AmazonCloudWatchLogsClient(Amazon.RegionEndpoint.USWest2);
+            Client = new AmazonCloudWatchLogsClient(Amazon.RegionEndpoint.USWest2);
             LogGroupNameList = new List<string>();
+
+            return Task.CompletedTask;
         }
 
-        public void Dispose()
+        public async Task DisposeAsync()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            AmazonCloudWatchLogsClient Client = 
-                new AmazonCloudWatchLogsClient(Amazon.RegionEndpoint.USWest2);
             foreach (var logGroupName in LogGroupNameList)
             {
-                if (!(string.IsNullOrEmpty(logGroupName)))
+                try
                 {
-                    DescribeLogGroupsResponse describeLogGroupsResponse = Client.DescribeLogGroupsAsync(
-                    new DescribeLogGroupsRequest
+                    if (!(string.IsNullOrEmpty(logGroupName)))
                     {
-                        LogGroupNamePrefix = logGroupName
-                    }).Result;
+                        var describeLogGroupsResponse = await Client.DescribeLogGroupsAsync(
+                            new DescribeLogGroupsRequest
+                            {
+                                LogGroupNamePrefix = logGroupName
+                            });
 
-                    if (!(string.IsNullOrEmpty(describeLogGroupsResponse.LogGroups[0].LogGroupName)))
-                    {
-                        var response = Client.DeleteLogGroupAsync(new DeleteLogGroupRequest
+                        foreach (var logGroup in describeLogGroupsResponse.LogGroups)
                         {
-                            LogGroupName = logGroupName
-                        }).Result;
+                            if (!(string.IsNullOrEmpty(logGroup.LogGroupName)))
+                            {
+                                var response = await Client.DeleteLogGroupAsync(new DeleteLogGroupRequest
+                                {
+                                    LogGroupName = logGroup.LogGroupName
+                                });
+                            }
+                        }
                     }
                 }
+                catch (Exception) { }
             }
         }
     }

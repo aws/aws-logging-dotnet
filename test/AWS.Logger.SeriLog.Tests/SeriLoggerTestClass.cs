@@ -1,5 +1,9 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Amazon.CloudWatchLogs.Model;
 using AWS.Logger.SeriLog;
 using AWS.Logger.TestUtils;
@@ -18,37 +22,45 @@ namespace AWS.Logger.SeriLog.Tests
         {
         }
 
-        private void CreateLoggerFromConfiguration(string configurationFile)
+        private void CreateLoggerFromConfiguration(string configurationFile, string logGroupName)
         {
-            var configuration = new ConfigurationBuilder()
-            .AddJsonFile(configurationFile)
-            .Build();
-             
-            Log.Logger = new LoggerConfiguration().
-                ReadFrom.Configuration(configuration).
-                 WriteTo.AWSSeriLog( configuration).CreateLogger();
+            var fileInfo = new FileInfo(configurationFile);
+            var fileContent = File.ReadAllText(fileInfo.FullName);
+            using (Stream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(fileContent.Replace("{LOG_GROUP_NAME}", logGroupName))))
+            {
+                var configuration = new ConfigurationBuilder()
+                .AddJsonStream(memoryStream)
+                .Build();
+
+                Log.Logger = new LoggerConfiguration().
+                    ReadFrom.Configuration(configuration).
+                     WriteTo.AWSSeriLog(configuration).CreateLogger();
+            }
         }
         #region Test Cases  
 
         [Fact]
-        public void SeriLogger()
+        public async Task SeriLogger()
         {
-            CreateLoggerFromConfiguration("AWSSeriLogGroup.json");
-            SimpleLoggingTest("AWSSeriLogGroup");
+            var logGroupName = $"AWSSeriLogGroup{Guid.NewGuid().ToString().Split('-').Last()}";
+            CreateLoggerFromConfiguration("AWSSeriLogGroup.json", logGroupName);
+            await SimpleLoggingTest(logGroupName);
         }
 
         [Fact]
-        public void MultiThreadTest()
+        public async Task MultiThreadTest()
         {
-            CreateLoggerFromConfiguration("AWSSeriLogGroupMultiThreadTest.json");
-            MultiThreadTestGroup("AWSSeriLogGroupMultiThreadTest");
+            var logGroupName = $"AWSSeriLogGroup{Guid.NewGuid().ToString().Split('-').Last()}";
+            CreateLoggerFromConfiguration("AWSSeriLogGroupMultiThreadTest.json", logGroupName);
+            await MultiThreadTestGroup(logGroupName);
         }
 
         [Fact]
-        public void MultiThreadBufferFullTest()
+        public async Task MultiThreadBufferFullTest()
         {
-            CreateLoggerFromConfiguration("AWSSeriLogGroupMultiThreadBufferFullTest.json");
-            MultiThreadBufferFullTestGroup("AWSSeriLogGroupMultiThreadBufferFullTest");
+            var logGroupName = $"AWSSeriLogGroup{Guid.NewGuid().ToString().Split('-').Last()}";
+            CreateLoggerFromConfiguration("AWSSeriLogGroupMultiThreadBufferFullTest.json", logGroupName);
+            await MultiThreadBufferFullTestGroup(logGroupName);
         }
 
         /// <summary>
@@ -56,56 +68,63 @@ namespace AWS.Logger.SeriLog.Tests
         /// when an override log stream name is provided
         /// </summary>
         [Fact]
-        public void CustomLogStreamNameTest()
+        public async Task CustomLogStreamNameTest()
         {
-            CreateLoggerFromConfiguration("AWSSeriLogGroupOverrideLogStreamName.json");
-            MultiThreadTestGroup("AWSSeriLogGroupOverrideLogStreamName", "CustomLogStream");
+            var logGroupName = $"AWSSeriLogGroup{Guid.NewGuid().ToString().Split('-').Last()}";
+            CreateLoggerFromConfiguration("AWSSeriLogGroupOverrideLogStreamName.json", logGroupName);
+            await MultiThreadTestGroup(logGroupName, "CustomLogStream");
         }
 
         [Fact]
-        public void RestrictedToMinimumLevelTest()
+        public async Task RestrictedToMinimumLevelTest()
         {
-            string logGroupName = "AWSSeriLogGroupRestrictedtoMinimumLevel";
-            // Create logger
-            var configuration = new ConfigurationBuilder()
-            .AddJsonFile("AWSSeriLogGroupRestrictedToMinimumLevel.json")
-            .Build();
+            var logGroupName = $"AWSSeriLogGroupRestrictedtoMinimumLevel{Guid.NewGuid().ToString().Split('-').Last()}";
 
-            Log.Logger = new LoggerConfiguration().
-                ReadFrom.Configuration(configuration).CreateLogger();
+            var fileInfo = new FileInfo("AWSSeriLogGroupRestrictedToMinimumLevel.json");
+            var fileContent = File.ReadAllText(fileInfo.FullName);
+            using (Stream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(fileContent.Replace("{LOG_GROUP_NAME}", logGroupName))))
+            {
+                // Create logger
+                var configuration = new ConfigurationBuilder()
+                .AddJsonStream(memoryStream)
+                .Build();
 
-            ExecuteRestrictedToMinimumLevelTest(logGroupName);
+                Log.Logger = new LoggerConfiguration().
+                    ReadFrom.Configuration(configuration).CreateLogger();
+            }
+
+            await ExecuteRestrictedToMinimumLevelTest(logGroupName);
         }
 
-        private void ExecuteRestrictedToMinimumLevelTest(string logGroupName)
+        private async Task ExecuteRestrictedToMinimumLevelTest(string logGroupName)
         {
             // Log 4 Debug messages
             for (int i = 0; i < 3; i++)
             {
-                Log.Debug(string.Format("Test logging message {0} SeriLog, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
+                Log.Debug(string.Format("Test logging message {0} SeriLog, Thread Id:{1}", i, Environment.CurrentManagedThreadId));
             }
             // Log 5 Error messages
             for (int i = 0; i < 5; i++)
             {
-                Log.Error(string.Format("Test logging message {0} SeriLog, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
+                Log.Error(string.Format("Test logging message {0} SeriLog, Thread Id:{1}", i, Environment.CurrentManagedThreadId));
             }
             Log.Error(LASTMESSAGE);
 
             GetLogEventsResponse getLogEventsResponse = new GetLogEventsResponse();
-            if (NotifyLoggingCompleted("AWSSeriLogGroupRestrictedtoMinimumLevel", "LASTMESSAGE"))
+            if (await NotifyLoggingCompleted(logGroupName, "LASTMESSAGE"))
             {
-                DescribeLogStreamsResponse describeLogstreamsResponse = Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
+                DescribeLogStreamsResponse describeLogstreamsResponse = await _testFixture.Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
                 {
                     Descending = true,
                     LogGroupName = logGroupName,
                     OrderBy = "LastEventTime"
-                }).Result;
+                });
 
-                getLogEventsResponse = Client.GetLogEventsAsync(new GetLogEventsRequest
+                getLogEventsResponse = await _testFixture.Client.GetLogEventsAsync(new GetLogEventsRequest
                 {
                     LogGroupName = logGroupName,
                     LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
-                }).Result;
+                });
             }
             Assert.Equal(6, getLogEventsResponse.Events.Count);
         }
@@ -118,7 +137,7 @@ namespace AWS.Logger.SeriLog.Tests
         {
             for (int i = 0; i < count - 1; i++)
             {
-                Log.Debug(string.Format("Test logging message {0} SeriLog, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
+                Log.Debug(string.Format("Test logging message {0} SeriLog, Thread Id:{1}", i, Environment.CurrentManagedThreadId));
             }
             Log.Debug(LASTMESSAGE);
         }
