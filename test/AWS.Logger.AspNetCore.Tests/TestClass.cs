@@ -80,10 +80,10 @@ namespace AWS.Logger.AspNetCore.Tests
         /// 10 debug messages to CloudWatchLogs. The results are then verified.
         /// </summary>
         [Fact]
-        public void ILogger()
+        public async Task ILogger()
         {
             LoggingSetup("appsettings.json",null);
-            SimpleLoggingTest(ConfigSection.Config.LogGroup);
+            await SimpleLoggingTest(ConfigSection.Config.LogGroup);
         }
 
         [Fact]
@@ -129,10 +129,10 @@ namespace AWS.Logger.AspNetCore.Tests
         /// threads that log 200 debug messages each to CloudWatchLogs. The results are then verified.
         /// </summary>
         [Fact]
-        public void MultiThreadTest()
+        public async Task MultiThreadTest()
         {
             LoggingSetup("multiThreadTest.json",null);
-            MultiThreadTestGroup(ConfigSection.Config.LogGroup);
+            await MultiThreadTestGroup(ConfigSection.Config.LogGroup);
         }
 
         /// <summary>
@@ -143,17 +143,17 @@ namespace AWS.Logger.AspNetCore.Tests
         /// inorder to force a buffer full scenario. The results are then verified.
         /// </summary>
         [Fact]
-        public void MultiThreadBufferFullTest()
+        public async Task MultiThreadBufferFullTest()
         {
             LoggingSetup("multiThreadBufferFullTest.json",null);
-            MultiThreadBufferFullTestGroup(ConfigSection.Config.LogGroup);
+            await MultiThreadBufferFullTestGroup(ConfigSection.Config.LogGroup);
         }
 
         [Fact]
-        public void OverrideLogStreamNameTest()
+        public async Task OverrideLogStreamNameTest()
         {
             LoggingSetup("overrideLogStreamName.json", null);
-            MultiThreadTestGroup(ConfigSection.Config.LogGroup, ConfigSection.Config.LogStreamName);
+            await MultiThreadTestGroup(ConfigSection.Config.LogGroup, ConfigSection.Config.LogStreamName);
         }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace AWS.Logger.AspNetCore.Tests
             Logger.LogError(0, new Exception("Exception message."), "Error message");
             for (int i = 0; i < count-2; i++)
             {
-                Logger.LogDebug(string.Format("Test logging message {0} Ilogger, Thread Id:{1}", i, Thread.CurrentThread.ManagedThreadId));
+                Logger.LogDebug(string.Format("Test logging message {0} Ilogger, Thread Id:{1}", i, Environment.CurrentManagedThreadId));
             }
             Logger.LogDebug(LASTMESSAGE);
         }
