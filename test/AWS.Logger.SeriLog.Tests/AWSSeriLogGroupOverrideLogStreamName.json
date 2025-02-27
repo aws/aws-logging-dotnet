@@ -2,7 +2,7 @@
   "Serilog": {
     "Using": [ "AWS.Logger.SeriLog" ],
     "MinimumLevel": "Debug",
-    "LogGroup": "AWSSeriLogGroupOverrideLogStreamName",
+    "LogGroup": "{LOG_GROUP_NAME}",
     "Region": "us-west-2",
     "LogStreamName": "CustomLogStream",
     "LogStreamNameSuffix": "Custom",
