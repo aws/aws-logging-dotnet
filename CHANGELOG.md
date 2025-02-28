@@ -1,3 +1,16 @@
+## Release 2025-02-28
+
+### AWS.Logger.AspNetCore (4.0.0-preview.2)
+* Update .NET SDK dependencies to v4.0.0-preview.8
+### AWS.Logger.Core (4.0.0-preview.2)
+* Update .NET SDK dependencies to v4.0.0-preview.8
+### AWS.Logger.Log4net (4.0.0-preview.2)
+* Update .NET SDK dependencies to v4.0.0-preview.8
+### AWS.Logger.SeriLog (4.0.0-preview.2)
+* Update .NET SDK dependencies to v4.0.0-preview.8
+### NLog.AWS.Logger (4.0.0-preview.2)
+* Update .NET SDK dependencies to v4.0.0-preview.8
+
 ## Release 2024-12-16
 
 ### AWS.Logger.AspNetCore (3.5.4)
