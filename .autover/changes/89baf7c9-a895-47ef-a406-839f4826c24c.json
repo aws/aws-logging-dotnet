@@ -1,0 +1,39 @@
+{
+  "Projects": [
+    {
+      "Name": "AWS.Logger.AspNetCore",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Update .NET SDK dependencies to v4.0.0-preview.8"
+      ]
+    },
+    {
+      "Name": "AWS.Logger.Core",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Update .NET SDK dependencies to v4.0.0-preview.8"
+      ]
+    },
+    {
+      "Name": "AWS.Logger.Log4net",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Update .NET SDK dependencies to v4.0.0-preview.8"
+      ]
+    },
+    {
+      "Name": "AWS.Logger.SeriLog",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Update .NET SDK dependencies to v4.0.0-preview.8"
+      ]
+    },
+    {
+      "Name": "NLog.AWS.Logger",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Update .NET SDK dependencies to v4.0.0-preview.8"
+      ]
+    }
+  ]
+}
