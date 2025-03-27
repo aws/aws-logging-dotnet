@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Amazon.Runtime.Credentials;
 
 namespace AWS.Logger.Core
 {
@@ -155,7 +156,7 @@ namespace AWS.Logger.Core
                 if (credentials != null)
                     return credentials;
             }
-            return FallbackCredentialsFactory.GetCredentials();
+            return DefaultAWSCredentialsIdentityResolver.GetCredentials();
         }
 
         private static AWSCredentials LookupCredentialsFromProfileStore(AWSLoggerConfig config)
