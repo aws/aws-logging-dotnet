@@ -1,3 +1,8 @@
+## Release 2025-04-01
+
+### AWS.Logger.Core (4.0.0-preview.3)
+* Update AWS SDK to Preview 11
+
 ## Release 2025-02-28
 
 ### AWS.Logger.AspNetCore (4.0.0-preview.2)
