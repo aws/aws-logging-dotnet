@@ -31,7 +31,7 @@ jobs:
           aws-region: us-west-2
       # Retrieve the Access Token from Secrets Manager
       - name: Retrieve secret from AWS Secrets Manager
-        uses: aws-actions/aws-secretsmanager-get-secrets@b059cd8b8897a9774d09b043dea953a08bf740ea #unknown-version
+        uses: aws-actions/aws-secretsmanager-get-secrets@fbd65ea98e018858715f591f03b251f02b2316cb #v2.0.8
         with:
           secret-ids: |
             AWS_SECRET, ${{ secrets.RELEASE_WORKFLOW_ACCESS_TOKEN_NAME }}
