@@ -37,7 +37,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
     <!-- This needs to be referenced to allow testing via AssumeRole credentials -->
-    <PackageReference Include="AWSSDK.SecurityToken" Version="4.0.0-preview.11" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="4.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">

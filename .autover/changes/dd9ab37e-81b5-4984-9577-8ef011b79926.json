@@ -1,0 +1,39 @@
+{
+  "Projects": [
+    {
+      "Name": "AWS.Logger.AspNetCore",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Updated the .NET SDK dependencies to the latest version GA 4.0.0"
+      ]
+    },
+    {
+      "Name": "AWS.Logger.Core",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Updated the .NET SDK dependencies to the latest version GA 4.0.0"
+      ]
+    },
+    {
+      "Name": "AWS.Logger.Log4net",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Updated the .NET SDK dependencies to the latest version GA 4.0.0"
+      ]
+    },
+    {
+      "Name": "AWS.Logger.SeriLog",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Updated the .NET SDK dependencies to the latest version GA 4.0.0"
+      ]
+    },
+    {
+      "Name": "NLog.AWS.Logger",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Updated the .NET SDK dependencies to the latest version GA 4.0.0"
+      ]
+    }
+  ]
+}
