@@ -6,8 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWS.Logger.SeriLog" Version="4.0.0" />
     <PackageReference Include="Serilog" Version="3.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\AWS.Logger.SeriLog\AWS.Logger.SeriLog.csproj" />
   </ItemGroup>
 
 </Project>
