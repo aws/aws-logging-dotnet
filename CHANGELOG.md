@@ -1,3 +1,16 @@
+## Release 2025-04-28
+
+### AWS.Logger.AspNetCore (4.0.0)
+* Updated the .NET SDK dependencies to the latest version GA 4.0.0
+### AWS.Logger.Core (4.0.0)
+* Updated the .NET SDK dependencies to the latest version GA 4.0.0
+### AWS.Logger.Log4net (4.0.0)
+* Updated the .NET SDK dependencies to the latest version GA 4.0.0
+### AWS.Logger.SeriLog (4.0.0)
+* Updated the .NET SDK dependencies to the latest version GA 4.0.0
+### NLog.AWS.Logger (4.0.0)
+* Updated the .NET SDK dependencies to the latest version GA 4.0.0
+
 ## Release 2025-04-01
 
 ### AWS.Logger.Core (4.0.0-preview.3)
