@@ -1,7 +1,5 @@
 ﻿using Xunit;
 using System;
-using System.IO;
-using System.Reflection;
 using System.Linq;
 using NLog.Config;
 using NLog;
@@ -45,7 +43,8 @@ namespace AWS.Logger.NLogger.FilterTests
             var config = new LoggingConfiguration();
             config.AddTarget("FakeAWSTarget", fakeawsTarget);
 
-            var rule = new LoggingRule("CustomFilter", LogLevel.Warn,LogLevel.Fatal, fakeawsTarget);
+            var rule = new LoggingRule("CustomFilter", LogLevel.Warn, LogLevel.Fatal, fakeawsTarget);
+            rule.FilterDefaultAction = FilterResult.Log;
             rule.Filters.Add(filter);
 
             config.LoggingRules.Add(rule);
