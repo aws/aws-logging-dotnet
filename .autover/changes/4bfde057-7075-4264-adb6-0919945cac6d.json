@@ -1,0 +1,11 @@
+{
+  "Projects": [
+    {
+      "Name": "AWS.Logger.Core",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Marked IsTrimmable = true"
+      ]
+    }
+  ]
+}

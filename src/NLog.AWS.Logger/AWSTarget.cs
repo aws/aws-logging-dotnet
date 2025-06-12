@@ -29,7 +29,6 @@ namespace NLog.AWS.Logger
         /// </summary>
         public AWSTarget()
         {
-            this.OptimizeBufferReuse = true;
         }
 
         /// <summary>

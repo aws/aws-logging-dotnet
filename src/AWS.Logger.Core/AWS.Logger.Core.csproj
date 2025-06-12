@@ -26,6 +26,8 @@
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <EnableTrimAnalyzer Condition=" '$(TargetFramework)' == 'net8.0' ">true</EnableTrimAnalyzer>
+        <IsTrimmable Condition=" '$(TargetFramework)' == 'net8.0' ">true</IsTrimmable>
         
         <Version>4.0.0</Version>
     </PropertyGroup>
