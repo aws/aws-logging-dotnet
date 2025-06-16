@@ -4,7 +4,7 @@
       "Name": "NLog.AWS.Logger",
       "Type": "Patch",
       "ChangelogMessages": [
-        "Updated to NLog v5.2.2 and marked IsTrimmable = true"
+        "Updated to NLog v5.2.2 to support IsTrimmable = true"
       ]
     }
   ]
