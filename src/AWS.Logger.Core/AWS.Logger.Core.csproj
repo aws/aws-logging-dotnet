@@ -41,7 +41,7 @@
     </ItemGroup>
     
     <ItemGroup>
-        <PackageReference Include="AWSSDK.CloudWatchLogs" Version="4.0.0" />
+        <PackageReference Include="AWSSDK.CloudWatchLogs" Version="4.0.8.4" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     </ItemGroup>
 
