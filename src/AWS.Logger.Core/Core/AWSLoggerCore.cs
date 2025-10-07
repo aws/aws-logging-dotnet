@@ -678,10 +678,10 @@ namespace AWS.Logger.Core
         {
             var userAgentString = $"{_baseUserAgentString} ft/{_logType}";
             var args = e as Amazon.Runtime.WebServiceRequestEventArgs;
-            if (args == null || !args.Headers.ContainsKey(UserAgentHeader) || args.Headers[UserAgentHeader].Contains(userAgentString))
+            if (args == null)
                 return;
 
-            args.Headers[UserAgentHeader] = args.Headers[UserAgentHeader] + " " + userAgentString;
+            ((Amazon.Runtime.Internal.IAmazonWebServiceRequest)args.Request).UserAgentDetails.AddUserAgentComponent(userAgentString);
         }
 
         void ServiceClienExceptionEvent(object sender, ExceptionEventArgs e)
@@ -705,7 +705,7 @@ namespace AWS.Logger.Core
         /// <summary>
         /// Write Exception details to the file specified with the filename
         /// </summary>
-        public static void LogLibraryError(Exception ex, string LibraryLogFileName)
+        public static void LogLibraryError(Exception originalException, string LibraryLogFileName)
         {
             try
             {
@@ -714,13 +714,14 @@ namespace AWS.Logger.Core
                     w.WriteLine("Log Entry : ");
                     w.WriteLine("{0}", DateTime.Now.ToString());
                     w.WriteLine("  :");
-                    w.WriteLine("  :{0}", ex.ToString());
+                    w.WriteLine("  :{0}", originalException.ToString());
                     w.WriteLine("-------------------------------");
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine("Exception caught when writing error log to file" + e.ToString());
+                Console.WriteLine("Original Exception attempted to be written to the log file: " + originalException.ToString());
             }
         }
     }
