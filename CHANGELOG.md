@@ -1,3 +1,18 @@
+## Release 2025-10-07
+
+### AWS.Logger.Core (4.0.1)
+* When failed to write to local log file write the original exception that triggered the reason for writing to the local log file to the console
+* Updated AWSSDK.CloudWatchLogs dependency to version 4.0.8.4
+### AWS.Logger.AspNetCore (4.0.1)
+* Update to latest version of AWS.Logger.Core
+### AWS.Logger.Log4net (4.0.1)
+* Update to latest version of AWS.Logger.Core
+### AWS.Logger.SeriLog (4.0.1)
+* Update to latest version of AWS.Logger.Core
+### NLog.AWS.Logger (5.0.0)
+* Update to latest version of AWS.Logger.Core
+* Updated to NLog v5.2.2 to support IsTrimmable = true
+
 ## Release 2025-04-28
 
 ### AWS.Logger.AspNetCore (4.0.0)
