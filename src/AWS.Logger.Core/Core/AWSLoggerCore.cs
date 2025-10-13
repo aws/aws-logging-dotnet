@@ -124,7 +124,7 @@ namespace AWS.Logger.Core
                 var client  = new AmazonCloudWatchLogsClient(credentials, awsConfig);
 
                 client.BeforeRequestEvent += ServiceClientBeforeRequestEvent;
-                client.ExceptionEvent += ServiceClienExceptionEvent;
+                client.ExceptionEvent += ServiceClientExceptionEvent;
 
                 return client;
             });
@@ -678,13 +678,13 @@ namespace AWS.Logger.Core
         {
             var userAgentString = $"{_baseUserAgentString} ft/{_logType}";
             var args = e as Amazon.Runtime.WebServiceRequestEventArgs;
-            if (args == null)
-                return;
-
-            ((Amazon.Runtime.Internal.IAmazonWebServiceRequest)args.Request).UserAgentDetails.AddUserAgentComponent(userAgentString);
+            if (args != null && args.Request is Amazon.Runtime.Internal.IAmazonWebServiceRequest internalRequest && !internalRequest.UserAgentDetails.GetCustomUserAgentComponents().Contains(userAgentString))
+            {
+                internalRequest.UserAgentDetails.AddUserAgentComponent(userAgentString);
+            }
         }
 
-        void ServiceClienExceptionEvent(object sender, ExceptionEventArgs e)
+        void ServiceClientExceptionEvent(object sender, ExceptionEventArgs e)
         {
             var eventArgs = e as WebServiceExceptionEventArgs;
             if (eventArgs?.Exception != null)
