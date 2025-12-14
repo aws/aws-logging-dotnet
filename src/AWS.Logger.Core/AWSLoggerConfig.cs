@@ -1,5 +1,5 @@
 ﻿using System;
-
+using Amazon.CloudWatchLogs;
 using Amazon.Runtime;
 namespace AWS.Logger
 {
@@ -215,5 +215,11 @@ namespace AWS.Logger
         /// change it only if the region cannot be determined from the service endpoint.
         /// </summary>
         public string AuthenticationRegion { get; set; }
+
+        /// <summary>
+        /// An IAmazonCloudWatchLogs that has already been configured to connect to Amazon CloudWatch Logs. This property
+        /// is general used for testing purposes testing special scenarios.
+        /// </summary>
+        public IAmazonCloudWatchLogs PreconfiguredServiceClient { get; set; }
     }
 }
