@@ -1,3 +1,9 @@
+## Release 2025-12-15
+
+### AWS.Logger.Core (4.0.3)
+* Add the property PreconfiguredServiceClient to AWSLoggerConfig to make it easier to test special scenarios
+* Update dependency version of AWSSDK.CloudWatchLogs to 4.0.13.3 from 4.0.8.4
+
 ## Release 2025-10-13
 
 ### AWS.Logger.Core (4.0.2)
