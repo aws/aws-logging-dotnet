@@ -1,3 +1,16 @@
+## Release 2025-10-13
+
+### AWS.Logger.Core (4.0.2)
+* Fixed issue with logging suffix in user agent being duplicated till the user agent is too big and requests stop working
+### AWS.Logger.AspNetCore (4.0.2)
+* Update to latest version of AWS.Logger.Core
+### AWS.Logger.Log4net (4.0.2)
+* Update to latest version of AWS.Logger.Core
+### AWS.Logger.SeriLog (4.0.2)
+* Update to latest version of AWS.Logger.Core
+### NLog.AWS.Logger (5.0.1)
+* Update to latest version of AWS.Logger.Core
+
 ## Release 2025-10-07
 
 ### AWS.Logger.Core (4.0.1)

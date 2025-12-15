@@ -696,10 +696,10 @@ namespace AWS.Logger.Core
         {
             var userAgentString = $"{_baseUserAgentString} ft/{_logType}";
             var args = e as Amazon.Runtime.WebServiceRequestEventArgs;
-            if (args == null)
-                return;
-
-            ((Amazon.Runtime.Internal.IAmazonWebServiceRequest)args.Request).UserAgentDetails.AddUserAgentComponent(userAgentString);
+            if (args != null && args.Request is Amazon.Runtime.Internal.IAmazonWebServiceRequest internalRequest && !internalRequest.UserAgentDetails.GetCustomUserAgentComponents().Contains(userAgentString))
+            {
+                internalRequest.UserAgentDetails.AddUserAgentComponent(userAgentString);
+        }
         }
 
         void ServiceClientExceptionEvent(object sender, ExceptionEventArgs e)

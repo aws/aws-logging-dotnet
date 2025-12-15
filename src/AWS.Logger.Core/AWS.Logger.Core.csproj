@@ -27,7 +27,7 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         
-        <Version>4.0.1</Version>
+        <Version>4.0.2</Version>
     </PropertyGroup>
     
     <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
