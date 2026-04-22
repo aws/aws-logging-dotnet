@@ -106,6 +106,7 @@ namespace AWS.Logger.Core
                     {
                         awsConfig.UseHttp = true;
                     }
+                    awsConfig.AuthenticationRegion = _config.Region;
                 }
                 else
                 {
@@ -430,9 +431,47 @@ namespace AWS.Logger.Core
                 }
                 catch (Exception ex)
                 {
+                    //drop logs in sending batch since those logs may cause exceptions
+                    _repo.Reset();
                     // We don't want to kill the main monitor loop. We will simply log the error, then continue.
                     // If it is an OperationCancelledException, die
-                    LogLibraryServiceError(ex);
+                    LogLibraryServiceError(new Exception("Logs in the sending batch are dropped because of exceptions", ex));
+                }
+            }
+        }
+
+        private void PrepareLogEventBatchForSending()
+        {
+            //Make sure the log events are in the right order.
+            _repo._request.LogEvents.Sort((ev1, ev2) =>
+                ev1.Timestamp.GetValueOrDefault().CompareTo(ev2.Timestamp.GetValueOrDefault()));
+            if (_repo._request.LogEvents.Count > 0)
+            {
+                DateTime? latestLogDateTime = _repo._request.LogEvents.Last().Timestamp;
+                if (!latestLogDateTime.HasValue)
+                {
+                    latestLogDateTime = DateTime.UtcNow;
+                }
+                //avoid the error that the log events should be in a 24 hours range
+                //https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/logs/client/put_log_events.html#put-log-events
+                while (_repo._request.LogEvents.Count > 0)
+                {
+                    var firstTimestamp = _repo._request.LogEvents.First().Timestamp;
+                    if (!firstTimestamp.HasValue)
+                    {
+                        // Skip events with null timestamps or remove them
+                        _repo.RemoveMessageAt(0);
+                        continue;
+                    }
+
+                    if ((latestLogDateTime - firstTimestamp.Value) > TimeSpan.FromHours(24))
+                    {
+                        _repo.RemoveMessageAt(0);
+                    }
+                    else
+                    {
+                        break; // Events are sorted, so we can stop checking
+                    }
                 }
             }
         }
@@ -447,8 +486,7 @@ namespace AWS.Logger.Core
             try
             {
                 //Make sure the log events are in the right order.
-                _repo._request.LogEvents.Sort((ev1, ev2) => 
-                    ev1.Timestamp.GetValueOrDefault().CompareTo(ev2.Timestamp.GetValueOrDefault()));
+                PrepareLogEventBatchForSending();
                 var response = await _client.Value.PutLogEventsAsync(_repo._request, token).ConfigureAwait(false);
                 _repo.Reset();
             }
@@ -681,6 +719,18 @@ namespace AWS.Logger.Core
                 Encoding unicode = Encoding.Unicode;
                 _totalMessageSize += unicode.GetMaxByteCount(ev.Message.Length);
                 _request.LogEvents.Add(ev);
+            }
+
+            public void RemoveMessageAt(int index)
+            {
+                if (index < 0 || index >= _request.LogEvents.Count)
+                {
+                    return;
+                }
+                Encoding unicode = Encoding.Unicode;
+                InputLogEvent ev = _request.LogEvents[index];
+                _totalMessageSize -= unicode.GetMaxByteCount(ev.Message.Length);
+                _request.LogEvents.RemoveAt(index);
             }
 
             public void Reset()
