@@ -485,7 +485,6 @@ namespace AWS.Logger.Core
         {
             try
             {
-                //Make sure the log events are in the right order.
                 PrepareLogEventBatchForSending();
                 var response = await _client.Value.PutLogEventsAsync(_repo._request, token).ConfigureAwait(false);
                 _repo.Reset();
