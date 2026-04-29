@@ -1,3 +1,8 @@
+## Release 2026-04-29
+
+### AWS.Logger.Log4net (4.1.0)
+* Updated log4net dependency from 2.0.15 to 3.3.0 to resolve moderate severity vulnerability (GHSA-4f7c-pmjv-c25w)
+
 ## Release 2025-12-15
 
 ### AWS.Logger.Core (4.0.3)
