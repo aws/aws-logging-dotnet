@@ -106,7 +106,6 @@ namespace AWS.Logger.Core
                     {
                         awsConfig.UseHttp = true;
                     }
-                    awsConfig.AuthenticationRegion = _config.Region;
                 }
                 else
                 {
@@ -440,9 +439,10 @@ namespace AWS.Logger.Core
             }
         }
 
+        private static readonly TimeSpan MaxLogEventBatchAllowedTimeRange = TimeSpan.FromHours(24);
         private void PrepareLogEventBatchForSending()
         {
-            //Make sure the log events are in the right order.
+            //Make sure the log events are in order from the oldest to the newest.
             _repo._request.LogEvents.Sort((ev1, ev2) =>
                 ev1.Timestamp.GetValueOrDefault().CompareTo(ev2.Timestamp.GetValueOrDefault()));
             if (_repo._request.LogEvents.Count > 0)
@@ -464,13 +464,13 @@ namespace AWS.Logger.Core
                         continue;
                     }
 
-                    if ((latestLogDateTime - firstTimestamp.Value) > TimeSpan.FromHours(24))
+                    if ((latestLogDateTime - firstTimestamp.Value) > MaxLogEventBatchAllowedTimeRange)
                     {
                         _repo.RemoveMessageAt(0);
                     }
                     else
                     {
-                        break; // Events are sorted, so we can stop checking
+                        break; // Events are within the allowed time range, so we can stop checking
                     }
                 }
             }
@@ -486,7 +486,7 @@ namespace AWS.Logger.Core
             try
             {
                 PrepareLogEventBatchForSending();
-                var response = await _client.Value.PutLogEventsAsync(_repo._request, token).ConfigureAwait(false);
+                await _client.Value.PutLogEventsAsync(_repo._request, token).ConfigureAwait(false);
                 _repo.Reset();
             }
             catch (ResourceNotFoundException ex)
