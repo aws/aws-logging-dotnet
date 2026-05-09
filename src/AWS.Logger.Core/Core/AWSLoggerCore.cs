@@ -447,13 +447,9 @@ namespace AWS.Logger.Core
                 ev1.Timestamp.GetValueOrDefault().CompareTo(ev2.Timestamp.GetValueOrDefault()));
             if (_repo._request.LogEvents.Count > 0)
             {
-                DateTime? latestLogDateTime = _repo._request.LogEvents.Last().Timestamp;
-                if (!latestLogDateTime.HasValue)
-                {
-                    latestLogDateTime = DateTime.UtcNow;
-                }
+                DateTime latestLogDateTime = _repo._request.LogEvents.Last().Timestamp ?? DateTime.UtcNow;
                 //avoid the error that the log events should be in a 24 hours range
-                //https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/logs/client/put_log_events.html#put-log-events
+                //https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutLogEvents.html
                 while (_repo._request.LogEvents.Count > 0)
                 {
                     var firstTimestamp = _repo._request.LogEvents.First().Timestamp;
