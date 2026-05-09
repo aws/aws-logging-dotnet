@@ -2,6 +2,8 @@
 using Amazon.CloudWatchLogs.Model;
 using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
+using Amazon.Runtime.Credentials;
+using Amazon.Runtime.Internal;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,7 +13,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Amazon.Runtime.Credentials;
 
 namespace AWS.Logger.Core
 {
@@ -448,24 +449,22 @@ namespace AWS.Logger.Core
                 DateTime latestLogDateTime = _repo._request.LogEvents.Last().Timestamp ?? DateTime.UtcNow;
                 //avoid the error that the log events should be in a 24 hours range
                 //https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutLogEvents.html
-                while (_repo._request.LogEvents.Count > 0)
+                int lastInvalidEventIndexToRemove = -1;
+                for (int i = 0; i < _repo._request.LogEvents.Count; i++)
                 {
-                    var firstTimestamp = _repo._request.LogEvents.First().Timestamp;
-                    if (!firstTimestamp.HasValue)
+                    var logEvent = _repo._request.LogEvents[i];
+                    if (!logEvent.Timestamp.HasValue || (latestLogDateTime - logEvent.Timestamp.Value) > MaxLogEventBatchAllowedTimeRange)
                     {
-                        // Skip events with null timestamps or remove them
-                        _repo.RemoveMessageAt(0);
-                        continue;
-                    }
-
-                    if ((latestLogDateTime - firstTimestamp.Value) > MaxLogEventBatchAllowedTimeRange)
-                    {
-                        _repo.RemoveMessageAt(0);
+                        lastInvalidEventIndexToRemove = i;
                     }
                     else
                     {
-                        break; // Events are within the allowed time range, so we can stop checking
+                        break; // Events are in order, so we can stop checking once we find a valid event
                     }
+                }
+                if (lastInvalidEventIndexToRemove >= 0)
+                {
+                    _repo.RemoveMessages(0, lastInvalidEventIndexToRemove + 1);
                 }
             }
         }
@@ -714,16 +713,19 @@ namespace AWS.Logger.Core
                 _request.LogEvents.Add(ev);
             }
 
-            public void RemoveMessageAt(int index)
+            public void RemoveMessages(int startIndex, int count)
             {
-                if (index < 0 || index >= _request.LogEvents.Count)
+                if (startIndex < 0 || startIndex >= _request.LogEvents.Count || count < 0 || (startIndex + count) > _request.LogEvents.Count)
                 {
                     return;
                 }
                 Encoding unicode = Encoding.Unicode;
-                InputLogEvent ev = _request.LogEvents[index];
-                _totalMessageSize -= unicode.GetMaxByteCount(ev.Message.Length);
-                _request.LogEvents.RemoveAt(index);
+                for (int i = startIndex; i < startIndex + count; i++)
+                {
+                    InputLogEvent ev = _request.LogEvents[i];
+                    _totalMessageSize -= unicode.GetMaxByteCount(ev.Message.Length);
+                }
+                _request.LogEvents.RemoveRange(startIndex, count);
             }
 
             public void Reset()
