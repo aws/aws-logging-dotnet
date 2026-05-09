@@ -478,6 +478,11 @@ namespace AWS.Logger.Core
             try
             {
                 PrepareLogEventBatchForSending();
+                if (_repo._request.LogEvents == null || _repo._request.LogEvents.Count == 0)
+                {
+                    _repo.Reset();
+                    return;
+                }
                 await _client.Value.PutLogEventsAsync(_repo._request, token).ConfigureAwait(false);
                 _repo.Reset();
             }
