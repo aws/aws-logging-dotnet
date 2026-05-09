@@ -478,7 +478,7 @@ namespace AWS.Logger.Core
             try
             {
                 PrepareLogEventBatchForSending();
-                if (_repo._request.LogEvents == null || _repo._request.LogEvents.Count == 0)
+                if (_repo._request.LogEvents.Count == 0)
                 {
                     _repo.Reset();
                     return;
@@ -495,7 +495,7 @@ namespace AWS.Logger.Core
             }
             catch (InvalidParameterException ex)
             {
-                // Bad log events with timestamp/range issues, log error and discard batch
+                // Bad log events, log error and discard batch
                 LogLibraryServiceError(ex);
                 _repo.Reset();
             }
