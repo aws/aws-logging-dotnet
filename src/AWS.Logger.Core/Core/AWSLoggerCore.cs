@@ -493,6 +493,12 @@ namespace AWS.Logger.Core
 
                 _currentStreamName = await LogEventTransmissionSetup(token).ConfigureAwait(false);
             }
+            catch (InvalidParameterException ex)
+            {
+                // Bad log events with timestamp/range issues, log error and discard batch
+                LogLibraryServiceError(ex);
+                _repo.Reset();
+            }
         }
 
         /// <summary>
