@@ -446,7 +446,7 @@ namespace AWS.Logger.Core
             if (_repo._request.LogEvents.Count > 0)
             {
                 DateTime latestLogDateTime = _repo._request.LogEvents.Last().Timestamp ?? DateTime.UtcNow;
-                //avoid the error that the log events should be in a 24 hours range
+                //Avoid the error that log events must be within a 24-hour window.
                 //https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutLogEvents.html
                 int lastInvalidEventIndexToRemove = -1;
                 for (int i = 0; i < _repo._request.LogEvents.Count; i++)
