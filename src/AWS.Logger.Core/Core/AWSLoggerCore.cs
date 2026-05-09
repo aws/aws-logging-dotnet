@@ -2,8 +2,6 @@
 using Amazon.CloudWatchLogs.Model;
 using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
-using Amazon.Runtime.Credentials;
-using Amazon.Runtime.Internal;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,6 +11,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Amazon.Runtime.Credentials;
 
 namespace AWS.Logger.Core
 {
