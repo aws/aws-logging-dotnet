@@ -8,9 +8,11 @@ on:
   pull_request:
     types: [closed]
 
-permissions: 
-  contents: write
-  id-token: write
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   # This job will check if the PR was successfully merged, it's source branch is `releases/next-release` and target branch is `dev`. 
@@ -23,10 +25,13 @@ jobs:
       github.event.pull_request.head.ref == 'releases/next-release' &&
       github.event.pull_request.base.ref == 'dev'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # to push the merge to main and delete the release branch
+      id-token: write # to assume the release-workflow AWS role via OIDC
     steps:
       # Assume an AWS Role that provides access to the Access Token
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 #v4
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
         with:
           role-to-assume: ${{ secrets.RELEASE_WORKFLOW_ACCESS_TOKEN_ROLE_ARN }}
           aws-region: us-west-2
@@ -86,8 +91,11 @@ jobs:
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ env.FG_PAT }}
+          TAG: ${{ steps.read-tag-name.outputs.TAG }}
+          VERSION: ${{ steps.read-release-name.outputs.VERSION }}
+          CHANGELOG: ${{ steps.read-changelog.outputs.CHANGELOG }}
         run: |
-          gh release create "${{ steps.read-tag-name.outputs.TAG }}" --title "${{ steps.read-release-name.outputs.VERSION }}" --notes "${{ steps.read-changelog.outputs.CHANGELOG }}"
+          gh release create "$TAG" --title "$VERSION" --notes "$CHANGELOG"
       # Delete the `releases/next-release` branch
       - name: Clean up
         run: |
@@ -103,10 +111,12 @@ jobs:
       github.event.pull_request.head.ref == 'releases/next-release' &&
       github.event.pull_request.base.ref == 'dev'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # to delete the tag and the release branch
     steps:
       # Checkout a full clone of the repo
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: releases/next-release
           fetch-depth: 0
@@ -131,7 +141,9 @@ jobs:
           echo "TAG=$tag" >> $GITHUB_OUTPUT
       # Delete the tag created by AutoVer and the release branch
       - name: Clean up
+        env:
+          TAG: ${{ steps.read-tag-name.outputs.TAG }}
         run: |
           git fetch origin
-          git push --delete origin ${{ steps.read-tag-name.outputs.TAG }}
+          git push --delete origin "$TAG"
           git push origin --delete releases/next-release
