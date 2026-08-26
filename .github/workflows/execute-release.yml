@@ -114,7 +114,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@254c19bd240aabef8777f48595e9d2d7b972184b # v6.2.1
         with:
           # zizmor: ignore[secrets-outside-env] role ARN, gated by AWS OIDC trust policy.
-          role-to-assume: ${{ secrets.EXECUTE_RELEASE_ROLE_ARN }}
+          role-to-assume: ${{ secrets.EXECUTE_RELEASE_ROLE_ARN_V3SDK }}
           aws-region: us-west-2
       # Freeze-aware: if the pipeline's Release-stage transition is disabled (re:Invent
       # or a staging embargo), do not start the pipeline.
