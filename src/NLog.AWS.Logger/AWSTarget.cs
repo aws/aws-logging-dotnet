@@ -158,6 +158,19 @@ namespace NLog.AWS.Logger
         }
 
         /// <summary>
+        /// Gets and sets the MaxMessageSizeInBytes property. A single log event larger than this (measured in UTF-8 bytes)
+        /// is broken up into multiple events before being sent to CloudWatch Logs. CloudWatch Logs caps a single event at 1 MB.
+        /// <para>
+        /// The default is 256,000 bytes.
+        /// </para>
+        /// </summary>
+        public int MaxMessageSizeInBytes
+        {
+            get { return _config.MaxMessageSizeInBytes; }
+            set { _config.MaxMessageSizeInBytes = value; }
+        }
+
+        /// <summary>
         /// Gets and sets the MaxQueuedMessages property. This specifies the maximum number of log messages that could be stored in-memory. MaxQueuedMessages 
         /// dictates the total number of log messages that can be stored in-memory. If this is exceeded, incoming log messages will be dropped.
         /// <para>
