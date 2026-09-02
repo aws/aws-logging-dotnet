@@ -35,6 +35,23 @@ namespace AWS.Logger.Core
         private string _logType;
 
         /// <summary>
+        /// Set once <see cref="Close"/> begins. While set, the background monitor keeps draining the pending
+        /// queue and the current batch until both are empty (issue #372) instead of doing a single flush pass.
+        /// </summary>
+        private volatile bool _shutdownInitiated;
+
+        /// <summary>
+        /// A short-lived, bounded-deadline token source used for the final drain during shutdown. It is
+        /// deliberately separate from <see cref="_cancelStartSource"/> so that cancelling the monitor does not
+        /// abort the final PutLogEvents calls. Its deadline (<see cref="AWSLoggerConfig.FlushTimeout"/>) means
+        /// the drain can never block forever, even under a continuous producer.
+        /// </summary>
+        private CancellationTokenSource _shutdownGraceSource;
+
+        /// <summary>Guards against <see cref="Close"/> running more than once (ProcessExit + explicit Dispose).</summary>
+        private int _closeCalled;
+
+        /// <summary>
         /// Internal CloudWatch Logs client
         /// </summary>
         /// <remarks>
@@ -189,12 +206,34 @@ namespace AWS.Logger.Core
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// On shutdown the pending queue and the current in-memory batch are fully drained and sent BEFORE the
+        /// background monitor is cancelled, so events produced right up to shutdown are not silently dropped
+        /// (issue #372). The drain is bounded by <see cref="AWSLoggerConfig.FlushTimeout"/> so Close() can never
+        /// block indefinitely.
+        /// <para>
+        /// Note: this only protects an orderly shutdown. An abrupt process kill, or exceeding the ~2 second
+        /// budget the .NET runtime allows <see cref="AppDomain.ProcessExit"/> handlers, can still lose messages
+        /// that are only held in this in-memory buffer. Durable delivery of the very last events would require
+        /// out-of-process buffering, which is outside the scope of this library.
+        /// </para>
+        /// </remarks>
         public void Close()
         {
+            // Close can be invoked from DomainUnload, ProcessExit and an explicit Dispose; only run once.
+            if (Interlocked.Exchange(ref _closeCalled, 1) != 0)
+                return;
+
             try
             {
+                // Order matters: publish the grace source before the volatile flag so the monitor sees a
+                // non-null source once it observes _shutdownInitiated.
+                _shutdownGraceSource = new CancellationTokenSource(_config.FlushTimeout);
+                _shutdownInitiated = true;
+
+                // Drain-and-send everything still buffered. During shutdown Flush() blocks until BOTH the
+                // pending queue and the current batch are empty (bounded by FlushTimeout).
                 Flush();
-                _cancelStartSource.Cancel();
             }
             catch (Exception ex)
             {
@@ -202,6 +241,8 @@ namespace AWS.Logger.Core
             }
             finally
             {
+                // Only now stop the monitor - the drain above has already sent the buffered events.
+                _cancelStartSource.Cancel();
                 LogLibraryAlert = null;
             }
         }
@@ -308,6 +349,14 @@ namespace AWS.Logger.Core
         /// <param name="rawMessage">Message to log.</param>
         public void AddMessage(string rawMessage)
         {
+            // Once the monitor has been cancelled at the end of shutdown there is nothing left to drain the
+            // queue, so reject new messages rather than growing memory with events that can never be sent.
+            // Messages produced earlier - including during the bounded shutdown drain - are still accepted.
+            if (_cancelStartSource.IsCancellationRequested)
+            {
+                return;
+            }
+
             if (string.IsNullOrEmpty(rawMessage))
             {
                 rawMessage = EMPTY_MESSAGE;
@@ -338,6 +387,10 @@ namespace AWS.Logger.Core
             if (_cancelStartSource != null)
             {
                 _cancelStartSource.Dispose();
+            }
+            if (_shutdownGraceSource != null)
+            {
+                _shutdownGraceSource.Dispose();
             }
         }
 
@@ -407,11 +460,48 @@ namespace AWS.Logger.Core
 
                     if (_repo.ShouldSendRequest(_config.MaxQueuedMessages) || (executeFlush && !_repo.IsEmpty))
                     {
-                        await SendMessages(token).ConfigureAwait(false);
+                        // During shutdown, send with the grace token so the monitor's own cancellation cannot
+                        // abort the final delivery. Steady-state sends keep using the monitor token unchanged.
+                        var sendToken = (_shutdownInitiated && _shutdownGraceSource != null)
+                            ? _shutdownGraceSource.Token
+                            : token;
+                        await SendMessages(sendToken).ConfigureAwait(false);
                     }
 
                     if (executeFlush)
+                    {
+                        // Issue #372: when the flush is part of shutdown, a single drain pass is not enough -
+                        // an event can be produced (or a batch can remain) after the pass above. Keep draining
+                        // the pending queue and the current batch until BOTH are empty before signalling the
+                        // flush as complete, so Flush()/Close() only return once everything buffered has been
+                        // sent. Sends use the dedicated shutdown-grace token (not the monitor's own token) so
+                        // that cancelling the monitor cannot abort the final PutLogEvents, and the grace token's
+                        // bounded deadline (FlushTimeout) guarantees this loop always terminates.
+                        if (_shutdownInitiated)
+                        {
+                            var graceToken = _shutdownGraceSource?.Token ?? token;
+                            while (!graceToken.IsCancellationRequested &&
+                                   (!_pendingMessageQueue.IsEmpty || !_repo.IsEmpty))
+                            {
+                                while (_pendingMessageQueue.TryDequeue(out var inputLogEvent))
+                                {
+                                    if (_repo.CurrentBatchMessageCount > 0 && _repo.IsSizeConstraintViolated(inputLogEvent.Message))
+                                    {
+                                        await SendMessages(graceToken).ConfigureAwait(false);
+                                    }
+
+                                    _repo.AddMessage(inputLogEvent);
+                                }
+
+                                if (!_repo.IsEmpty)
+                                {
+                                    await SendMessages(graceToken).ConfigureAwait(false);
+                                }
+                            }
+                        }
+
                         _flushCompletedEvent.Set();
+                    }
 
                     executeFlush = await _flushTriggerEvent.WaitAsync(TimeSpan.FromMilliseconds(_config.MonitorSleepTime.TotalMilliseconds), token);
                 }
