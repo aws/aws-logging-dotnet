@@ -48,6 +48,13 @@ namespace AWS.Logger.UnitTests.Fakes
         /// </summary>
         public Action OnFirstPut { get; set; }
 
+        /// <summary>
+        /// Optional hook invoked synchronously on every
+        /// <see cref="PutLogEventsAsync(PutLogEventsRequest, CancellationToken)"/> call. Used to model a
+        /// producer that never stops logging, to verify the shutdown drain is bounded by FlushTimeout.
+        /// </summary>
+        public Action OnEachPut { get; set; }
+
         /// <summary>Number of times PutLogEvents was invoked.</summary>
         public int PutCallCount => Volatile.Read(ref _putCallCount);
 
@@ -98,6 +105,8 @@ namespace AWS.Logger.UnitTests.Fakes
             {
                 OnFirstPut();
             }
+
+            OnEachPut?.Invoke();
 
             return Task.FromResult(new PutLogEventsResponse { HttpStatusCode = HttpStatusCode.OK });
         }

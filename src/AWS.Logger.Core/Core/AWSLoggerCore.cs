@@ -243,6 +243,13 @@ namespace AWS.Logger.Core
             {
                 // Only now stop the monitor - the drain above has already sent the buffered events.
                 _cancelStartSource.Cancel();
+
+                // Flush() has returned, so the monitor is done using the grace source; dispose it here to
+                // release its backing timer promptly instead of waiting for finalization. Interlocked.Exchange
+                // makes disposal single-shot and safe against the finalizer.
+                var graceSource = Interlocked.Exchange(ref _shutdownGraceSource, null);
+                graceSource?.Dispose();
+
                 LogLibraryAlert = null;
             }
         }
@@ -352,7 +359,15 @@ namespace AWS.Logger.Core
             // Once the monitor has been cancelled at the end of shutdown there is nothing left to drain the
             // queue, so reject new messages rather than growing memory with events that can never be sent.
             // Messages produced earlier - including during the bounded shutdown drain - are still accepted.
-            if (_cancelStartSource.IsCancellationRequested)
+            // The token source can also be disposed during teardown; treat that as "closed" and no-op safely.
+            try
+            {
+                if (_cancelStartSource.IsCancellationRequested)
+                {
+                    return;
+                }
+            }
+            catch (ObjectDisposedException)
             {
                 return;
             }
@@ -462,8 +477,9 @@ namespace AWS.Logger.Core
                     {
                         // During shutdown, send with the grace token so the monitor's own cancellation cannot
                         // abort the final delivery. Steady-state sends keep using the monitor token unchanged.
-                        var sendToken = (_shutdownInitiated && _shutdownGraceSource != null)
-                            ? _shutdownGraceSource.Token
+                        var graceSource = _shutdownGraceSource;
+                        var sendToken = (_shutdownInitiated && graceSource != null)
+                            ? graceSource.Token
                             : token;
                         await SendMessages(sendToken).ConfigureAwait(false);
                     }
@@ -479,7 +495,8 @@ namespace AWS.Logger.Core
                         // bounded deadline (FlushTimeout) guarantees this loop always terminates.
                         if (_shutdownInitiated)
                         {
-                            var graceToken = _shutdownGraceSource?.Token ?? token;
+                            var graceSource = _shutdownGraceSource;
+                            var graceToken = graceSource?.Token ?? token;
                             while (!graceToken.IsCancellationRequested &&
                                    (!_pendingMessageQueue.IsEmpty || !_repo.IsEmpty))
                             {
@@ -497,6 +514,15 @@ namespace AWS.Logger.Core
                                 {
                                     await SendMessages(graceToken).ConfigureAwait(false);
                                 }
+                            }
+
+                            // If the grace deadline (FlushTimeout) elapsed while events were still buffered, the
+                            // loop exits without having sent everything. Surface it instead of silently reporting
+                            // completion, so operators can tell a full drain apart from a timed-out one.
+                            if (!_pendingMessageQueue.IsEmpty || !_repo.IsEmpty)
+                            {
+                                var serviceUrl = GetServiceUrl();
+                                LogLibraryServiceError(new TimeoutException($"Shutdown flush timed out before all messages were sent - ServiceURL={serviceUrl}, StreamName={_currentStreamName}, PendingMessages={_pendingMessageQueue.Count}, CurrentBatch={_repo.CurrentBatchMessageCount}"), serviceUrl);
                             }
                         }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Amazon.CloudWatchLogs;
 using AWS.Logger.Core;
@@ -91,6 +92,47 @@ namespace AWS.Logger.UnitTests
             Assert.Equal(
                 Enumerable.Range(0, burst).Select(i => "event-" + i).OrderBy(x => x),
                 received.OrderBy(x => x));
+        }
+
+        /// <summary>
+        /// Under a producer that never stops logging, the shutdown drain must not loop forever: it is bounded
+        /// by FlushTimeout, and when it exits with events still buffered it surfaces a TimeoutException via
+        /// LogLibraryAlert rather than silently reporting a clean flush.
+        /// </summary>
+        [Fact]
+        public void Close_IsBoundedAndSurfacesTimeout_WhenProducerNeverStops()
+        {
+            var fake = new InMemoryCloudWatchLogsClient();
+            var config = CreateConfig(fake);
+            config.FlushTimeout = TimeSpan.FromMilliseconds(300); // short, bounded deadline for the test
+
+            var core = new AWSLoggerCore(config, "unit");
+
+            Exception timeoutAlert = null;
+            core.LogLibraryAlert += (_, e) =>
+            {
+                if (e.Exception is TimeoutException)
+                {
+                    timeoutAlert = e.Exception;
+                }
+            };
+
+            // Every delivered batch enqueues another message, so the pending queue is never empty.
+            fake.OnEachPut = () => core.AddMessage("keep-going");
+
+            for (var i = 0; i < 5; i++)
+            {
+                core.AddMessage("event-" + i);
+            }
+
+            var sw = Stopwatch.StartNew();
+            core.Close();
+            sw.Stop();
+
+            // Close() must return promptly (bounded by FlushTimeout), never hang.
+            Assert.True(sw.Elapsed < TimeSpan.FromSeconds(5), $"Close() was not bounded; took {sw.Elapsed}.");
+            // The timed-out drain must be surfaced, not silently completed.
+            Assert.NotNull(timeoutAlert);
         }
     }
 }
