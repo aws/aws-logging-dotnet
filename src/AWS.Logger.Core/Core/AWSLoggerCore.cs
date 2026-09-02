@@ -22,6 +22,17 @@ namespace AWS.Logger.Core
     {
         const int MAX_MESSAGE_SIZE_IN_BYTES = 256000;
 
+        // CloudWatch Logs PutLogEvents service limits.
+        // https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/cloudwatch_limits_cwl.html
+        //
+        // The maximum batch size is 1,048,576 bytes. This size is calculated as the sum of all
+        // event messages in UTF-8, plus 26 bytes for each log event. A batch may also contain no
+        // more than 10,000 log events. These hard limits are enforced independently of the
+        // configurable BatchSizeInBytes so that a batch is never rejected by the service.
+        const int MAX_BATCH_SIZE_IN_BYTES = 1048576;
+        const int EVENT_SIZE_OVERHEAD_IN_BYTES = 26;
+        const int MAX_EVENTS_IN_BATCH = 10000;
+
         #region Private Members
         const string EMPTY_MESSAGE = "\t";
         private ConcurrentQueue<InputLogEvent> _pendingMessageQueue = new ConcurrentQueue<InputLogEvent>();
@@ -313,10 +324,11 @@ namespace AWS.Logger.Core
                 rawMessage = EMPTY_MESSAGE;
             }
 
-            // Only do the extra work of breaking up the message if the max unicode bytes exceeds the possible size. This is not
-            // an exact measurement since the string is UTF8 but it gives us a chance to skip the extra computation for 
-            // typically small messages.
-            if (Encoding.Unicode.GetMaxByteCount(rawMessage.Length) < MAX_MESSAGE_SIZE_IN_BYTES)
+            // Only do the extra work of breaking up the message if the real UTF-8 size exceeds
+            // the per-event limit. GetByteCount is O(n), but it is the exact measurement the
+            // service uses, and it is computed at most once here for the breakup decision so
+            // typically small messages skip the split path entirely.
+            if (Encoding.UTF8.GetByteCount(rawMessage) < MAX_MESSAGE_SIZE_IN_BYTES)
             {
                 AddSingleMessage(rawMessage);
             }
@@ -395,14 +407,19 @@ namespace AWS.Logger.Core
                 {
                     while (_pendingMessageQueue.TryDequeue(out var inputLogEvent))
                     {
-                        // See if new message will cause the current batch to violote the size constraint.
-                        // If so send the current batch now before adding more to the batch of messages to send.
-                        if (_repo.CurrentBatchMessageCount > 0 && _repo.IsSizeConstraintViolated(inputLogEvent.Message))
+                        // Compute the event's contribution to the batch size once (UTF-8 bytes plus
+                        // per-event overhead) and reuse it for both the constraint check and the add.
+                        var eventSize = LogEventBatch.CalculateEventSize(inputLogEvent.Message);
+
+                        // See if new message will cause the current batch to violate the size or
+                        // count constraint. If so send the current batch now before adding more
+                        // messages to the batch.
+                        if (_repo.CurrentBatchMessageCount > 0 && _repo.IsSizeConstraintViolated(eventSize))
                         {
                             await SendMessages(token).ConfigureAwait(false);
                         }
 
-                        _repo.AddMessage(inputLogEvent);
+                        _repo.AddMessage(inputLogEvent, eventSize);
                     }
 
                     if (_repo.ShouldSendRequest(_config.MaxQueuedMessages) || (executeFlush && !_repo.IsEmpty))
@@ -666,20 +683,44 @@ namespace AWS.Logger.Core
 
             public bool IsEmpty => _request.LogEvents.Count == 0;
 
-            public bool IsSizeConstraintViolated(string message)
+            /// <summary>
+            /// The size a single log event contributes to a PutLogEvents batch: the real UTF-8 byte
+            /// count of the message plus the fixed per-event overhead that CloudWatch Logs counts
+            /// against the batch size limit.
+            /// </summary>
+            public static int CalculateEventSize(string message)
             {
-                Encoding unicode = Encoding.Unicode;
-                int prospectiveLength = _totalMessageSize + unicode.GetMaxByteCount(message.Length);
-                if (MaxBatchSize < prospectiveLength)
+                return Encoding.UTF8.GetByteCount(message) + EVENT_SIZE_OVERHEAD_IN_BYTES;
+            }
+
+            /// <summary>
+            /// The configured batch size limit, clamped so it can never exceed the hard CloudWatch
+            /// service limit of 1,048,576 bytes regardless of how BatchSizeInBytes was configured.
+            /// </summary>
+            private int EffectiveMaxBatchSize =>
+                MaxBatchSize > 0 ? Math.Min(MaxBatchSize, MAX_BATCH_SIZE_IN_BYTES) : MAX_BATCH_SIZE_IN_BYTES;
+
+            /// <summary>
+            /// Determines whether adding an event of the given size (as returned by
+            /// <see cref="CalculateEventSize"/>) would violate either the batch byte-size limit or
+            /// the 10,000-events-per-batch count limit.
+            /// </summary>
+            public bool IsSizeConstraintViolated(int eventSize)
+            {
+                // A batch may contain at most 10,000 log events.
+                if (_request.LogEvents.Count >= MAX_EVENTS_IN_BATCH)
+                    return true;
+
+                int prospectiveLength = _totalMessageSize + eventSize;
+                if (EffectiveMaxBatchSize < prospectiveLength)
                     return true;
 
                 return false;
             }
 
-            public void AddMessage(InputLogEvent ev)
+            public void AddMessage(InputLogEvent ev, int eventSize)
             {
-                Encoding unicode = Encoding.Unicode;
-                _totalMessageSize += unicode.GetMaxByteCount(ev.Message.Length);
+                _totalMessageSize += eventSize;
                 _request.LogEvents.Add(ev);
             }
 
