@@ -1,0 +1,11 @@
+{
+  "Projects": [
+    {
+      "Name": "AWS.Logger.Core",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Fixed a shutdown race where log events produced near Close()/Dispose() could be silently dropped. Buffered events in the pending queue and current batch are now fully drained and sent (bounded by FlushTimeout) before the background monitor is cancelled."
+      ]
+    }
+  ]
+}
