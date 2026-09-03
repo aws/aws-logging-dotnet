@@ -30,6 +30,7 @@ namespace AWS.Logger.Core
         private CancellationTokenSource _cancelStartSource;
         private SemaphoreSlim _flushTriggerEvent;
         private ManualResetEventSlim _flushCompletedEvent;
+        private int _monitorStarted;
         private AWSLoggerConfig _config;
         private DateTime _maxBufferTimeStamp = new DateTime();
         private string _logType;
@@ -347,9 +348,15 @@ namespace AWS.Logger.Core
         /// </summary>
         public void StartMonitor()
         {
+            if (Interlocked.CompareExchange(ref _monitorStarted, 1, 0) != 0)
+            {
+                return;
+            }
+
             _flushTriggerEvent = new SemaphoreSlim(0, 1);
             _flushCompletedEvent = new ManualResetEventSlim(false);
             _cancelStartSource = new CancellationTokenSource();
+
             Task.Run(async () =>
             {
                 await Monitor(_cancelStartSource.Token);
