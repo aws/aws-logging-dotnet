@@ -10,8 +10,6 @@
         <PackageIcon>icon.png</PackageIcon>
         <PackageProjectUrl>https://github.com/aws/aws-logging-dotnet</PackageProjectUrl>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
-        <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>https://github.com/aws/aws-logging-dotnet.git</RepositoryUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
@@ -20,11 +18,6 @@
         
         <SignAssembly>True</SignAssembly>
         <AssemblyOriginatorKeyFile>..\..\public.snk</AssemblyOriginatorKeyFile>
-        
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         
         <Version>4.0.2</Version>
     </PropertyGroup>
@@ -47,7 +40,6 @@
         <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.1" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     </ItemGroup>
 
 </Project>

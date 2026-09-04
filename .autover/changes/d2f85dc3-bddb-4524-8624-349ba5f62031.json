@@ -1,0 +1,39 @@
+{
+  "Projects": [
+    {
+      "Name": "AWS.Logger.AspNetCore",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Enabled deterministic builds and completed Source Link configuration (Deterministic, ContinuousIntegrationBuild, and explicit SourceRoot) so published packages embed accurate source control metadata."
+      ]
+    },
+    {
+      "Name": "AWS.Logger.Core",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Enabled deterministic builds and completed Source Link configuration (Deterministic, ContinuousIntegrationBuild, and explicit SourceRoot) so published packages embed accurate source control metadata."
+      ]
+    },
+    {
+      "Name": "AWS.Logger.Log4net",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Enabled deterministic builds and completed Source Link configuration (Deterministic, ContinuousIntegrationBuild, and explicit SourceRoot) so published packages embed accurate source control metadata."
+      ]
+    },
+    {
+      "Name": "AWS.Logger.SeriLog",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Enabled deterministic builds and completed Source Link configuration (Deterministic, ContinuousIntegrationBuild, and explicit SourceRoot) so published packages embed accurate source control metadata."
+      ]
+    },
+    {
+      "Name": "NLog.AWS.Logger",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Enabled deterministic builds and completed Source Link configuration (Deterministic, ContinuousIntegrationBuild, and explicit SourceRoot) so published packages embed accurate source control metadata."
+      ]
+    }
+  ]
+}
