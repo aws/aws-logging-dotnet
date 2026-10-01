@@ -74,12 +74,51 @@ namespace AWS.Logger.TestUtils
             }
         }
 
+        /// <summary>
+        /// Counts the events in a log stream, polling until at least <paramref name="expectedCount"/> events are
+        /// visible or <see cref="THREAD_WAITTIME"/> elapses. GetLogEvents is eventually consistent and is indexed
+        /// separately from FilterLogEvents, so seeing LASTMESSAGE via a filter does not mean every event is readable yet.
+        /// </summary>
+        protected async Task<int> GetLogEventCountWithRetries(string logGroupName, string logStreamName, int expectedCount)
+        {
+            var timer = Stopwatch.StartNew();
+            while (true)
+            {
+                var count = 0;
+                string nextToken = null;
+                while (true)
+                {
+                    var getLogEventsResponse = await _testFixture.Client.GetLogEventsAsync(new GetLogEventsRequest
+                    {
+                        LogGroupName = logGroupName,
+                        LogStreamName = logStreamName,
+                        StartFromHead = true,
+                        NextToken = nextToken
+                    });
+                    count += getLogEventsResponse.Events?.Count ?? 0;
+
+                    // GetLogEvents signals the end of the stream by returning the same token that was passed in.
+                    if (getLogEventsResponse.NextForwardToken == null || getLogEventsResponse.NextForwardToken == nextToken)
+                    {
+                        break;
+                    }
+                    nextToken = getLogEventsResponse.NextForwardToken;
+                }
+
+                if (count >= expectedCount || timer.Elapsed >= TimeSpan.FromSeconds(THREAD_WAITTIME))
+                {
+                    return count;
+                }
+                await Task.Delay(1000);
+            }
+        }
+
         protected abstract void LogMessages(int count);
 
         protected async Task SimpleLoggingTest(string logGroupName)
         {
             LogMessages(SIMPLELOGTEST_COUNT);
-            GetLogEventsResponse getLogEventsResponse = new GetLogEventsResponse();
+            var eventCount = 0;
             if (await NotifyLoggingCompleted(logGroupName, "LASTMESSAGE"))
             {
                 var describeLogstreamsResponse = await _testFixture.Client.DescribeLogStreamsAsync(
@@ -90,18 +129,14 @@ namespace AWS.Logger.TestUtils
                         OrderBy = "LastEventTime"
                     });
                 var logStream = describeLogstreamsResponse.LogStreams.First();
-                getLogEventsResponse = await _testFixture.Client.GetLogEventsAsync(new GetLogEventsRequest
-                {
-                    LogGroupName = logGroupName,
-                    LogStreamName = logStream.LogStreamName
-                });
+                eventCount = await GetLogEventCountWithRetries(logGroupName, logStream.LogStreamName, SIMPLELOGTEST_COUNT);
 
                 var customStreamSuffix = logStream.LogStreamName.Split('-').Last().Trim();
                 Assert.Equal(CUSTOMSTREAMSUFFIX, customStreamSuffix);
                 var customStreamPrefix = logStream.LogStreamName.Split('-').First().Trim();
                 Assert.Equal(CUSTOMSTREAMPREFIX, customStreamPrefix);
             }
-            Assert.Equal(SIMPLELOGTEST_COUNT, getLogEventsResponse.Events.Count);
+            Assert.Equal(SIMPLELOGTEST_COUNT, eventCount);
 
 
             _testFixture.LogGroupNameList.Add(logGroupName);
@@ -154,18 +189,7 @@ namespace AWS.Logger.TestUtils
                         Assert.Single(describeLogstreamsResponse.LogStreams);
                         Assert.Equal(expectedLogStreamName, describeLogstreamsResponse.LogStreams[0].LogStreamName);
                     }
-                    testCount = 0;
-                    GetLogEventsResponse getLogEventsResponse =
-                            await _testFixture.Client.GetLogEventsAsync(new GetLogEventsRequest
-                            {
-                                LogGroupName = logGroupName,
-                                LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
-                            });
-
-                    if (getLogEventsResponse != null)
-                    {
-                        testCount += getLogEventsResponse.Events.Count;
-                    }
+                    testCount = await GetLogEventCountWithRetries(logGroupName, describeLogstreamsResponse.LogStreams[0].LogStreamName, totalCount);
                 }
             }
 

@@ -87,7 +87,7 @@ namespace AWS.Logger.NLogger.Tests
             Logger.Debug(new string('a', 600000)); 
             Logger.Debug(LASTMESSAGE);
 
-            GetLogEventsResponse getLogEventsResponse = new GetLogEventsResponse();
+            var eventCount = 0;
             if (await NotifyLoggingCompleted(logGroupName, "LASTMESSAGE"))
             {
                 DescribeLogStreamsResponse describeLogstreamsResponse =
@@ -99,15 +99,10 @@ namespace AWS.Logger.NLogger.Tests
                 });
 
                 // Wait for the large messages to propagate
-                Thread.Sleep(5000);
-                getLogEventsResponse = await _testFixture.Client.GetLogEventsAsync(new GetLogEventsRequest
-                {
-                    LogGroupName = logGroupName,
-                    LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
-                });
+                eventCount = await GetLogEventCountWithRetries(logGroupName, describeLogstreamsResponse.LogStreams[0].LogStreamName, 4);
             }
             _testFixture.LogGroupNameList.Add(logGroupName);
-            Assert.Equal(4, getLogEventsResponse.Events.Count);
+            Assert.Equal(4, eventCount);
         }
 
         protected override void LogMessages(int count)

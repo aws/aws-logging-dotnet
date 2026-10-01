@@ -110,7 +110,7 @@ namespace AWS.Logger.SeriLog.Tests
             }
             Log.Error(LASTMESSAGE);
 
-            GetLogEventsResponse getLogEventsResponse = new GetLogEventsResponse();
+            var eventCount = 0;
             if (await NotifyLoggingCompleted(logGroupName, "LASTMESSAGE"))
             {
                 DescribeLogStreamsResponse describeLogstreamsResponse = await _testFixture.Client.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
@@ -120,13 +120,9 @@ namespace AWS.Logger.SeriLog.Tests
                     OrderBy = "LastEventTime"
                 });
 
-                getLogEventsResponse = await _testFixture.Client.GetLogEventsAsync(new GetLogEventsRequest
-                {
-                    LogGroupName = logGroupName,
-                    LogStreamName = describeLogstreamsResponse.LogStreams[0].LogStreamName
-                });
+                eventCount = await GetLogEventCountWithRetries(logGroupName, describeLogstreamsResponse.LogStreams[0].LogStreamName, 6);
             }
-            Assert.Equal(6, getLogEventsResponse.Events.Count);
+            Assert.Equal(6, eventCount);
         }
 
         /// <summary>
