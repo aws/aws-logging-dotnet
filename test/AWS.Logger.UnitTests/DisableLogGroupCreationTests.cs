@@ -116,11 +116,10 @@ namespace AWS.Logger.UnitTests
                 core.AddMessage("Test message added at " + DateTimeOffset.UtcNow.ToString());
                 core.Flush();
                 _testFixure.LogGroupNameList.Add(logGroupName); // let's enlist the auto-created group for deletion.
-                var logGroupResponse = await client.DescribeLogGroupsAsync(new DescribeLogGroupsRequest
-                {
-                    LogGroupNamePrefix = logGroupName
-                });
-                var retention = logGroupResponse.LogGroups.Find(x => x.LogGroupName == logGroupName)?.RetentionInDays;
+                // The log group is created and its retention policy applied on a background thread, and
+                // DescribeLogGroups is eventually consistent, so poll until the retention shows up rather
+                // than reading once immediately after Flush (which was racy and intermittently returned null).
+                var retention = await GetRetentionInDaysWithRetriesAsync(client, logGroupName);
                 Assert.Equal(3,retention);
                 core.Close();
             }
@@ -152,6 +151,34 @@ namespace AWS.Logger.UnitTests
                 Assert.Null(incorrectRetention);
                 core.Close();
             }
+        }
+
+        /// <summary>
+        /// Polls DescribeLogGroups until the log group reports a retention policy, or the attempts are
+        /// exhausted. The logger creates the group and applies its retention policy on a background thread
+        /// and DescribeLogGroups is eventually consistent, so a single read right after Flush() is racy.
+        /// </summary>
+        private static async Task<int?> GetRetentionInDaysWithRetriesAsync(
+            IAmazonCloudWatchLogs client,
+            string logGroupName,
+            int maxAttempts = 20,
+            int delayMilliseconds = 1000)
+        {
+            int? retention = null;
+            for (var attempt = 0; attempt < maxAttempts; attempt++)
+            {
+                var logGroupResponse = await client.DescribeLogGroupsAsync(new DescribeLogGroupsRequest
+                {
+                    LogGroupNamePrefix = logGroupName
+                });
+                retention = logGroupResponse.LogGroups.Find(x => x.LogGroupName == logGroupName)?.RetentionInDays;
+                if (retention != null)
+                {
+                    break;
+                }
+                await Task.Delay(delayMilliseconds);
+            }
+            return retention;
         }
     }
 }
