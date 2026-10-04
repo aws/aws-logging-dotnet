@@ -1,0 +1,11 @@
+{
+  "Projects": [
+    {
+      "Name": "AWS.Logger.Core",
+      "Type": "Minor",
+      "ChangelogMessages": [
+        "Added the configurable MaxMessageSizeInBytes property to AWSLoggerConfig (default 256,000 bytes) to control the size at which a single log event is split, allowing callers to take advantage of CloudWatch Logs\u0027 1 MB per-event limit"
+      ]
+    }
+  ]
+}

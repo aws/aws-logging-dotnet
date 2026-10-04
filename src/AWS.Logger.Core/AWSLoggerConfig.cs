@@ -18,6 +18,19 @@ namespace AWS.Logger
     public class AWSLoggerConfig : IAWSLoggerConfig
     {
         private int batchSizeInBytes = 102400;
+
+        /// <summary>
+        /// The default value for <see cref="MaxMessageSizeInBytes"/>: a single log event is split once it
+        /// exceeds 256,000 UTF-8 bytes.
+        /// </summary>
+        public const int DefaultMaxMessageSizeInBytes = 256000;
+
+        /// <summary>
+        /// CloudWatch Logs caps a single log event at 1 MB, so <see cref="MaxMessageSizeInBytes"/> cannot exceed it.
+        /// </summary>
+        private const int MaxAllowedMessageSizeInBytes = 1024 * 1024;
+
+        private int maxMessageSizeInBytes = DefaultMaxMessageSizeInBytes;
         #region Public Properties
 
         /// <summary>
@@ -118,6 +131,31 @@ namespace AWS.Logger
                     throw new ArgumentException("The events batch size cannot exeed 1MB. https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/cloudwatch_limits_cwl.html");
                 }
                 batchSizeInBytes = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets and sets the MaxMessageSizeInBytes property. A single log event larger than this (measured in
+        /// UTF-8 bytes) is broken up into multiple events before being sent to CloudWatch Logs.
+        /// <para>
+        /// The default is 256,000 bytes. CloudWatch Logs caps a single event at 1 MB, so this cannot be larger.
+        /// When raising this above <see cref="BatchSizeInBytes"/>, raise BatchSizeInBytes to match so that large
+        /// events are still batched and sent.
+        /// </para>
+        /// </summary>
+        public int MaxMessageSizeInBytes
+        {
+            get
+            {
+                return maxMessageSizeInBytes;
+            }
+            set
+            {
+                if (value < 1 || value > MaxAllowedMessageSizeInBytes)
+                {
+                    throw new ArgumentException("MaxMessageSizeInBytes must be between 1 and 1,048,576 (1 MB). https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/cloudwatch_limits_cwl.html");
+                }
+                maxMessageSizeInBytes = value;
             }
         }
 

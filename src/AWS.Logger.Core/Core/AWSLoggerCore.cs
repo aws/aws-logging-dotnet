@@ -20,7 +20,10 @@ namespace AWS.Logger.Core
     /// </summary>
     public class AWSLoggerCore : IAWSLoggerCore
     {
-        const int MAX_MESSAGE_SIZE_IN_BYTES = 256000;
+        // Default cap on a single log event's size before it is split. Configurable via
+        // AWSLoggerConfig.MaxMessageSizeInBytes; this constant is the fallback used by the parameterless
+        // BreakupMessage overload kept for backwards compatibility.
+        const int MAX_MESSAGE_SIZE_IN_BYTES = AWSLoggerConfig.DefaultMaxMessageSizeInBytes;
 
         #region Private Members
         const string EMPTY_MESSAGE = "\t";
@@ -316,13 +319,14 @@ namespace AWS.Logger.Core
             // Only do the extra work of breaking up the message if the max unicode bytes exceeds the possible size. This is not
             // an exact measurement since the string is UTF8 but it gives us a chance to skip the extra computation for 
             // typically small messages.
-            if (Encoding.Unicode.GetMaxByteCount(rawMessage.Length) < MAX_MESSAGE_SIZE_IN_BYTES)
+            var maxMessageSize = _config?.MaxMessageSizeInBytes ?? MAX_MESSAGE_SIZE_IN_BYTES;
+            if (Encoding.Unicode.GetMaxByteCount(rawMessage.Length) < maxMessageSize)
             {
                 AddSingleMessage(rawMessage);
             }
             else
             {
-                var messageParts = BreakupMessage(rawMessage);
+                var messageParts = BreakupMessage(rawMessage, maxMessageSize);
                 foreach (var message in messageParts)
                 {
                     AddSingleMessage(message);
@@ -585,18 +589,29 @@ namespace AWS.Logger.Core
         }
 
         /// <summary>
-        /// Break up the message into max parts of 256K.
+        /// Break up the message into parts no larger than the default max message size (256K).
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
         public static IList<string> BreakupMessage(string message)
+        {
+            return BreakupMessage(message, MAX_MESSAGE_SIZE_IN_BYTES);
+        }
+
+        /// <summary>
+        /// Break up the message into parts no larger than <paramref name="maxMessageSizeInBytes"/> UTF-8 bytes.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="maxMessageSizeInBytes">Maximum size in UTF-8 bytes of each returned part.</param>
+        /// <returns></returns>
+        public static IList<string> BreakupMessage(string message, int maxMessageSizeInBytes)
         {
             var parts = new List<string>();
 
             var singleCharArray = new char[1];
             var encoding = Encoding.UTF8;
             int byteCount = 0;
-            var sb = new StringBuilder(MAX_MESSAGE_SIZE_IN_BYTES);
+            var sb = new StringBuilder(maxMessageSizeInBytes);
             foreach (var c in message)
             {
                 singleCharArray[0] = c;
@@ -604,7 +619,7 @@ namespace AWS.Logger.Core
                 sb.Append(c);
 
                 // This could go a couple bytes
-                if (byteCount > MAX_MESSAGE_SIZE_IN_BYTES)
+                if (byteCount > maxMessageSizeInBytes)
                 {
                     parts.Add(sb.ToString());
                     sb.Clear();
