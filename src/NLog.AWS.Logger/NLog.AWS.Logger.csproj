@@ -11,8 +11,6 @@
         <PackageIcon>icon.png</PackageIcon>
         <PackageProjectUrl>https://github.com/aws/aws-logging-dotnet</PackageProjectUrl>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
-        <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>https://github.com/aws/aws-logging-dotnet.git</RepositoryUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
@@ -22,11 +20,6 @@
         <SignAssembly>True</SignAssembly>
         <AssemblyOriginatorKeyFile>..\..\public.snk</AssemblyOriginatorKeyFile>
         
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-
         <Version>5.0.1</Version>
     </PropertyGroup>
     
@@ -46,7 +39,6 @@
     
     <ItemGroup>
         <PackageReference Include="NLog" Version="5.2.2" />
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     </ItemGroup>
 
 </Project>

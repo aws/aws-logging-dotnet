@@ -1,0 +1,32 @@
+<Project>
+
+    <!--
+      Shared Source Link / deterministic-build settings for the packable projects under src/.
+      Scoped to src/ (not the repo root) so it does not apply to test/ or samples/ projects.
+      Keep project-specific metadata (Version, Description, PackageTags, etc.) in each .csproj.
+    -->
+    <PropertyGroup>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/aws/aws-logging-dotnet.git</RepositoryUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <Deterministic>true</Deterministic>
+        <ContinuousIntegrationBuild Condition="'$(CI)' == 'true' or '$(TF_BUILD)' == 'true' or '$(CODEBUILD_BUILD_ID)' != ''">true</ContinuousIntegrationBuild>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
+    </ItemGroup>
+
+    <!--
+      AWS release pipelines pack from a source archive without a .git directory, so SourceLink
+      emits nothing unless SourceRoot is set explicitly. Guarded on SourceRevisionId so local
+      dev builds are unaffected.
+    -->
+    <ItemGroup Condition="'$(SourceRevisionId)' != ''">
+        <SourceRoot Include="$(MSBuildThisFileDirectory)" SourceControl="git" RepositoryUrl="$(RepositoryUrl)" RevisionId="$(SourceRevisionId)" />
+    </ItemGroup>
+
+</Project>

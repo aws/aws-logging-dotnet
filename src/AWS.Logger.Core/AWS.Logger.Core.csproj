@@ -10,8 +10,6 @@
         <PackageIcon>icon.png</PackageIcon>
         <PackageProjectUrl>https://github.com/aws/aws-logging-dotnet</PackageProjectUrl>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
-        <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>https://github.com/aws/aws-logging-dotnet.git</RepositoryUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
@@ -21,11 +19,6 @@
         <SignAssembly>True</SignAssembly>
         <DelaySign>False</DelaySign>
         <AssemblyOriginatorKeyFile>..\..\public.snk</AssemblyOriginatorKeyFile>
-        
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         
         <Version>4.0.3</Version>
     </PropertyGroup>
@@ -42,7 +35,6 @@
     
     <ItemGroup>
         <PackageReference Include="AWSSDK.CloudWatchLogs" Version="4.0.13.3" />
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     </ItemGroup>
 
 </Project>
