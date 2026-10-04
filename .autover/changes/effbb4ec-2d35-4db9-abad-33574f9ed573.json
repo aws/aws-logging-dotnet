@@ -1,0 +1,11 @@
+{
+  "Projects": [
+    {
+      "Name": "AWS.Logger.Core",
+      "Type": "Patch",
+      "ChangelogMessages": [
+        "Fix PutLogEvents batch-size accounting to use real UTF-8 byte counts plus the 26-byte-per-event CloudWatch overhead, and enforce the 1,048,576-byte and 10,000-event per-batch service limits. Previously batch size was estimated with Encoding.Unicode.GetMaxByteCount (roughly 2x the real UTF-8 size for ASCII/JSON payloads), so bursts were split into about twice as many PutLogEvents calls as necessary."
+      ]
+    }
+  ]
+}
