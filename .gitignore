@@ -22,6 +22,8 @@
 **/Deployment/
 /src/AWS.Logger.Core/AWS.Logger.Core45.nuget.props
 *.props
+# Shared build props must be tracked despite the blanket *.props ignore above
+!src/Directory.Build.props
 
 # JetBrains Rider
 .idea/
